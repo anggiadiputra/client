@@ -1,0 +1,93 @@
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { ChevronLeft, MessageCircle, Clock, CheckCircle, XCircle, User, FileText, Send } from 'lucide-react';
+import { whatsappAPI } from '../lib/api';
+
+export default function WhatsAppLogDetailPage() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [log, setLog] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchLog();
+  }, [id]);
+
+  const fetchLog = async () => {
+    if (!id) return;
+    try {
+      const data = await whatsappAPI.getById(id);
+      setLog(data);
+    } catch (error) {
+      console.error('Error fetching log:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) return <div className="p-8 text-center">Memuat...</div>;
+  if (!log) return <div className="p-8 text-center">Log tidak ditemukan.</div>;
+
+  return (
+    <div className="p-8 bg-gray-50 min-h-screen">
+      <button onClick={() => navigate('/logs/whatsapp')} className="flex items-center gap-2 text-gray-600 mb-8 hover:text-gray-900">
+        <ChevronLeft size={20} /> Kembali
+      </button>
+
+      <div className="max-w-3xl bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
+        <div className="flex items-center gap-4 mb-8">
+          <div className="bg-green-500 p-3 rounded-2xl text-white">
+            <MessageCircle size={32} />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">WhatsApp Log Detail</h1>
+            <p className="text-gray-500">ID Log: #{log.id}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+          <div className="space-y-6">
+            <div>
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-1">Penerima</label>
+              <div className="flex items-center gap-2 text-gray-900 font-bold">
+                <User size={18} className="text-gray-400" />
+                {log.customer_name || 'Pelanggan'} ({log.target})
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-1">Status</label>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-700 font-bold text-sm">
+                <CheckCircle size={16} /> {log.status.toUpperCase()}
+              </div>
+            </div>
+          </div>
+          <div className="space-y-6">
+            <div>
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-1">Waktu Kirim</label>
+              <div className="flex items-center gap-2 text-gray-900 font-medium">
+                <Clock size={18} className="text-gray-400" />
+                {new Date(log.sent_at).toLocaleString('id-ID')}
+              </div>
+            </div>
+            {log.invoice_number && (
+              <div>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-1">Invoice Terkait</label>
+                <div className="flex items-center gap-2 text-blue-600 font-bold">
+                  <FileText size={18} />
+                  #{log.invoice_number}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-3">Pesan Dikirim</label>
+          <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 whitespace-pre-wrap text-gray-700 font-medium text-sm leading-relaxed">
+            {log.message || '(Pesan tidak tersimpan dalam log database)'}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
