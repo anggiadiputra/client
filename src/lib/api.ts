@@ -4,13 +4,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 const getOptions = async (): Promise<RequestInit> => {
   const token = await getJWTToken();
-  if (token) {
-    if (token.length > 50) {
-      console.log(`[API] Sending token (RS256/Neon): ${token.substring(0, 10)}...`);
-    } else {
-      console.log(`[API] Sending token (HS256/Local): ${token.substring(0, 10)}...`);
-    }
-  } else {
+  if (!token) {
     console.warn('[API] No token found! Request will likely fail with 401.');
   }
 
