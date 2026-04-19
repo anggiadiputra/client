@@ -11,7 +11,7 @@ interface AppContextType {
 }
 
 const defaultSettings: AppSettings = {
-  appName: 'Invoizes',
+  appName: 'Invoizes - Pro Billing System',
   logoUrl: undefined,
   turnstileSiteKey: undefined,
 };
