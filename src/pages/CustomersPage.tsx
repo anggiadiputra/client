@@ -1,10 +1,13 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Trash2, Edit2, Plus, Eye, X, CheckCircle, XCircle, Loader2, ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { Trash2, Edit2, Plus, Eye, X, CheckCircle, XCircle, Loader2, ChevronLeft, ChevronRight, Search, Phone, MapPin, Mail } from 'lucide-react';
 import { customersAPI, whatsappAPI } from '../lib/api';
 import { toTitleCase } from '../lib/formatter';
 import RegionSelect from '../components/RegionSelect';
 import { SkeletonTable } from '../components/LoadingSkeleton';
 import KeyboardShortcutWrapper from '../components/KeyboardShortcutWrapper';
+import DropdownFilter from '../components/DropdownFilter';
+import CompactBatchActions from '../components/CompactBatchActions';
+import { CheckSquare, Square } from 'lucide-react';
 
 import { Customer } from '../types';
 
@@ -17,20 +20,23 @@ export default function CustomersPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-  
+
   // Pagination & Layout states
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [statusFilter, setStatusFilter] = useState('');
+  const [isBatchLoading, setIsBatchLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const LIMIT = 15;
-  
+
   // WhatsApp validation states
   const [validatingPhone, setValidatingPhone] = useState(false);
   const [phoneValidation, setPhoneValidation] = useState<{
     isRegistered: boolean;
     message: string;
   } | null>(null);
-  
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -46,25 +52,26 @@ export default function CustomersPage() {
     regency_name: '',
     district_name: '',
     village_name: '',
+    status: 'active',
   });
 
   useEffect(() => {
-    fetchCustomers(page, searchTerm);
-  }, [page]);
+    fetchCustomers(page, searchTerm, statusFilter);
+  }, [page, statusFilter]);
 
   // Debounce search: reset to page 1 and refetch when searchTerm changes
   useEffect(() => {
     const timer = setTimeout(() => {
       setPage(1);
-      fetchCustomers(1, searchTerm);
+      fetchCustomers(1, searchTerm, statusFilter);
     }, 400);
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  const fetchCustomers = useCallback(async (currentPage = page, search = searchTerm) => {
+  const fetchCustomers = useCallback(async (currentPage = page, search = searchTerm, status = statusFilter) => {
     setLoading(true);
     try {
-      const json = await customersAPI.getAll(currentPage, LIMIT, search);
+      const json = await customersAPI.getAll(currentPage, LIMIT, search, status);
       // Backend returns { data, pagination } when page/limit provided
       if (json.pagination) {
         setCustomers(json.data);
@@ -85,7 +92,7 @@ export default function CustomersPage() {
     e.preventDefault();
     setError('');
     setSaving(true);
-    
+
     try {
       const customerData = {
         name: formData.name,
@@ -110,7 +117,7 @@ export default function CustomersPage() {
       } else if (modalMode === 'edit' && selectedCustomer) {
         await customersAPI.update(selectedCustomer.id, customerData);
       }
-      
+
       resetForm();
       fetchCustomers(page, searchTerm);
     } catch (error: any) {
@@ -141,6 +148,35 @@ export default function CustomersPage() {
     setShowModal(false);
     setSelectedCustomer(null);
     setError('');
+  };
+
+  const handleBatchDelete = async () => {
+    if (!confirm(`Apakah Anda yakin ingin menghapus ${selectedIds.length} customer?`)) return;
+    setIsBatchLoading(true);
+    try {
+      await customersAPI.batchDelete(selectedIds);
+      setSelectedIds([]);
+      fetchCustomers(page, searchTerm, statusFilter);
+    } catch (error: any) {
+      console.error('Error batch deleting:', error);
+      setError(error.message || 'Gagal menghapus beberapa customer');
+    } finally {
+      setIsBatchLoading(false);
+    }
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === customers.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(customers.map(c => c.id));
+    }
+  };
+
+  const toggleSelect = (id: number) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
   };
 
   const handleEdit = (customer: Customer) => {
@@ -207,7 +243,7 @@ export default function CustomersPage() {
 
     try {
       const result = await whatsappAPI.validateNumber(formData.phone, '62');
-      
+
       setPhoneValidation({
         isRegistered: result.isRegistered,
         message: result.message,
@@ -237,7 +273,7 @@ export default function CustomersPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-      
+
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
@@ -255,16 +291,34 @@ export default function CustomersPage() {
 
       {/* Toolbar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-        <div className="relative w-full md:max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-          <input
-            type="text"
-            placeholder="Search by name or email..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+        <div className="flex flex-1 items-center gap-3">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+            <input
+              type="text"
+              placeholder="Cari nama atau email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-gray-400"
+            />
+          </div>
+          <DropdownFilter
+            value={statusFilter}
+            onChange={setStatusFilter}
+            options={[
+              { label: 'Active', value: 'active' },
+              { label: 'Inactive', value: 'inactive' },
+            ]}
           />
         </div>
+
+        <CompactBatchActions
+          selectedCount={selectedIds.length}
+          onDelete={handleBatchDelete}
+          onClear={() => setSelectedIds([])}
+          isLoading={isBatchLoading}
+        />
+
         {!loading && (
           <span className="text-xs text-gray-400 whitespace-nowrap">{totalItems} customers</span>
         )}
@@ -276,88 +330,139 @@ export default function CustomersPage() {
           <SkeletonTable rows={10} columns={5} />
         ) : (
           <>
-          <div className="overflow-x-auto hidden md:block">
-            <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Contact Info</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden xl:table-cell">Address</th>
-                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
+            <div className="overflow-x-auto hidden md:block">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="w-10 px-6 py-3">
+                      <button 
+                        onClick={toggleSelectAll}
+                        className="text-gray-400 hover:text-blue-600 transition-colors"
+                      >
+                        {selectedIds.length > 0 && selectedIds.length === customers.length ? (
+                          <CheckSquare size={18} className="text-blue-600" />
+                        ) : (
+                          <Square size={18} />
+                        )}
+                      </button>
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Contact Info</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden xl:table-cell">Address</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {customers.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                        {searchTerm || statusFilter ? 'No customers match your filters' : 'No customers yet'}
+                      </td>
+                    </tr>
+                  ) : (
+                    customers.map((customer) => (
+                      <tr key={customer.id} className={`hover:bg-gray-50 transition-colors ${selectedIds.includes(customer.id) ? 'bg-blue-50/50' : ''}`}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <button 
+                            onClick={() => toggleSelect(customer.id)}
+                            className="text-gray-400 hover:text-blue-600 transition-colors"
+                          >
+                            {selectedIds.includes(customer.id) ? (
+                              <CheckSquare size={18} className="text-blue-600" />
+                            ) : (
+                              <Square size={18} />
+                            )}
+                          </button>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap hidden lg:table-cell">
+                          <div className="flex flex-col">
+                            <span className="text-sm text-gray-700">{customer.email || '-'}</span>
+                            <span className="text-xs text-gray-400">{customer.phone || '-'}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 hidden xl:table-cell">
+                          <div className="text-xs text-gray-500 max-w-xs line-clamp-2">{getFullAddress(customer)}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                            (customer.status || 'active') === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          }`}>
+                            {customer.status || 'active'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <button onClick={() => handleView(customer)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View"><Eye size={16} /></button>
+                            <button onClick={() => handleEdit(customer)} className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Edit"><Edit2 size={16} /></button>
+                            <button onClick={() => handleDelete(customer.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete"><Trash2 size={16} /></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile View (Cards) */}
+            <div className="md:hidden divide-y divide-gray-100">
               {customers.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
-                    {searchTerm ? 'No customers found' : 'No customers yet'}
-                  </td>
-                </tr>
+                <div className="px-6 py-12 text-center text-gray-500">
+                  {searchTerm || statusFilter ? 'No customers match your filters' : 'No customers yet'}
+                </div>
               ) : (
                 customers.map((customer) => (
-                  <tr key={customer.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{customer.name}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap hidden lg:table-cell">
-                      <div className="flex flex-col">
-                        <span className="text-sm text-gray-700">{customer.email || '-'}</span>
-                        <span className="text-xs text-gray-400">{customer.phone || '-'}</span>
+                  <div key={customer.id} className={`p-4 bg-white rounded-xl shadow-sm border border-gray-100 mb-3 mx-2 hover:shadow-md transition-all ${selectedIds.includes(customer.id) ? 'bg-blue-50/50 border-blue-200 ring-1 ring-blue-100' : ''}`}>
+                    <div className="flex items-start gap-3">
+                      <button 
+                        onClick={() => toggleSelect(customer.id)}
+                        className="mt-1 text-gray-400 hover:text-blue-600 transition-colors"
+                      >
+                        {selectedIds.includes(customer.id) ? (
+                          <CheckSquare size={20} className="text-blue-600" />
+                        ) : (
+                          <Square size={20} />
+                        )}
+                      </button>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h3 className="text-sm font-extrabold text-gray-900 tracking-tight">{customer.name}</h3>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <Mail size={12} className="text-gray-400" />
+                              <p className="text-xs text-gray-500">{customer.email || 'No email'}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-lg">
+                            <button onClick={() => handleView(customer)} className="p-1.5 text-blue-600 hover:bg-white hover:shadow-sm rounded-md transition-all" title="View"><Eye size={14} /></button>
+                            <button onClick={() => handleEdit(customer)} className="p-1.5 text-amber-600 hover:bg-white hover:shadow-sm rounded-md transition-all" title="Edit"><Edit2 size={14} /></button>
+                            <button onClick={() => handleDelete(customer.id)} className="p-1.5 text-red-600 hover:bg-white hover:shadow-sm rounded-md transition-all" title="Delete"><Trash2 size={14} /></button>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2 border-t border-gray-50 pt-3">
+                          {customer.phone && (
+                            <div className="flex items-center gap-2.5 text-xs text-gray-600">
+                              <div className="w-5 h-5 bg-green-50 rounded flex items-center justify-center shrink-0">
+                                <Phone size={10} className="text-green-600" />
+                              </div>
+                              <span className="font-medium">{customer.phone}</span>
+                            </div>
+                          )}
+                          <div className="flex items-start gap-2.5 text-[11px] text-gray-500 leading-relaxed">
+                            <div className="w-5 h-5 bg-blue-50 rounded flex items-center justify-center shrink-0 mt-0.5">
+                              <MapPin size={10} className="text-blue-600" />
+                            </div>
+                            <span className="line-clamp-2">{getFullAddress(customer)}</span>
+                          </div>
+                        </div>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 hidden xl:table-cell">
-                      <div className="text-xs text-gray-500 max-w-xs line-clamp-2">{getFullAddress(customer)}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button onClick={() => handleView(customer)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View"><Eye size={16} /></button>
-                        <button onClick={() => handleEdit(customer)} className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Edit"><Edit2 size={16} /></button>
-                        <button onClick={() => handleDelete(customer.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete"><Trash2 size={16} /></button>
-                      </div>
-                    </td>
-                  </tr>
+                    </div>
+                  </div>
                 ))
               )}
-            </tbody>
-          </table>
-          </div>
-
-          {/* Mobile View (Cards) */}
-          <div className="md:hidden divide-y divide-gray-100">
-            {customers.length === 0 ? (
-              <div className="px-6 py-12 text-center text-gray-500">
-                {searchTerm ? 'No customers found' : 'No customers yet'}
-              </div>
-            ) : (
-              customers.map((customer) => (
-                <div key={customer.id} className="p-4 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <h3 className="text-sm font-bold text-gray-900">{customer.name}</h3>
-                      <p className="text-xs text-gray-500 mt-0.5">{customer.email || 'No email'}</p>
-                    </div>
-                    <div className="flex items-center gap-1">
-                       <button onClick={() => handleView(customer)} className="p-2 text-blue-600 bg-blue-50 rounded-lg" title="View"><Eye size={16} /></button>
-                       <button onClick={() => handleEdit(customer)} className="p-2 text-amber-600 bg-amber-50 rounded-lg" title="Edit"><Edit2 size={16} /></button>
-                       <button onClick={() => handleDelete(customer.id)} className="p-2 text-red-600 bg-red-50 rounded-lg" title="Delete"><Trash2 size={16} /></button>
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    {customer.phone && (
-                      <div className="flex items-center gap-2 text-xs text-gray-600">
-                        <span className="font-semibold text-gray-400">WA:</span>
-                        {customer.phone}
-                      </div>
-                    )}
-                    <div className="flex items-start gap-2 text-[11px] text-gray-500 leading-relaxed">
-                       <span className="font-semibold text-gray-400 mt-0.5 whitespace-nowrap">Alamat:</span>
-                       <span className="line-clamp-2">{getFullAddress(customer)}</span>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+            </div>
           </>
         )}
       </div>
@@ -379,9 +484,8 @@ export default function CustomersPage() {
               const p = start + i;
               return (
                 <button key={p} onClick={() => { setPage(p); fetchCustomers(p, searchTerm); }}
-                  className={`w-8 h-8 text-sm rounded-lg transition-colors ${
-                    p === page ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-50 border border-gray-200'
-                  }`}>{p}</button>
+                  className={`w-8 h-8 text-sm rounded-lg transition-colors ${p === page ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-50 border border-gray-200'
+                    }`}>{p}</button>
               );
             })}
             <button
@@ -403,9 +507,9 @@ export default function CustomersPage() {
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
               <div>
                 <h2 className="text-lg font-bold text-gray-900">
-                    {modalMode === 'create' && 'Add Customer'}
-                    {modalMode === 'edit' && 'Edit Customer'}
-                    {modalMode === 'view' && 'Customer Details'}
+                  {modalMode === 'create' && 'Add Customer'}
+                  {modalMode === 'edit' && 'Edit Customer'}
+                  {modalMode === 'view' && 'Customer Details'}
                 </h2>
                 <p className="text-sm text-gray-500">Complete the information below</p>
               </div>
@@ -444,11 +548,11 @@ export default function CustomersPage() {
                     {error}
                   </p>
                 )}
-                
+
                 {/* Personal Information */}
                 <div className="space-y-4">
                   <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Personal Information</h3>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div className="col-span-2 md:col-span-1">
                       <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -498,11 +602,10 @@ export default function CustomersPage() {
                         )}
                       </div>
                       {phoneValidation && (
-                        <div className={`mt-1.5 flex items-center gap-1.5 text-xs font-medium ${
-                          phoneValidation.isRegistered
+                        <div className={`mt-1.5 flex items-center gap-1.5 text-xs font-medium ${phoneValidation.isRegistered
                             ? 'text-green-600'
                             : 'text-red-600'
-                        }`}>
+                          }`}>
                           {phoneValidation.isRegistered ? (
                             <>
                               <CheckCircle size={12} />
@@ -527,13 +630,24 @@ export default function CustomersPage() {
                         placeholder="12345"
                       />
                     </div>
+                    <div className="col-span-2 md:col-span-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Status</label>
+                      <select
+                        value={formData.status}
+                        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                        className="w-full pl-4 pr-10 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition appearance-none bg-white"
+                      >
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
 
                 {/* Address Information */}
                 <div className="space-y-4">
                   <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Address Details</h3>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
                       Street Address <span className="text-red-500">*</span>
@@ -551,14 +665,14 @@ export default function CustomersPage() {
                   {/* Region Selector */}
                   <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4">
                     <RegionSelect
-                        provinceId={formData.province_id}
-                        regencyId={formData.regency_id}
-                        districtId={formData.district_id}
-                        villageId={formData.village_id}
-                        onProvinceChange={(id, name) => setFormData({ ...formData, province_id: id, province_name: name })}
-                        onRegencyChange={(id, name) => setFormData({ ...formData, regency_id: id, regency_name: name })}
-                        onDistrictChange={(id, name) => setFormData({ ...formData, district_id: id, district_name: name })}
-                        onVillageChange={(id, name) => setFormData({ ...formData, village_id: id, village_name: name })}
+                      provinceId={formData.province_id}
+                      regencyId={formData.regency_id}
+                      districtId={formData.district_id}
+                      villageId={formData.village_id}
+                      onProvinceChange={(id, name) => setFormData({ ...formData, province_id: id, province_name: name })}
+                      onRegencyChange={(id, name) => setFormData({ ...formData, regency_id: id, regency_name: name })}
+                      onDistrictChange={(id, name) => setFormData({ ...formData, district_id: id, district_name: name })}
+                      onVillageChange={(id, name) => setFormData({ ...formData, village_id: id, village_name: name })}
                     />
                   </div>
 

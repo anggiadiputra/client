@@ -99,8 +99,47 @@ export default function TemplatesPage() {
 
   if (loading) {
     return (
-      <div className="p-8 flex justify-center items-center min-h-screen">
-        <Loader2 className="animate-spin text-blue-600" size={48} />
+      <div className="max-w-7xl mx-auto px-6 py-8 animate-pulse">
+        {/* Header Skeleton */}
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-2">
+            <div className="h-8 bg-gray-200 rounded-lg w-32"></div>
+            <div className="h-4 bg-gray-100 rounded-lg w-64"></div>
+          </div>
+          <div className="h-10 bg-gray-200 rounded-lg w-40"></div>
+        </div>
+
+        {/* Tabs Skeleton */}
+        <div className="flex border-b border-gray-200 mb-6 pb-px">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="px-6 py-3 border-b-2 border-transparent">
+              <div className="h-5 bg-gray-200 rounded w-24"></div>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* WhatsApp & Email Skeletal Cards */}
+          {[1, 2].map((i) => (
+            <div key={i} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div className="p-4 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+                <div className="h-5 bg-gray-200 rounded w-32"></div>
+                <div className="h-8 bg-gray-200 rounded w-16 md:hidden lg:block"></div>
+              </div>
+              <div className="p-4 sm:p-6 space-y-4">
+                <div className="h-64 bg-gray-50 border border-gray-100 rounded-lg w-full"></div>
+                <div className="p-4 bg-gray-50 rounded-lg space-y-3">
+                  <div className="h-3 bg-gray-200 rounded w-28"></div>
+                  <div className="flex flex-wrap gap-2">
+                    {[1, 2, 3, 4, 5, 6].map((j) => (
+                      <div key={j} className="h-6 bg-white border border-gray-200 rounded w-20"></div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -122,7 +161,7 @@ export default function TemplatesPage() {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Templates</h1>
@@ -184,14 +223,14 @@ export default function TemplatesPage() {
               placeholder="Type WhatsApp message..."
             />
             
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-              <p className="text-xs font-bold text-gray-500 uppercase mb-3 tracking-wider">Available Variables</p>
-              <div className="flex flex-wrap gap-2">
+            <div className="mt-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
+              <p className="text-[10px] font-bold text-gray-500 uppercase mb-3 tracking-wider">Available Variables</p>
+              <div className="flex flex-wrap gap-1.5 sm:gap-2">
                 {variables.map((v) => (
                   <button
                     key={v}
                     onClick={() => insertVariable('wa', v)}
-                    className="px-2 py-1 bg-white border border-gray-200 text-xs font-mono rounded-md hover:border-blue-500 transition-colors shadow-sm"
+                    className="px-2 py-1 bg-white border border-gray-200 text-[10px] sm:text-xs font-mono rounded-md hover:border-blue-500 transition-colors shadow-sm whitespace-nowrap"
                   >
                     {v}
                   </button>
@@ -203,13 +242,13 @@ export default function TemplatesPage() {
 
         {/* Email */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="p-4 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+          <div className="p-4 bg-gray-50 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Mail size={18} className="text-gray-500" />
               <h2 className="font-bold text-gray-700">Email Template (HTML)</h2>
             </div>
             
-            <div className="flex border border-gray-200 rounded-md overflow-hidden bg-white">
+            <div className="flex border border-gray-200 rounded-md overflow-hidden bg-white w-fit self-end sm:self-auto">
               <button
                 onClick={() => setEmailViewMode('code')}
                 className={`p-1.5 transition-colors ${emailViewMode === 'code' ? 'bg-blue-50 text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}
@@ -235,14 +274,14 @@ export default function TemplatesPage() {
                   placeholder="Type HTML email body..."
                 />
                 
-                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                  <p className="text-xs font-bold text-gray-500 uppercase mb-3 tracking-wider">Available Variables</p>
-                  <div className="flex flex-wrap gap-2">
+                <div className="mt-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
+                  <p className="text-[10px] font-bold text-gray-500 uppercase mb-3 tracking-wider">Available Variables</p>
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
                     {variables.map((v) => (
                       <button
                         key={v}
                         onClick={() => insertVariable('email', v)}
-                        className="px-2 py-1 bg-white border border-gray-200 text-xs font-mono rounded-md hover:border-blue-500 transition-colors shadow-sm"
+                        className="px-2 py-1 bg-white border border-gray-200 text-[10px] sm:text-xs font-mono rounded-md hover:border-blue-500 transition-colors shadow-sm whitespace-nowrap"
                       >
                         {v}
                       </button>

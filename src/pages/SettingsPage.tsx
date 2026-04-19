@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import { CheckCircle, XCircle, Loader2, ExternalLink, HardDrive, Mail, Edit, Plus, Trash2, Star, Palette } from 'lucide-react';
+import { 
+  CheckCircle, XCircle, Loader2, ExternalLink, HardDrive, Mail, Edit, Plus, Trash2, Star, Palette,
+  MessageSquare, Monitor
+} from 'lucide-react';
 import { settingsAPI, bankAccountsAPI, whatsappAPI } from '../lib/api';
 import { useAppSettings } from '../context/AppContext';
 
 export default function SettingsPage() {
-  const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const { updateSettings, userRole } = useAppSettings();
 
@@ -47,6 +49,12 @@ export default function SettingsPage() {
   const [smtpStatus, setSmtpStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [smtpMessage, setSmtpMessage] = useState('');
 
+  // Template states
+  const [editingTemplates, setEditingTemplates] = useState(false);
+  const [savingTemplates, setSavingTemplates] = useState(false);
+  const [templatesStatus, setTemplatesStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [templatesMessage, setTemplatesMessage] = useState('');
+
   // Bank accounts states
   const [bankAccounts, setBankAccounts] = useState<any[]>([]);
   const [showBankForm, setShowBankForm] = useState(false);
@@ -71,6 +79,8 @@ export default function SettingsPage() {
     fonnte_test_target: '',
     fonnte_test_message: '',
     wa_invoice_template: '',
+    wa_paid_template: '',
+    wa_reminder_template: '',
     s3_endpoint: '',
     s3_bucket_name: '',
     s3_region: '',
@@ -107,7 +117,10 @@ export default function SettingsPage() {
         turnstile_secret_key: data.turnstile_secret_key || '',
         fonnte_token: data.fonnte_token || '',
         fonnte_test_target: data.fonnte_test_target || '',
+        fonnte_test_message: data.fonnte_test_message || '',
         wa_invoice_template: data.wa_invoice_template || '',
+        wa_paid_template: data.wa_paid_template || '',
+        wa_reminder_template: data.wa_reminder_template || '',
         s3_endpoint: data.s3_endpoint || '',
         s3_bucket_name: data.s3_bucket_name || '',
         s3_region: data.s3_region || '',
@@ -125,7 +138,6 @@ export default function SettingsPage() {
         smtp_test_message: data.smtp_test_message || '',
         app_name: data.app_name || 'Invoice System',
       });
-      setSettings(data);
     } catch (error) {
       console.error('Error fetching settings:', error);
     } finally {
@@ -133,70 +145,54 @@ export default function SettingsPage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent, section: 'company' | 'turnstile' | 'all') => {
-    e.preventDefault();
-
-    if (section === 'company' && savingCompany) return;
-    if (section === 'turnstile' && savingTurnstile) return;
-
-    if (section === 'company') {
-      setSavingCompany(true);
-      try {
-        await settingsAPI.update({
-          company_name: formData.company_name,
-          company_email: formData.company_email,
-          company_phone: formData.company_phone,
-          company_address: formData.company_address,
-          company_logo: formData.company_logo,
-        });
-        setCompanyStatus('success');
-        setCompanyMessage('Informasi perusahaan berhasil disimpan!');
-        setTimeout(() => setCompanyStatus('idle'), 3000);
-      } catch (error: any) {
-        console.error('Error saving company settings:', error);
-        setCompanyStatus('error');
-        setCompanyMessage(error.message || 'Gagal menyimpan informasi perusahaan');
-        setTimeout(() => setCompanyStatus('idle'), 3000);
-      } finally {
-        setSavingCompany(false);
-      }
-    } else if (section === 'turnstile') {
-      setSavingTurnstile(true);
-      try {
-        await settingsAPI.updateSystem({
-          turnstile_site_key: formData.turnstile_site_key,
-          turnstile_secret_key: formData.turnstile_secret_key,
-        });
-        setTurnstileStatus('success');
-        setTurnstileMessage('Konfigurasi Turnstile berhasil disimpan!');
-        setTimeout(() => setTurnstileStatus('idle'), 3000);
-      } catch (error: any) {
-        console.error('Error saving turnstile settings:', error);
-        setTurnstileStatus('error');
-        setTurnstileMessage(error.message || 'Gagal menyimpan konfigurasi Turnstile');
-        setTimeout(() => setTurnstileStatus('idle'), 3000);
-      } finally {
-        setSavingTurnstile(false);
-      }
-    } else {
-      // Save all - exclude fonnte_test_target and app_name
-      setSavingCompany(true);
-      try {
-        const { fonnte_test_target, app_name, ...dataWithoutTestTarget } = formData;
-        await settingsAPI.update(dataWithoutTestTarget);
-        setCompanyStatus('success');
-        setCompanyMessage('Semua pengaturan berhasil disimpan!');
-        setTimeout(() => setCompanyStatus('idle'), 3000);
-      } catch (error: any) {
-        console.error('Error saving all settings:', error);
-        setCompanyStatus('error');
-        setCompanyMessage(error.message || 'Gagal menyimpan pengaturan');
-        setTimeout(() => setCompanyStatus('idle'), 3000);
-      } finally {
-        setSavingCompany(false);
-      }
+  const handleSaveTemplates = async () => {
+    setSavingTemplates(true);
+    setTemplatesStatus('idle');
+    try {
+      await settingsAPI.update({
+        wa_invoice_template: formData.wa_invoice_template,
+        wa_paid_template: formData.wa_paid_template,
+        wa_reminder_template: formData.wa_reminder_template,
+      });
+      
+      setTemplatesStatus('success');
+      setTemplatesMessage('Template pesan berhasil diperbarui!');
+      setEditingTemplates(false);
+      setTimeout(() => setTemplatesStatus('idle'), 3000);
+    } catch (error: any) {
+      console.error('Error saving templates:', error);
+      setTemplatesStatus('error');
+      setTemplatesMessage(error.message || 'Gagal memperbarui template');
+      setTimeout(() => setTemplatesStatus('idle'), 3000);
+    } finally {
+      setSavingTemplates(false);
     }
   };
+
+  const handleSaveGlobalTemplates = async () => {
+    setSavingTemplates(true);
+    setTemplatesStatus('idle');
+    try {
+      await settingsAPI.updateSystem({
+        wa_invoice_template: formData.wa_invoice_template,
+        wa_paid_template: formData.wa_paid_template,
+        wa_reminder_template: formData.wa_reminder_template,
+      });
+      
+      setTemplatesStatus('success');
+      setTemplatesMessage('Template default sistem berhasil diperbarui!');
+      setEditingTemplates(false);
+      setTimeout(() => setTemplatesStatus('idle'), 3000);
+    } catch (error: any) {
+      console.error('Error saving global templates:', error);
+      setTemplatesStatus('error');
+      setTemplatesMessage(error.message || 'Gagal memperbarui template sistem');
+      setTimeout(() => setTemplatesStatus('idle'), 3000);
+    } finally {
+      setSavingTemplates(false);
+    }
+  };
+
 
   const handleTestFonnteConnection = async () => {
     if (!formData.fonnte_token) {
@@ -290,6 +286,8 @@ export default function SettingsPage() {
         smtp_from_email: formData.smtp_from_email,
         smtp_from_name: formData.smtp_from_name,
         smtp_encryption: formData.smtp_encryption,
+        smtp_test_target: formData.smtp_test_target,
+        smtp_test_message: formData.smtp_test_message,
       });
       setEditingSmtp(false);
       setSmtpStatus('success');
@@ -349,8 +347,6 @@ export default function SettingsPage() {
     try {
       await settingsAPI.updateSystem({
         app_name: formData.app_name,
-        primary_color: formData.primary_color,
-        sidebar_color: formData.sidebar_color,
         company_logo: formData.company_logo,
       });
 
@@ -445,9 +441,51 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="p-8">
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="max-w-7xl mx-auto px-6 py-8 animate-pulse">
+        {/* Header Skeleton */}
+        <div className="mb-8">
+          <div className="h-8 bg-gray-200 rounded-lg w-48 mb-2"></div>
+          <div className="h-4 bg-gray-100 rounded-lg w-64"></div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* LEFT COLUMN */}
+          <div className="lg:col-span-4 space-y-6">
+            {/* 3 Small Cards Skeletons */}
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white rounded-lg border border-gray-200 p-5 space-y-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-gray-200 rounded"></div>
+                  <div className="h-4 bg-gray-200 rounded w-32"></div>
+                </div>
+                <div className="space-y-3">
+                  <div className="h-10 bg-gray-100 rounded-lg w-full"></div>
+                  <div className="h-3 bg-gray-50 rounded w-3/4"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* RIGHT COLUMN */}
+          <div className="lg:col-span-8 space-y-6">
+            {/* 2 Large Cards Skeletons */}
+            {[1, 2].map((i) => (
+              <div key={i} className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 bg-gray-200 rounded"></div>
+                  <div className="h-5 bg-gray-200 rounded w-40"></div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {[1, 2, 3, 4].map((j) => (
+                    <div key={j} className="space-y-2">
+                      <div className="h-3 bg-gray-200 rounded w-24"></div>
+                      <div className="h-10 bg-gray-100 rounded-lg w-full"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -924,7 +962,7 @@ export default function SettingsPage() {
                       e.preventDefault();
                       setSavingTurnstile(true);
                       try {
-                        await settingsAPI.update({
+                        await settingsAPI.updateSystem({
                           turnstile_site_key: formData.turnstile_site_key,
                           turnstile_secret_key: formData.turnstile_secret_key,
                         });
@@ -985,188 +1023,246 @@ export default function SettingsPage() {
                 </div>
               )}
             </div>
-          </div>
+            </div>
 
-          {/* Section 3: Fonnte WhatsApp Configuration */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-            <h2 className="text-sm font-semibold text-gray-900 mb-4">Fonnte WhatsApp Configuration</h2>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Fonnte Token
-                </label>
-                <input
-                  type="text"
-                  value={formData.fonnte_token}
-                  onChange={(e) => setFormData({ ...formData, fonnte_token: e.target.value })}
-                  disabled={!editingFonnte}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
-                  placeholder="Masukkan Fonnte Token Anda"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Dapatkan token dari{' '}
-                  <a
-                    href="https://fonnte.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-700 inline-flex items-center gap-1"
-                  >
-                    https://fonnte.com
-                    <ExternalLink size={12} />
-                  </a>
-                </p>
+            {/* Section 7: Fonnte WhatsApp Configuration (ADMIN ONLY) */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 mt-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Monitor size={16} className="text-blue-600" />
+                <h2 className="text-sm font-semibold text-gray-900">Fonnte WhatsApp Configuration</h2>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Nomor Test WhatsApp
-                </label>
-                <input
-                  type="tel"
-                  value={formData.fonnte_test_target}
-                  onChange={(e) => setFormData({ ...formData, fonnte_test_target: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="08xxxxxxxxxx atau 628xxxxxxxxxx"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Nomor WhatsApp yang akan digunakan untuk testing. Pesan test akan dikirim ke nomor ini.
-                </p>
-              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Fonnte Token
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.fonnte_token}
+                    onChange={(e) => setFormData({ ...formData, fonnte_token: e.target.value })}
+                    disabled={!editingFonnte}
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                    placeholder="Masukkan Fonnte Token Anda"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Pesan Test (Opsional)
-                </label>
-                <textarea
-                  value={formData.fonnte_test_message}
-                  onChange={(e) => setFormData({ ...formData, fonnte_test_message: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows={3}
-                  placeholder="Test message from Invoice System (kosongkan untuk default)"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Pesan yang akan dikirim saat Anda klik "Test Connection".
-                </p>
-              </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Nomor Test WhatsApp
+                    </label>
+                    <input
+                      type="tel"
+                      value={formData.fonnte_test_target}
+                      onChange={(e) => setFormData({ ...formData, fonnte_test_target: e.target.value })}
+                      disabled={!editingFonnte}
+                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500"
+                      placeholder="08xxxxxxxxxx"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Pesan Test
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.fonnte_test_message}
+                      onChange={(e) => setFormData({ ...formData, fonnte_test_message: e.target.value })}
+                      disabled={!editingFonnte}
+                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500"
+                      placeholder="Test message..."
+                    />
+                  </div>
+                </div>
 
-              {/* Edit/Save/Cancel/Test Buttons for Fonnte */}
-              <div className="flex items-start gap-4 flex-wrap">
-                {!editingFonnte ? (
+                <div className="flex items-center gap-3 pt-2">
+                  {!editingFonnte ? (
+                    <button
+                      type="button"
+                      onClick={() => setEditingFonnte(true)}
+                      className="flex items-center gap-1.5 border border-gray-300 hover:border-blue-500 hover:text-blue-600 text-gray-600 text-sm font-medium py-1.5 px-3 rounded-lg transition-colors bg-white"
+                    >
+                      <Edit size={14} />
+                      Edit
+                    </button>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          setSavingFonnte(true);
+                          try {
+                            await settingsAPI.updateSystem({ 
+                              fonnte_token: formData.fonnte_token,
+                              fonnte_test_target: formData.fonnte_test_target,
+                              fonnte_test_message: formData.fonnte_test_message
+                            });
+                            setEditingFonnte(false);
+                            setConnectionStatus('success');
+                            setConnectionMessage('Token berhasil disimpan!');
+                            setTimeout(() => setConnectionStatus('idle'), 3000);
+                          } catch (error) {
+                            setConnectionStatus('error');
+                            setConnectionMessage('Gagal menyimpan token');
+                          } finally {
+                            setSavingFonnte(false);
+                          }
+                        }}
+                        disabled={savingFonnte}
+                        className="bg-blue-600 text-white text-xs font-semibold py-1.5 px-3 rounded-lg hover:bg-blue-700 disabled:bg-blue-400 flex items-center gap-1"
+                      >
+                        {savingFonnte ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle size={12} />}
+                        Simpan
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingFonnte(false);
+                          fetchSettings();
+                        }}
+                        className="text-xs text-gray-500 hover:text-gray-700 font-medium"
+                      >
+                        Batal
+                      </button>
+                    </div>
+                  )}
+
                   <button
                     type="button"
-                    onClick={() => setEditingFonnte(true)}
-                    className="flex items-center gap-1.5 border border-gray-300 hover:border-blue-500 hover:text-blue-600 text-gray-600 text-sm font-medium py-1.5 px-3 rounded-lg transition-colors bg-white"
+                    onClick={handleTestFonnteConnection}
+                    disabled={testingFonnte || !formData.fonnte_token || !formData.fonnte_test_target}
+                    className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white text-sm font-semibold py-1.5 px-3 rounded-lg transition-colors ml-auto"
                   >
-                <ExternalLink size={14} />
-                    Edit
+                    {testingFonnte ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}
+                    Test Connection
                   </button>
-                ) : (
-                  <>
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        setSavingFonnte(true);
-                        setConnectionStatus('idle');
-                        setConnectionMessage('');
-                        try {
-                          await settingsAPI.updateSystem({ fonnte_token: formData.fonnte_token });
-                          setEditingFonnte(false);
-                          setConnectionStatus('success');
-                          setConnectionMessage('Token Fonnte berhasil disimpan!');
-                          setTimeout(() => {
-                            setConnectionStatus('idle');
-                            setConnectionMessage('');
-                          }, 3000);
-                        } catch (error) {
-                          console.error('Error saving fonnte token:', error);
-                          setConnectionStatus('error');
-                          setConnectionMessage('Gagal menyimpan token Fonnte');
-                          setTimeout(() => {
-                            setConnectionStatus('idle');
-                            setConnectionMessage('');
-                          }, 3000);
-                        } finally {
-                          setSavingFonnte(false);
-                        }
-                      }}
-                      disabled={savingFonnte}
-                      className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-semibold py-1.5 px-3 rounded-lg transition-colors"
-                    >
-                      {savingFonnte ? (
-                        <>
-                        <Loader2 size={14} className="animate-spin" />
-                          Menyimpan...
-                        </>
-                      ) : (
-                        <>
-                        <CheckCircle size={14} />
-                          Simpan
-                        </>
-                      )}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEditingFonnte(false);
-                        fetchSettings(); // Reset form to original values
-                      }}
-                      className="flex items-center gap-1.5 border border-gray-300 bg-white hover:bg-gray-50 text-gray-600 text-sm font-medium py-1.5 px-3 rounded-lg transition-colors"
-                    >
-                      Batal
-                    </button>
-                  </>
-                )}
-
-                <button
-                  type="button"
-                  onClick={handleTestFonnteConnection}
-                  disabled={testingFonnte || !formData.fonnte_token}
-                  className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white text-sm font-semibold py-1.5 px-3 rounded-lg transition-colors"
-                >
-                  {testingFonnte ? (
-                    <>
-                      <Loader2 size={18} className="animate-spin" />
-                      Testing...
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle size={18} />
-                      Test Connection
-                    </>
-                  )}
-                </button>
+                </div>
 
                 {connectionStatus !== 'idle' && (
-                  <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
-                    connectionStatus === 'success'
-                      ? 'bg-green-50 text-green-700 border border-green-200'
-                      : 'bg-red-50 text-red-700 border border-red-200'
+                  <div className={`text-xs px-3 py-2 rounded-lg ${
+                    connectionStatus === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
                   }`}>
-                    {connectionStatus === 'success' ? (
-                      <CheckCircle size={18} />
-                    ) : (
-                      <XCircle size={18} />
-                    )}
-                    <span className="text-sm font-medium">{connectionMessage}</span>
+                    {connectionMessage}
                   </div>
                 )}
               </div>
+            </div>
+            </>
+          )}
+        </div>
+        {/* RIGHT COLUMN */}
+        <div className="space-y-6">
+        {/* Section 6: WhatsApp Message Templates (ALL USERS except admin in Settings) */}
+        {userRole !== 'admin' && (
+          <>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <MessageSquare size={16} className="text-blue-600" />
+                <h2 className="text-sm font-semibold text-gray-900">Template Pesan WhatsApp</h2>
+              </div>
+              <div className="flex items-center gap-2">
+                {!editingTemplates ? (
+                  <button
+                    type="button"
+                    onClick={() => setEditingTemplates(true)}
+                    className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors"
+                  >
+                    <Edit size={16} />
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingTemplates(false);
+                        fetchSettings();
+                      }}
+                      className="text-xs text-gray-500 hover:text-gray-700 font-medium"
+                    >
+                      Batal
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSaveTemplates}
+                      disabled={savingTemplates}
+                      className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 disabled:bg-blue-400 font-semibold flex items-center gap-1"
+                    >
+                      {savingTemplates ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle size={12} />}
+                      Simpan
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
 
-              {connectionStatus === 'idle' && connectionMessage && (
-                <p className="text-sm text-gray-600">{connectionMessage}</p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                  Template Invoice Baru
+                </label>
+                <textarea
+                  value={formData.wa_invoice_template}
+                  onChange={(e) => setFormData({ ...formData, wa_invoice_template: e.target.value })}
+                  disabled={!editingTemplates}
+                  rows={4}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:bg-gray-50 disabled:text-gray-500"
+                  placeholder="Yth. {customer_name}, berikut invoice {invoice_number} sebesar {total_amount}..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                  Template Pelunasan (Paid)
+                </label>
+                <textarea
+                  value={formData.wa_paid_template}
+                  onChange={(e) => setFormData({ ...formData, wa_paid_template: e.target.value })}
+                  disabled={!editingTemplates}
+                  rows={4}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:bg-gray-50 disabled:text-gray-500"
+                  placeholder="Terima kasih {customer_name}, invoice {invoice_number} telah lunas..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                  Template Pengingat (Reminder)
+                </label>
+                <textarea
+                  value={formData.wa_reminder_template}
+                  onChange={(e) => setFormData({ ...formData, wa_reminder_template: e.target.value })}
+                  disabled={!editingTemplates}
+                  rows={4}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:bg-gray-50 disabled:text-gray-500"
+                  placeholder="Mengingatkan invoice {invoice_number} akan jatuh tempo pada {due_date}..."
+                />
+              </div>
+
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Variabel Tersedia</p>
+                <div className="flex flex-wrap gap-2">
+                  {['{customer_name}', '{company_name}', '{invoice_number}', '{issue_date}', '{due_date}', '{total_amount}', '{public_invoice_url}'].map(tag => (
+                    <span key={tag} className="text-[10px] bg-white border border-gray-200 text-gray-600 px-1.5 py-0.5 rounded font-mono">{tag}</span>
+                  ))}
+                </div>
+              </div>
+
+              {templatesStatus !== 'idle' && (
+                <div className={`text-xs px-3 py-2 rounded-lg ${
+                  templatesStatus === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+                }`}>
+                  {templatesStatus === 'success' ? '✔ ' : '✘ '}{templatesMessage}
+                </div>
               )}
             </div>
-          </div>
-        </>
-      )}
-    </div>
+          </>
+        )}
 
-        {/* RIGHT COLUMN - ADMIN ONLY */}
-        {userRole === 'admin' && (
-          <div className="space-y-6">
-          {/* Section 4: S3 Compatible Storage Configuration */}
+
+          {userRole === 'admin' && (
+            <div className="space-y-6">
+            {/* Section 4: S3 Compatible Storage Configuration */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
             <div className="flex items-center gap-2 mb-4">
               <HardDrive size={16} className="text-blue-600" />
@@ -1616,8 +1712,9 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
-      )}
+          )}
+        </div>
+      </div>
     </div>
-  </div>
-);
+  );
 }

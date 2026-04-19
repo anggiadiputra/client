@@ -299,7 +299,8 @@ export default function CreateInvoicePage() {
             </div>
 
             {/* Table Header */}
-            <div className="overflow-x-auto">
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
               <div className="min-w-[1000px]">
                 <div className="flex gap-3 bg-slate-700 text-white py-3 px-4 rounded-t-lg items-center">
                   <div className="flex-1 min-w-[150px] text-sm font-semibold">Layanan</div>
@@ -429,6 +430,111 @@ export default function CreateInvoicePage() {
                   ))}
                 </div>
               </div>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+              {items.map((item, index) => (
+                <div key={item.id} className="bg-gray-50 rounded-xl border border-gray-200 p-4 space-y-3 relative">
+                  <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Item #{index + 1}</span>
+                    {items.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeItem(item.id!)}
+                        className="text-red-500 hover:text-red-600 p-1"
+                      >
+                        Hapus
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="space-y-3 pt-1">
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Pilih Layanan</label>
+                      <select
+                        value={item.service_id || ''}
+                        onChange={(e) => updateItem(item.id!, 'service_id', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white"
+                      >
+                        <option value="">Pilih Layanan</option>
+                        {services.map((service) => (
+                          <option key={service.id} value={service.id}>
+                            {service.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Deskripsi</label>
+                      <textarea
+                        value={item.description}
+                        onChange={(e) => updateItem(item.id!, 'description', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white"
+                        rows={2}
+                        placeholder="Deskripsi..."
+                        required
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Qty {showUnit && `(${item.unit || 'Unit'})`}</label>
+                        <input
+                          type="number"
+                          value={item.quantity}
+                          onChange={(e) => updateItem(item.id!, 'quantity', parseFloat(e.target.value) || 0)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Harga Satuan</label>
+                        <input
+                          type="number"
+                          value={item.unit_price}
+                          onChange={(e) => updateItem(item.id!, 'unit_price', parseFloat(e.target.value) || 0)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-right"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    {(showDiscount || showTax) && (
+                      <div className="grid grid-cols-2 gap-3">
+                        {showDiscount && (
+                          <div>
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Diskon %</label>
+                            <input
+                              type="number"
+                              value={item.discount}
+                              onChange={(e) => updateItem(item.id!, 'discount', parseFloat(e.target.value) || 0)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-center"
+                            />
+                          </div>
+                        )}
+                        {showTax && (
+                          <div>
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Pajak %</label>
+                            <input
+                              type="number"
+                              value={item.tax_rate}
+                              onChange={(e) => updateItem(item.id!, 'tax_rate', parseFloat(e.target.value) || 0)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-center"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="flex justify-between items-center pt-2 mt-2 border-t border-dashed border-gray-300">
+                      <span className="text-sm font-bold text-gray-600">Subtotal</span>
+                      <span className="text-sm font-bold text-blue-600">{formatCurrency(calculateSubtotal(item))}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
 
             {/* Opsi Tambahan */}

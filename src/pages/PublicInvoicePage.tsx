@@ -15,6 +15,7 @@ export default function PublicInvoicePage() {
   const [services, setServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -92,6 +93,29 @@ export default function PublicInvoicePage() {
         useCORS: true,
         letterRendering: true,
         scrollY: 0,
+        onclone: (clonedDoc: Document) => {
+          // Exhaustive fix for oklch colors which crash html2canvas
+          const elements = clonedDoc.getElementsByTagName('*');
+          for (let i = 0; i < elements.length; i++) {
+            const el = elements[i] as HTMLElement;
+            const style = clonedDoc.defaultView?.getComputedStyle(el);
+            if (style) {
+              // Check ALL computed properties to ensure no oklch leaks through
+              for (let j = 0; j < style.length; j++) {
+                const prop = style[j];
+                const val = style.getPropertyValue(prop);
+                
+                if (val && (val.includes('oklch') || val.includes('var('))) {
+                  if (prop.includes('shadow')) {
+                    el.style.setProperty(prop, 'none', 'important');
+                  } else if (prop.includes('color') || prop === 'fill' || prop === 'stroke') {
+                    el.style.setProperty(prop, 'currentColor', 'important');
+                  }
+                }
+              }
+            }
+          }
+        }
       },
       jsPDF: { 
         unit: 'mm' as const, 
@@ -100,11 +124,32 @@ export default function PublicInvoicePage() {
       },
     };
 
+    const forceCleanup = () => {
+      // Emergency cleanup for html2canvas containers that might block the UI
+      const containers = document.querySelectorAll('.html2canvas-container');
+      containers.forEach(container => container.remove());
+      
+      const iframes = document.querySelectorAll('iframe[id^="html2canvas"]');
+      iframes.forEach(iframe => iframe.remove());
+    };
+ 
+    setIsDownloading(true);
     try {
-      await html2pdf().set(opt).from(element).save();
+      // Add a safety timeout to prevent permanent UI lockup
+      const pdfPromise = html2pdf().set(opt).from(element).save();
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('PDF generation timed out')), 30000)
+      );
+
+      await Promise.race([pdfPromise, timeoutPromise]);
     } catch (error) {
       console.error('Error generating PDF:', error);
-      alert('Failed to download PDF. Please try again.');
+      alert('Gagal mengunduh PDF. Silakan coba lagi.');
+      forceCleanup();
+    } finally {
+      setIsDownloading(false);
+      // Ensure cleanup runs even on success just in case
+      setTimeout(forceCleanup, 1000);
     }
   };
 
@@ -188,14 +233,6 @@ export default function PublicInvoicePage() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           {/* Invoice Content */}
           <div ref={invoiceRef} className="p-8 relative">
-            {/* Paid Stamp */}
-            {invoice.status === 'paid' && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 select-none overflow-visible">
-                <div className="-rotate-[20deg] border-[3px] border-emerald-500/10 text-emerald-500/10 text-7xl font-black px-12 py-4 rounded-xl uppercase tracking-[8px] whitespace-nowrap text-center">
-                  PAID
-                </div>
-              </div>
-            )}
             {/* Invoice Header */}
             <div className="flex justify-between items-start mb-8">
               {companySettings?.company_logo ? (
@@ -219,6 +256,9 @@ export default function PublicInvoicePage() {
                   <p><span className="inline-block w-24 text-left">Reference</span>: <span className="font-semibold text-gray-900">{invoice.invoice_number}</span></p>
                   <p><span className="inline-block w-24 text-left">Date</span>: <span className="font-semibold text-gray-900">{formatDate(invoice.issue_date)}</span></p>
                   <p><span className="inline-block w-24 text-left">Due Date</span>: <span className="font-semibold text-gray-900">{formatDate(invoice.due_date)}</span></p>
+                  {invoice.status === 'paid' && (
+                    <p><span className="inline-block w-24 text-left">Status</span>: <span className="font-bold text-emerald-600">PAID</span></p>
+                  )}
                   {invoice.expires_at && (
                     <p className="text-xs text-gray-500 mt-2">
                       Link valid until: {new Date(invoice.expires_at).toLocaleDateString('en-US', {
@@ -356,14 +396,19 @@ export default function PublicInvoicePage() {
             )}
           </div>
 
-          {/* Download Button */}
-          <div className="p-8 pt-0 flex justify-end">
+          {/* Download Button Area */}
+          <div className="bg-gray-50 border-t border-gray-100 p-6 flex justify-end items-center">
             <button
               onClick={handleDownloadPDF}
-              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg transition-colors text-sm"
+              disabled={isDownloading}
+              className={`flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-all text-sm shadow-sm ${isDownloading ? 'opacity-70 cursor-wait' : ''}`}
             >
-              <Download size={16} />
-              Download PDF
+              {isDownloading ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+              ) : (
+                <Download size={16} />
+              )}
+              {isDownloading ? 'Memproses PDF...' : 'Download PDF'}
             </button>
           </div>
         </div>

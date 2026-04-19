@@ -13,7 +13,7 @@ const getOptions = async (): Promise<RequestInit> => {
   } else {
     console.warn('[API] No token found! Request will likely fail with 401.');
   }
-  
+
   return {
     credentials: 'include',
     headers: {
@@ -25,11 +25,12 @@ const getOptions = async (): Promise<RequestInit> => {
 
 // Customers
 export const customersAPI = {
-  getAll: async (page?: number, limit?: number, search?: string) => {
+  getAll: async (page?: number, limit?: number, search?: string, status?: string) => {
     const params = new URLSearchParams();
     if (page) params.append('page', String(page));
     if (limit) params.append('limit', String(limit));
     if (search) params.append('search', search);
+    if (status) params.append('status', status);
 
     const queryString = params.toString() ? `?${params.toString()}` : '';
     const response = await fetch(`${API_URL}/customers${queryString}`, {
@@ -67,12 +68,29 @@ export const customersAPI = {
     if (!response.ok) throw new Error('Failed to delete customer');
     return response.json();
   },
+
+  batchDelete: async (ids: (number | string)[]) => {
+    const response = await fetch(`${API_URL}/customers/batch-delete`, {
+      method: 'POST',
+      ...(await getOptions()),
+      body: JSON.stringify({ ids }),
+    });
+    if (!response.ok) throw new Error('Failed to batch delete customers');
+    return response.json();
+  },
 };
 
 // Services
 export const servicesAPI = {
-  getAll: async () => {
-    const response = await fetch(`${API_URL}/services`, {
+  getAll: async (page?: number, limit?: number, search?: string, status?: string) => {
+    const params = new URLSearchParams();
+    if (page) params.append('page', String(page));
+    if (limit) params.append('limit', String(limit));
+    if (search) params.append('search', search);
+    if (status) params.append('status', status);
+
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    const response = await fetch(`${API_URL}/services${queryString}`, {
       ...(await getOptions()),
     });
     if (!response.ok) {
@@ -113,12 +131,29 @@ export const servicesAPI = {
     if (!response.ok) throw new Error('Failed to delete service');
     return response.json();
   },
+
+  batchDelete: async (ids: (number | string)[]) => {
+    const response = await fetch(`${API_URL}/services/batch-delete`, {
+      method: 'POST',
+      ...(await getOptions()),
+      body: JSON.stringify({ ids }),
+    });
+    if (!response.ok) throw new Error('Failed to batch delete services');
+    return response.json();
+  },
 };
 
 // Invoices
 export const invoicesAPI = {
-  getAll: async () => {
-    const response = await fetch(`${API_URL}/invoices`, {
+  getAll: async (page?: number, limit?: number, status?: string, search?: string) => {
+    const params = new URLSearchParams();
+    if (page) params.append('page', String(page));
+    if (limit) params.append('limit', String(limit));
+    if (status) params.append('status', status);
+    if (search) params.append('search', search);
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+
+    const response = await fetch(`${API_URL}/invoices${queryString}`, {
       ...(await getOptions()),
     });
     if (!response.ok) throw new Error('Failed to fetch invoices');
@@ -188,6 +223,26 @@ export const invoicesAPI = {
       body: JSON.stringify({ status }),
     });
     if (!response.ok) throw new Error('Failed to update invoice');
+    return response.json();
+  },
+
+  batchDelete: async (ids: (number | string)[]) => {
+    const response = await fetch(`${API_URL}/invoices/batch-delete`, {
+      method: 'POST',
+      ...(await getOptions()),
+      body: JSON.stringify({ ids }),
+    });
+    if (!response.ok) throw new Error('Failed to batch delete invoices');
+    return response.json();
+  },
+
+  batchUpdateStatus: async (ids: (number | string)[], status: string) => {
+    const response = await fetch(`${API_URL}/invoices/batch-status`, {
+      method: 'POST',
+      ...(await getOptions()),
+      body: JSON.stringify({ ids, status }),
+    });
+    if (!response.ok) throw new Error('Failed to batch update status');
     return response.json();
   },
 };
@@ -342,16 +397,16 @@ export const logsAPI = {
       fetch(`${API_URL}/fonnte/logs?limit=5`, { ...(await getOptions()) }),
       fetch(`${API_URL}/emails/logs?limit=5`, { ...(await getOptions()) })
     ]);
-    
+
     const waData = waRes.ok ? await waRes.json() : { logs: [] };
     const emailData = emailRes.ok ? await emailRes.json() : { logs: [] };
-    
+
     // Combine and sort by date
     const combined = [
       ...(waData.logs || []).map((l: any) => ({ ...l, type: 'whatsapp' })),
       ...(emailData.logs || []).map((l: any) => ({ ...l, type: 'email' }))
     ].sort((a, b) => new Date(b.sent_at).getTime() - new Date(a.sent_at).getTime());
-    
+
     return combined.slice(0, 10);
   }
 };
@@ -401,6 +456,16 @@ export const emailsAPI = {
     return response.json();
   },
 
+  batchDelete: async (ids: (number | string)[]) => {
+    const response = await fetch(`${API_URL}/emails/logs/batch-delete`, {
+      method: 'POST',
+      ...(await getOptions()),
+      body: JSON.stringify({ ids }),
+    });
+    if (!response.ok) throw new Error('Failed to batch delete email logs');
+    return response.json();
+  },
+
   sendInvoice: async (invoiceId: string | number) => {
     const response = await fetch(`${API_URL}/emails/send-invoice`, {
       method: 'POST',
@@ -430,6 +495,16 @@ export const whatsappAPI = {
       ...(await getOptions()),
     });
     if (!response.ok) throw new Error('Failed to fetch WhatsApp log details');
+    return response.json();
+  },
+
+  batchDelete: async (ids: (number | string)[]) => {
+    const response = await fetch(`${API_URL}/fonnte/logs/batch-delete`, {
+      method: 'POST',
+      ...(await getOptions()),
+      body: JSON.stringify({ ids }),
+    });
+    if (!response.ok) throw new Error('Failed to batch delete WhatsApp logs');
     return response.json();
   },
 
@@ -511,13 +586,58 @@ export const regionsAPI = {
 
 // Users (Admin Only)
 export const usersAPI = {
-  getAll: async () => {
-    const response = await fetch(`${API_URL}/users`, {
+  getAll: async (page?: number, limit?: number, search?: string, status?: string) => {
+    const params = new URLSearchParams();
+    if (page) params.append('page', String(page));
+    if (limit) params.append('limit', String(limit));
+    if (search) params.append('search', search);
+    if (status) params.append('status', status);
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+
+    const response = await fetch(`${API_URL}/users${queryString}`, {
       ...(await getOptions()),
     });
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.error || 'Failed to fetch users');
+    }
+    return response.json();
+  },
+
+  update: async (id: number | string, data: any) => {
+    const response = await fetch(`${API_URL}/users/${id}`, {
+      method: 'PUT',
+      ...(await getOptions()),
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to update user');
+    }
+    return response.json();
+  },
+
+  delete: async (id: number | string) => {
+    const response = await fetch(`${API_URL}/users/${id}`, {
+      method: 'DELETE',
+      ...(await getOptions()),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to delete user');
+    }
+    return response.json();
+  },
+
+  batchDelete: async (ids: (number | string)[]) => {
+    const response = await fetch(`${API_URL}/users/batch-delete`, {
+      method: 'POST',
+      ...(await getOptions()),
+      body: JSON.stringify({ ids }),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to batch delete users');
     }
     return response.json();
   },

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Edit, Download, Share2, Copy, Check, Mail } from 'lucide-react';
 import WhatsAppIcon from '../components/WhatsAppIcon';
 import SendWhatsAppModal from '../components/SendWhatsAppModal';
-import { servicesAPI, invoicesAPI, customersAPI, settingsAPI, bankAccountsAPI } from '../lib/api';
+import { servicesAPI, invoicesAPI, customersAPI, settingsAPI, bankAccountsAPI, emailsAPI } from '../lib/api';
 import html2pdf from 'html2pdf.js';
 import { toast } from '../components/Toast';
 import { toTitleCase } from '../lib/formatter';
@@ -20,6 +20,12 @@ export default function InvoiceDetailPage() {
   const [showShareLink, setShowShareLink] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [isActionLoading, setIsActionLoading] = useState({
+    email: false,
+    whatsapp: false,
+    edit: false
+  });
 
   useEffect(() => {
     fetchData();
@@ -96,12 +102,24 @@ export default function InvoiceDetailPage() {
 
   const handleSendEmail = async () => {
     try {
-      if (!id) return;
-      await emailsAPI.sendInvoice(parseInt(id));
+      if (!invoice?.id) {
+        toast.error('Data invoice belum dimuat sepenuhnya');
+        return;
+      }
+      setIsActionLoading(prev => ({ ...prev, email: true }));
+      await emailsAPI.sendInvoice(invoice.id);
       toast.success('Email berhasil dikirim!');
     } catch (error: any) {
       console.error('Error sending email:', error);
-      toast.error(error.message || 'Terjadi kesalahan saat mengirim email');
+      
+      // More helpful error message for SMTP issues
+      if (error.message?.includes('SMTP settings not configured')) {
+        toast.error('SMTP belum dikonfigurasi. Silakan hubungi Admin atau atur di Menu Pengaturan.');
+      } else {
+        toast.error(error.message || 'Terjadi kesalahan saat mengirim email');
+      }
+    } finally {
+      setIsActionLoading(prev => ({ ...prev, email: false }));
     }
   };
 
@@ -142,6 +160,32 @@ export default function InvoiceDetailPage() {
         useCORS: true,
         letterRendering: true,
         scrollY: 0,
+        onclone: (clonedDoc: Document) => {
+          // Exhaustive fix for oklch colors which crash html2canvas
+          const elements = clonedDoc.getElementsByTagName('*');
+          for (let i = 0; i < elements.length; i++) {
+            const el = elements[i] as HTMLElement;
+            const style = clonedDoc.defaultView?.getComputedStyle(el);
+            if (style) {
+              // Instead of a whitelist, we now check ALL computed properties
+              // This is more exhaustive and covers every possible color field
+              for (let j = 0; j < style.length; j++) {
+                const prop = style[j];
+                const val = style.getPropertyValue(prop);
+                
+                if (val && (val.includes('oklch') || val.includes('var('))) {
+                  // For shadows, removing them is the safest way to prevent a crash
+                  if (prop.includes('shadow')) {
+                    el.style.setProperty(prop, 'none', 'important');
+                  } else if (prop.includes('color') || prop === 'fill' || prop === 'stroke') {
+                    // For other colors, provide a safe fallback
+                    el.style.setProperty(prop, 'currentColor', 'important');
+                  }
+                }
+              }
+            }
+          }
+        }
       },
       jsPDF: { 
         unit: 'mm' as const, 
@@ -149,12 +193,34 @@ export default function InvoiceDetailPage() {
         orientation: 'portrait' as const,
       },
     };
-
+ 
+    const forceCleanup = () => {
+      // Emergency cleanup for html2canvas containers that might block the UI
+      const containers = document.querySelectorAll('.html2canvas-container');
+      containers.forEach(container => container.remove());
+      
+      // Also check for any iframes left by the library
+      const iframes = document.querySelectorAll('iframe[id^="html2canvas"]');
+      iframes.forEach(iframe => iframe.remove());
+    };
+ 
+    setIsDownloading(true);
     try {
-      await html2pdf().set(opt).from(element).save();
+      // Add a safety timeout to prevent permanent UI lockup
+      const pdfPromise = html2pdf().set(opt).from(element).save();
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('PDF generation timed out')), 30000)
+      );
+
+      await Promise.race([pdfPromise, timeoutPromise]);
     } catch (error) {
       console.error('Error generating PDF:', error);
-      toast.error('Gagal mengunduh PDF');
+      toast.error('Gagal mengunduh PDF. Silakan coba lagi.');
+      forceCleanup();
+    } finally {
+      setIsDownloading(false);
+      // Ensure cleanup runs even on success just in case
+      setTimeout(forceCleanup, 1000);
     }
   };
 
@@ -215,15 +281,6 @@ export default function InvoiceDetailPage() {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         {/* Invoice Content - Ref for PDF */}
         <div ref={invoiceRef} className="p-6 md:p-10 relative">
-          {/* Paid Stamp */}
-          {invoice.status === 'paid' && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 select-none overflow-hidden">
-              <div className="-rotate-[20deg] border-[4px] border-emerald-500/10 text-emerald-500/10 text-7xl font-black px-12 py-4 rounded-xl uppercase tracking-[8px] whitespace-nowrap">
-                LUNAS
-              </div>
-            </div>
-          )}
-          
           {/* Invoice Header */}
           <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-10">
             {companySettings?.company_logo ? (
@@ -241,11 +298,17 @@ export default function InvoiceDetailPage() {
               </div>
             )}
             <div className="text-left md:text-right">
-              <h1 className="text-4xl font-black text-gray-900 uppercase tracking-tight mb-4">INVOICE</h1>
-              <div className="space-y-1.5 text-sm">
-                <p className="text-gray-500">No. Tagihan: <span className="font-bold text-gray-900">{invoice.invoice_number}</span></p>
+              <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-4">INVOICE</h1>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center md:justify-end gap-2 text-gray-500">
+                  <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-mono text-[10px] uppercase">No. Tagihan</span>
+                  <span className="font-bold text-gray-900">{invoice.invoice_number}</span>
+                </div>
                 <p className="text-gray-500">Tanggal: <span className="font-semibold text-gray-900">{formatDate(invoice.issue_date)}</span></p>
                 <p className="text-gray-500">Jatuh Tempo: <span className="font-semibold text-gray-900">{formatDate(invoice.due_date)}</span></p>
+                {invoice.status === 'paid' && (
+                  <p className="text-gray-500">Status: <span className="font-bold text-emerald-600">PAID</span></p>
+                )}
               </div>
             </div>
           </div>
@@ -357,43 +420,66 @@ export default function InvoiceDetailPage() {
         </div>
 
         {/* Actions Bar */}
-        <div className="bg-gray-50 border-t border-gray-100 p-6 flex flex-wrap gap-3">
-          <button
-            onClick={() => navigate(`/invoices/${id}/edit`)}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-bold py-2.5 px-6 rounded-lg border border-gray-200 transition-all text-sm shadow-sm"
-          >
-            <Edit size={16} /> Edit
-          </button>
-          
-          <button
-            onClick={handleDownloadPDF}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-bold py-2.5 px-6 rounded-lg border border-gray-200 transition-all text-sm shadow-sm"
-          >
-            <Download size={16} /> Unduh PDF
-          </button>
+        <div className="bg-gray-50 border-t border-gray-100 p-6 flex justify-end items-center">
+          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+            <div className="flex gap-2 w-full sm:w-auto">
+              <button
+                onClick={() => navigate(`/invoices/${id}/edit`)}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-bold py-2.5 px-4 rounded-xl border border-gray-200 transition-all text-sm shadow-sm"
+                title="Edit Invoice"
+              >
+                <Edit size={16} /> <span>Edit</span>
+              </button>
+              
+              <button
+                onClick={handleDownloadPDF}
+                disabled={isDownloading}
+                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-bold py-2.5 px-4 rounded-xl border border-gray-200 transition-all text-sm shadow-sm ${isDownloading ? 'opacity-70 cursor-wait' : ''}`}
+                title="Download PDF"
+              >
+                {isDownloading ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
+                ) : (
+                  <Download size={16} />
+                )}
+                <span>{isDownloading ? 'Memproses...' : 'Unduh PDF'}</span>
+              </button>
 
-          <button
-            onClick={handleShareLink}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-bold py-2.5 px-6 rounded-lg border border-gray-200 transition-all text-sm shadow-sm"
-          >
-            <Share2 size={16} /> Bagikan
-          </button>
+              <button
+                onClick={handleShareLink}
+                disabled={isDownloading}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-bold py-2.5 px-4 rounded-xl border border-gray-200 transition-all text-sm shadow-sm disabled:opacity-50"
+                title="Share Link"
+              >
+                <Share2 size={16} /> <span>Bagikan</span>
+              </button>
+            </div>
 
-          <div className="w-full sm:w-px sm:h-8 bg-gray-200 mx-1 hidden sm:block"></div>
+            <div className="w-full sm:w-px sm:h-8 bg-gray-200 mx-1 hidden sm:block"></div>
 
-          <button
-            onClick={handleSendEmail}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition-all text-sm shadow-md shadow-blue-200"
-          >
-            <Mail size={16} /> Kirim Email
-          </button>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <button
+                onClick={handleSendEmail}
+                disabled={isDownloading || isActionLoading.email}
+                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-xl transition-all text-sm shadow-md shadow-blue-200 disabled:opacity-50 ${(isDownloading || isActionLoading.email) ? 'cursor-wait' : ''}`}
+              >
+                {isActionLoading.email ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                ) : (
+                  <Mail size={16} />
+                )}
+                {isActionLoading.email ? 'Mengirim...' : 'Kirim Email'}
+              </button>
 
-          <button
-            onClick={handleWhatsApp}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 px-6 rounded-lg transition-all text-sm shadow-md shadow-green-200"
-          >
-            <WhatsAppIcon size={16} className="fill-current" /> WhatsApp
-          </button>
+              <button
+                onClick={handleWhatsApp}
+                disabled={isDownloading}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 px-5 rounded-xl transition-all text-sm shadow-md shadow-green-200 disabled:opacity-50"
+              >
+                <WhatsAppIcon size={16} className="fill-current" /> WhatsApp
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 

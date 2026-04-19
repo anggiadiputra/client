@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Trash2, Eye, Edit2, Loader2, Mail, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Trash2, Eye, Edit2, Loader2, Mail, Search, ChevronLeft, ChevronRight, CheckSquare, Square, Hash, User as UserIcon, Calendar, CreditCard } from 'lucide-react';
 import { invoicesAPI, emailsAPI } from '../lib/api';
 import { formatRupiah, formatDate } from '../lib/formatter';
 import SendWhatsAppModal from '../components/SendWhatsAppModal';
@@ -8,6 +8,8 @@ import WhatsAppIcon from '../components/WhatsAppIcon';
 import { SkeletonTable } from '../components/LoadingSkeleton';
 import { toast } from '../components/Toast';
 import { Invoice } from '../types';
+import DropdownFilter from '../components/DropdownFilter';
+import CompactBatchActions from '../components/CompactBatchActions';
 
 const PAGE_SIZE = 10;
 
@@ -20,12 +22,16 @@ export default function InvoicesPage() {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [companySettings, setCompanySettings] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [totalItems, setTotalItems] = useState(0);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
+  const [isBatchLoading, setIsBatchLoading] = useState(false);
 
   useEffect(() => {
     fetchInvoices();
     fetchCompanySettings();
-  }, []);
+  }, [page, statusFilter, searchTerm]);
 
   // Reset to page 1 whenever search changes
   useEffect(() => {
@@ -43,11 +49,20 @@ export default function InvoicesPage() {
   };
 
   const fetchInvoices = async () => {
+    setLoading(true);
     try {
-      const data = await invoicesAPI.getAll();
-      setInvoices(data);
+      const data = await invoicesAPI.getAll(page, PAGE_SIZE, statusFilter, searchTerm);
+      // Backend returns { data, pagination } if paged
+      if (data.data) {
+        setInvoices(data.data);
+        setTotalItems(data.pagination.total);
+      } else {
+        setInvoices(data);
+        setTotalItems(data.length);
+      }
     } catch (error) {
       console.error('Error fetching invoices:', error);
+      toast.error('Failed to load invoices');
     } finally {
       setLoading(false);
     }
@@ -95,28 +110,67 @@ export default function InvoicesPage() {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    const colors: Record<string, string> = {
-      draft: 'bg-gray-100 text-gray-800',
-      sent: 'bg-blue-100 text-blue-800',
-      paid: 'bg-green-100 text-green-800',
-      overdue: 'bg-red-100 text-red-800',
-    };
-    return colors[status] || colors.draft;
+  const handleBatchDelete = async () => {
+    if (!confirm(`Are you sure you want to delete ${selectedIds.length} invoices?`)) return;
+    
+    setIsBatchLoading(true);
+    try {
+      await invoicesAPI.batchDelete(selectedIds);
+      toast.success('Invoices deleted successfully');
+      setSelectedIds([]);
+      fetchInvoices();
+    } catch (error: any) {
+      console.error('Error batch deleting:', error);
+      toast.error(error.message || 'Failed to delete invoices');
+    } finally {
+      setIsBatchLoading(false);
+    }
   };
 
-  // Client-side filtering
-  const filtered = invoices.filter((inv) => {
-    const q = searchTerm.toLowerCase();
-    return (
-      inv.invoice_number?.toLowerCase().includes(q) ||
-      inv.customer_name?.toLowerCase().includes(q) ||
-      inv.status?.toLowerCase().includes(q)
-    );
-  });
+  const handleBatchUpdateStatus = async (status: string) => {
+    setIsBatchLoading(true);
+    try {
+      await invoicesAPI.batchUpdateStatus(selectedIds, status);
+      toast.success(`Updated ${selectedIds.length} invoices to ${status}`);
+      setSelectedIds([]);
+      fetchInvoices();
+    } catch (error: any) {
+      console.error('Error batch updating status:', error);
+      toast.error(error.message || 'Failed to update invoices');
+    } finally {
+      setIsBatchLoading(false);
+    }
+  };
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const toggleSelectAll = () => {
+    if (selectedIds.length === invoices.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(invoices.map(i => i.id));
+    }
+  };
+
+  const toggleSelect = (id: number) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+
+  const getStatusColor = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'paid':
+        return 'bg-green-100 text-green-800 border border-green-200';
+      case 'sent':
+        return 'bg-blue-100 text-blue-800 border border-blue-200';
+      case 'overdue':
+        return 'bg-red-100 text-red-800 border border-red-200';
+      case 'draft':
+      default:
+        return 'bg-gray-100 text-gray-800 border border-gray-200';
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
@@ -138,19 +192,46 @@ export default function InvoicesPage() {
 
       {/* Toolbar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-        <div className="relative w-full md:max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-          <input
-            type="text"
-            placeholder="Search invoice no., customer, or status..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+        <div className="flex flex-1 items-center gap-3">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+            <input
+              type="text"
+              placeholder="Cari no. invoice atau customer..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-gray-400"
+            />
+          </div>
+          <DropdownFilter
+            value={statusFilter}
+            onChange={setStatusFilter}
+            options={[
+              { label: 'Draft', value: 'draft' },
+              { label: 'Sent', value: 'sent' },
+              { label: 'Paid', value: 'paid' },
+              { label: 'Overdue', value: 'overdue' },
+            ]}
           />
         </div>
+
+        <CompactBatchActions
+          selectedCount={selectedIds.length}
+          onDelete={handleBatchDelete}
+          onUpdateStatus={handleBatchUpdateStatus}
+          statusOptions={[
+            { label: 'Draft', value: 'draft' },
+            { label: 'Sent', value: 'sent' },
+            { label: 'Paid', value: 'paid' },
+            { label: 'Overdue', value: 'overdue' },
+          ]}
+          onClear={() => setSelectedIds([])}
+          isLoading={isBatchLoading}
+        />
+
         {!loading && (
           <span className="text-xs text-gray-400 whitespace-nowrap">
-            {filtered.length} invoice{filtered.length !== 1 ? 's' : ''}
+            {totalItems} invoice{totalItems !== 1 ? 's' : ''}
           </span>
         )}
       </div>
@@ -161,104 +242,149 @@ export default function InvoicesPage() {
           <SkeletonTable rows={5} columns={6} />
         ) : (
           <>
-          <div className="overflow-x-auto hidden md:block">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Invoice #</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Customer</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden xl:table-cell">Due Date</th>
-                  <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {paginated.length === 0 ? (
+            <div className="overflow-x-auto hidden md:block">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                      {searchTerm ? 'No invoices match your search.' : 'No invoices yet. Click "Create Invoice" to get started.'}
-                    </td>
+                    <th className="w-10 px-6 py-3">
+                      <button 
+                        onClick={toggleSelectAll}
+                        className="text-gray-400 hover:text-blue-600 transition-colors"
+                      >
+                        {selectedIds.length > 0 && selectedIds.length === invoices.length ? (
+                          <CheckSquare size={18} className="text-blue-600" />
+                        ) : (
+                          <Square size={18} />
+                        )}
+                      </button>
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Invoice #</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Customer</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden xl:table-cell">Due Date</th>
+                    <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
-                ) : (
-                  paginated.map((invoice) => (
-                    <tr key={invoice.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">{invoice.invoice_number}</td>
-                      <td className="px-6 py-4 whitespace-nowrap hidden lg:table-cell">
-                        <div className="text-sm text-gray-700">{invoice.customer_name}</div>
-                      </td>
-                      <td className="px-6 py-4 text-sm font-semibold text-gray-900 whitespace-nowrap">
-                        {formatRupiah(parseFloat(String(invoice.grand_total ?? invoice.total_amount ?? 0)))}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${getStatusColor(invoice.status)}`}>
-                          {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap hidden xl:table-cell">
-                        {formatDate(invoice.due_date, { day: 'numeric', month: 'short', year: 'numeric' })}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-right whitespace-nowrap">
-                        <div className="flex items-center justify-end gap-1">
-                          <button onClick={() => handleSendEmail(invoice.id)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Send via Email"><Mail size={16} /></button>
-                          <button onClick={() => handleOpenWhatsApp(invoice)} className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Send WhatsApp"><WhatsAppIcon size={16} /></button>
-                          <button onClick={() => handleViewInvoice(invoice)} className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors" title="View"><Eye size={16} /></button>
-                          <button onClick={() => handleEditInvoice(invoice)} className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Edit"><Edit2 size={16} /></button>
-                          <button onClick={() => handleDeleteInvoice(invoice)} disabled={deletingId === invoice.id} className="p-1.5 text-red-600 hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition-colors" title="Delete">
-                            {deletingId === invoice.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
-                          </button>
-                        </div>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {invoices.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                        {searchTerm || statusFilter ? 'No invoices match your filters.' : 'No invoices yet. Click "Create Invoice" to get started.'}
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                  ) : (
+                    invoices.map((invoice) => (
+                      <tr key={invoice.id} className={`hover:bg-gray-50 transition-colors ${selectedIds.includes(invoice.id) ? 'bg-blue-50/50' : ''}`}>
+                        <td className="px-6 py-4">
+                          <button 
+                            onClick={() => toggleSelect(invoice.id)}
+                            className="text-gray-400 hover:text-blue-600 transition-colors"
+                          >
+                            {selectedIds.includes(invoice.id) ? (
+                              <CheckSquare size={18} className="text-blue-600" />
+                            ) : (
+                              <Square size={18} />
+                            )}
+                          </button>
+                        </td>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">{invoice.invoice_number}</td>
+                        <td className="px-6 py-4 whitespace-nowrap hidden lg:table-cell">
+                          <div className="text-sm text-gray-700">{invoice.customer_name}</div>
+                        </td>
+                        <td className="px-6 py-4 text-sm font-semibold text-gray-900 whitespace-nowrap">
+                          {formatRupiah(parseFloat(String(invoice.grand_total ?? invoice.total_amount ?? 0)))}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${getStatusColor(invoice.status)}`}>
+                            {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap hidden xl:table-cell">
+                          {formatDate(invoice.due_date, { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-right whitespace-nowrap">
+                          <div className="flex items-center justify-end gap-1">
+                            <button onClick={() => handleSendEmail(invoice.id)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Send via Email"><Mail size={16} /></button>
+                            <button onClick={() => handleOpenWhatsApp(invoice)} className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Send WhatsApp"><WhatsAppIcon size={16} /></button>
+                            <button onClick={() => handleViewInvoice(invoice)} className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors" title="View"><Eye size={16} /></button>
+                            <button onClick={() => handleEditInvoice(invoice)} className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Edit"><Edit2 size={16} /></button>
+                            <button onClick={() => handleDeleteInvoice(invoice)} disabled={deletingId === invoice.id} className="p-1.5 text-red-600 hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition-colors" title="Delete">
+                              {deletingId === invoice.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
 
-          {/* Mobile View (Cards) */}
-          <div className="md:hidden divide-y divide-gray-100">
-            {paginated.length === 0 ? (
-              <div className="px-6 py-8 text-center text-gray-500">
-                {searchTerm ? 'No invoices match your search.' : 'No invoices yet.'}
-              </div>
-            ) : (
-              paginated.map((invoice) => (
-                <div key={invoice.id} className="p-4 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-bold text-gray-400 capitalize">{invoice.invoice_number}</span>
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${getStatusColor(invoice.status)}`}>
-                          {invoice.status}
-                        </span>
-                      </div>
-                      <h3 className="text-sm font-bold text-gray-900 truncate">{invoice.customer_name}</h3>
-                      <p className="text-[11px] text-gray-500 mt-1">Due: {formatDate(invoice.due_date, { day: 'numeric', month: 'short' })}</p>
-                    </div>
-                    <div className="flex flex-col items-end gap-2 ml-4">
-                      <span className="text-sm font-bold text-blue-600">
-                        {formatRupiah(parseFloat(String(invoice.grand_total ?? invoice.total_amount ?? 0)))}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between pt-2 border-t border-gray-50">
-                    <div className="flex items-center gap-1">
-                      <button onClick={() => handleSendEmail(invoice.id)} className="p-2 text-blue-600 bg-blue-50 rounded-lg" title="Email"><Mail size={16} /></button>
-                      <button onClick={() => handleOpenWhatsApp(invoice)} className="p-2 text-green-600 bg-green-50 rounded-lg" title="WA"><WhatsAppIcon size={16} /></button>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <button onClick={() => handleViewInvoice(invoice)} className="p-2 text-gray-600 bg-gray-50 rounded-lg" title="View"><Eye size={16} /></button>
-                      <button onClick={() => handleEditInvoice(invoice)} className="p-2 text-amber-600 bg-amber-50 rounded-lg" title="Edit"><Edit2 size={16} /></button>
-                      <button onClick={() => handleDeleteInvoice(invoice)} disabled={deletingId === invoice.id} className="p-2 text-red-600 bg-red-50 rounded-lg" title="Delete">
-                        {deletingId === invoice.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
-                      </button>
-                    </div>
-                  </div>
+            {/* Mobile View (Cards) */}
+            <div className="md:hidden divide-y divide-gray-100">
+              {invoices.length === 0 ? (
+                <div className="px-6 py-8 text-center text-gray-500">
+                  {searchTerm || statusFilter ? 'No invoices match your filters.' : 'No invoices yet.'}
                 </div>
-              ))
-            )}
-          </div>
+              ) : (
+                invoices.map((invoice) => (
+                  <div key={invoice.id} className={`p-4 bg-white rounded-xl shadow-sm border border-gray-100 mb-3 mx-2 hover:shadow-md transition-all ${selectedIds.includes(invoice.id) ? 'bg-blue-50/50 border-blue-200 ring-1 ring-blue-100' : ''}`}>
+                    <div className="flex items-start gap-3 mb-3">
+                      <button 
+                        onClick={() => toggleSelect(invoice.id)}
+                        className="mt-1 text-gray-400 hover:text-blue-600 transition-colors"
+                      >
+                        {selectedIds.includes(invoice.id) ? (
+                          <CheckSquare size={20} className="text-blue-600" />
+                        ) : (
+                          <Square size={20} />
+                        )}
+                      </button>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <div className="bg-gray-50 flex items-center gap-1.5 px-2 py-0.5 rounded border border-gray-100">
+                              <Hash size={10} className="text-gray-400" />
+                              <span className="text-[10px] font-extrabold text-gray-500 uppercase tracking-wider">{invoice.invoice_number}</span>
+                            </div>
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${getStatusColor(invoice.status)}`}>
+                              {invoice.status}
+                            </span>
+                          </div>
+                          <span className="text-sm font-extrabold text-blue-600">
+                            {formatRupiah(parseFloat(String(invoice.grand_total ?? invoice.total_amount ?? 0)))}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-6 h-6 bg-blue-50 rounded-full flex items-center justify-center shrink-0">
+                            <UserIcon size={12} className="text-blue-600" />
+                          </div>
+                          <h3 className="text-sm font-extrabold text-gray-900 truncate tracking-tight">{invoice.customer_name}</h3>
+                        </div>
+                        <div className="flex items-center gap-2 text-[11px] text-gray-500">
+                          <Calendar size={12} className="text-gray-400" />
+                          <span>Tempo: {formatDate(invoice.due_date, { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between pt-3 border-t border-gray-50">
+                      <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-lg">
+                        <button onClick={() => handleSendEmail(invoice.id)} className="p-1.5 text-blue-600 hover:bg-white hover:shadow-sm rounded-md transition-all" title="Email"><Mail size={14} /></button>
+                        <button onClick={() => handleOpenWhatsApp(invoice)} className="p-1.5 text-green-600 hover:bg-white hover:shadow-sm rounded-md transition-all" title="WA"><WhatsAppIcon size={14} /></button>
+                      </div>
+                      <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-lg">
+                        <button onClick={() => handleViewInvoice(invoice)} className="p-1.5 text-gray-600 hover:bg-white hover:shadow-sm rounded-md transition-all" title="View"><Eye size={14} /></button>
+                        <button onClick={() => handleEditInvoice(invoice)} className="p-1.5 text-amber-600 hover:bg-white hover:shadow-sm rounded-md transition-all" title="Edit"><Edit2 size={14} /></button>
+                        <button onClick={() => handleDeleteInvoice(invoice)} disabled={deletingId === invoice.id} className="p-1.5 text-red-600 hover:bg-white hover:shadow-sm rounded-md transition-all disabled:opacity-40" title="Delete">
+                          {deletingId === invoice.id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </>
         )}
       </div>
