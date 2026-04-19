@@ -11,7 +11,7 @@ interface AppContextType {
 }
 
 const defaultSettings: AppSettings = {
-  appName: 'Invoizes - Pro Billing System',
+  appName: 'Billing System',
   logoUrl: undefined,
   turnstileSiteKey: undefined,
 };
@@ -27,7 +27,17 @@ const AppContext = createContext<AppContextType>({
 export const useAppSettings = () => useContext(AppContext);
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [settings, setSettings] = useState<AppSettings>(defaultSettings);
+  const [settings, setSettings] = useState<AppSettings>(() => {
+    const saved = localStorage.getItem('app_settings');
+    if (saved) {
+      try {
+        return { ...defaultSettings, ...JSON.parse(saved) };
+      } catch (e) {
+        return defaultSettings;
+      }
+    }
+    return defaultSettings;
+  });
   const [userRole, setUserRole] = useState<'admin' | 'member' | null>(() => {
     const user = localStorage.getItem('user');
     if (user) {
@@ -111,9 +121,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Save to localStorage
     localStorage.setItem('app_settings', JSON.stringify(settings));
-    
-    // Update page title
-    document.title = settings.appName;
   }, [settings]);
 
   const updateSettings = (newSettings: Partial<AppSettings>) => {
