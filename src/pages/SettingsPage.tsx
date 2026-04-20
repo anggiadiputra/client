@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { 
   CheckCircle, XCircle, Loader2, ExternalLink, HardDrive, Mail, Edit, Plus, Trash2, Star, Palette,
-  MessageSquare, Monitor
+  MessageSquare, Monitor, CreditCard
 } from 'lucide-react';
 import { settingsAPI, bankAccountsAPI, whatsappAPI } from '../lib/api';
 import { useAppSettings } from '../context/AppContext';
@@ -41,6 +41,12 @@ export default function SettingsPage() {
   const [testingS3, setTestingS3] = useState(false);
   const [s3Status, setS3Status] = useState<'idle' | 'success' | 'error'>('idle');
   const [s3Message, setS3Message] = useState('');
+
+  // Pakasir states
+  const [editingPakasir, setEditingPakasir] = useState(false);
+  const [savingPakasir, setSavingPakasir] = useState(false);
+  const [pakasirStatus, setPakasirStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [pakasirMessage, setPakasirMessage] = useState('');
 
   // SMTP states
   const [editingSmtp, setEditingSmtp] = useState(false);
@@ -97,6 +103,9 @@ export default function SettingsPage() {
     smtp_test_target: '',
     smtp_test_message: '',
     app_name: 'Invoice System',
+    pakasir_slug: '',
+    pakasir_api_key: '',
+    pakasir_is_sandbox: false,
   });
 
   useEffect(() => {
@@ -137,6 +146,9 @@ export default function SettingsPage() {
         smtp_test_target: data.smtp_test_target || '',
         smtp_test_message: data.smtp_test_message || '',
         app_name: data.app_name || 'Invoice System',
+        pakasir_slug: data.pakasir_slug || '',
+        pakasir_api_key: data.pakasir_api_key || '',
+        pakasir_is_sandbox: data.pakasir_is_sandbox || false,
       });
     } catch (error) {
       console.error('Error fetching settings:', error);
@@ -169,29 +181,6 @@ export default function SettingsPage() {
     }
   };
 
-  const handleSaveGlobalTemplates = async () => {
-    setSavingTemplates(true);
-    setTemplatesStatus('idle');
-    try {
-      await settingsAPI.updateSystem({
-        wa_invoice_template: formData.wa_invoice_template,
-        wa_paid_template: formData.wa_paid_template,
-        wa_reminder_template: formData.wa_reminder_template,
-      });
-      
-      setTemplatesStatus('success');
-      setTemplatesMessage('Template default sistem berhasil diperbarui!');
-      setEditingTemplates(false);
-      setTimeout(() => setTemplatesStatus('idle'), 3000);
-    } catch (error: any) {
-      console.error('Error saving global templates:', error);
-      setTemplatesStatus('error');
-      setTemplatesMessage(error.message || 'Gagal memperbarui template sistem');
-      setTimeout(() => setTemplatesStatus('idle'), 3000);
-    } finally {
-      setSavingTemplates(false);
-    }
-  };
 
 
   const handleTestFonnteConnection = async () => {
@@ -1153,7 +1142,128 @@ export default function SettingsPage() {
         </div>
         {/* RIGHT COLUMN */}
         <div className="space-y-6">
-        {/* Section 6: WhatsApp Message Templates (ALL USERS except admin in Settings) */}
+          {/* Section 8: Pakasir Payment Gateway Configuration (ADMIN ONLY) */}
+          {userRole === 'admin' && (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <CreditCard size={16} className="text-blue-600" />
+                  <h2 className="text-sm font-semibold text-gray-900">Pakasir Payment Gateway</h2>
+                </div>
+                {!editingPakasir ? (
+                  <button
+                    type="button"
+                    onClick={() => setEditingPakasir(true)}
+                    className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors"
+                  >
+                    <Edit size={16} />
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingPakasir(false);
+                        fetchSettings();
+                      }}
+                      className="text-xs text-gray-500 hover:text-gray-700 font-medium"
+                    >
+                      Batal
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        setSavingPakasir(true);
+                        try {
+                          await settingsAPI.updateSystem({
+                            pakasir_slug: formData.pakasir_slug,
+                            pakasir_api_key: formData.pakasir_api_key,
+                            pakasir_is_sandbox: formData.pakasir_is_sandbox,
+                          });
+                          setEditingPakasir(false);
+                          setPakasirStatus('success');
+                          setPakasirMessage('Konfigurasi Pakasir berhasil disimpan!');
+                          setTimeout(() => setPakasirStatus('idle'), 3000);
+                        } catch (error: any) {
+                          setPakasirStatus('error');
+                          setPakasirMessage(error.message || 'Gagal menyimpan konfigurasi Pakasir');
+                        } finally {
+                          setSavingPakasir(false);
+                        }
+                      }}
+                      disabled={savingPakasir}
+                      className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 disabled:bg-blue-400 font-semibold flex items-center gap-1"
+                    >
+                      {savingPakasir ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle size={12} />}
+                      Simpan
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Pakasir Project Slug
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.pakasir_slug}
+                    onChange={(e) => setFormData({ ...formData, pakasir_slug: e.target.value })}
+                    disabled={!editingPakasir}
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:bg-gray-50 disabled:text-gray-500"
+                    placeholder="my-saas-project"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Pakasir API Key
+                  </label>
+                  <input
+                    type="password"
+                    value={formData.pakasir_api_key}
+                    onChange={(e) => setFormData({ ...formData, pakasir_api_key: e.target.value })}
+                    disabled={!editingPakasir}
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:bg-gray-50 disabled:text-gray-500"
+                    placeholder="pk_live_xxxxxxxxxxxx"
+                  />
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    id="pakasir_is_sandbox"
+                    checked={formData.pakasir_is_sandbox}
+                    onChange={(e) => setFormData({ ...formData, pakasir_is_sandbox: e.target.checked })}
+                    disabled={!editingPakasir}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 disabled:opacity-50"
+                  />
+                  <label htmlFor="pakasir_is_sandbox" className="text-sm font-medium text-gray-700">
+                    Gunakan Mode Sandbox (Testing)
+                  </label>
+                </div>
+
+                {pakasirStatus !== 'idle' && (
+                  <div className={`text-xs px-3 py-2 rounded-lg ${
+                    pakasirStatus === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+                  }`}>
+                    {pakasirMessage}
+                  </div>
+                )}
+                
+                <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                  <p className="text-[10px] text-blue-800 leading-relaxed font-medium">
+                    Webhooks URL: <span className="font-mono bg-white px-1 border border-blue-200 rounded">/api/webhooks/pakasir</span>
+                    <br />
+                    Pastikan Anda telah mengisi webhook URL ini di dashboard Pakasir untuk sinkronisasi otomatis saldo top-up.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Section 6: WhatsApp Message Templates (ALL USERS except admin in Settings) */}
         {userRole !== 'admin' && (
           <>
             <div className="flex items-center justify-between mb-4">

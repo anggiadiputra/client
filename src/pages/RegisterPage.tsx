@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { User, Building2, Mail, Eye, EyeOff } from 'lucide-react';
-import { authClient } from '../lib/stackAuth';
+import { authClient, clearAllSessions } from '../lib/stackAuth';
+import authService from '../lib/authService';
 import Navbar from '../components/Navbar';
 import GoogleIcon from '../components/GoogleIcon';
 import { Turnstile } from '@marsidev/react-turnstile';
@@ -37,28 +38,44 @@ export default function RegisterPage() {
     setError('');
     setSuccess('');
     try {
+      // SECURITY FIX: Clear any existing sessions (potentially Admin) before starting new registration
+      await clearAllSessions();
+      
       // Verify Turnstile first (pre-flight)
       if (turnstileSiteKey && turnstileToken) {
         await publicAPI.verifyTurnstile(turnstileToken);
       }
 
-      const { error: signUpError } = await authClient.signUp.email({
+      // Step 1: Register in Neon Auth (handles OTP verification flow)
+      await authClient.signUp.email({
         email,
         password,
-        name: `${firstName} ${lastName}`.trim(),
-        callbackURL: `${window.location.origin}/login`,
+        name: `${firstName} ${lastName}`,
+        callbackURL: window.location.origin + '/dashboard',
       });
-
-      if (signUpError) {
-        throw new Error(signUpError.message || 'Registration failed');
+      
+      // Step 2: Also pre-create local user with password hash so they can re-login
+      // after Neon Auth session expires. This is non-blocking - if it fails,
+      // JIT provisioning will still create a local user (but without password).
+      try {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+        await fetch(`${API_URL}/auth/neon-pre-register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, firstName, lastName, companyName }),
+        });
+      } catch (preRegErr) {
+        console.warn('[Register] Local pre-registration failed (non-fatal):', preRegErr);
       }
-
+      
+      setSuccess('Account created! Please check your email for the verification code.');
+      
+      // Save email to sessionStorage so the verify page can find it
       sessionStorage.setItem('pending_verification_email', email);
-      setSuccess('Account created successfully! Redirecting to verification...');
-      setTimeout(() => {
-        navigate('/verify-email');
-      }, 1000);
-    } catch (err) {
+      
+      // INSTANT REDIRECT to OTP verification
+      navigate('/verify-email', { state: { email } });
+    } catch (err: any) {
       setError(err instanceof Error ? err.message : 'Registration failed');
     } finally {
       setLoading(false);
@@ -73,20 +90,6 @@ export default function RegisterPage() {
           <div className="text-center mb-7">
             <h1 className="text-2xl font-bold text-gray-900 mb-1.5">Create your account</h1>
             <p className="text-sm text-gray-500">Start managing your containers today</p>
-          </div>
-
-          <button
-            type="button"
-            className="w-full flex items-center justify-center gap-2.5 border border-gray-200 rounded-lg py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors mb-5"
-          >
-            <GoogleIcon />
-            Sign up with Google
-          </button>
-
-          <div className="flex items-center gap-3 mb-5">
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-xs text-gray-400 whitespace-nowrap">Or sign up with email</span>
-            <div className="flex-1 h-px bg-gray-200" />
           </div>
 
           <form onSubmit={handleRegister} className="flex flex-col gap-4">

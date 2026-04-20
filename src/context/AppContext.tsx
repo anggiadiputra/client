@@ -6,8 +6,11 @@ interface AppContextType {
   settings: AppSettings;
   userRole: 'admin' | 'member' | null;
   turnstileSiteKey?: string;
+  subscription: any | null;
+  wallet: any | null;
   updateSettings: (newSettings: Partial<AppSettings>) => void;
   setUserRole: (role: 'admin' | 'member' | null) => void;
+  refreshSaaSData: () => Promise<void>;
 }
 
 const defaultSettings: AppSettings = {
@@ -20,8 +23,11 @@ const AppContext = createContext<AppContextType>({
   settings: defaultSettings,
   userRole: null,
   turnstileSiteKey: undefined,
+  subscription: null,
+  wallet: null,
   updateSettings: () => {},
   setUserRole: () => {},
+  refreshSaaSData: async () => {},
 });
 
 export const useAppSettings = () => useContext(AppContext);
@@ -49,6 +55,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     return null;
   });
+  const [subscription, setSubscription] = useState<any | null>(null);
+  const [wallet, setWallet] = useState<any | null>(null);
+
+  const refreshSaaSData = async () => {
+    const user = localStorage.getItem('user');
+    if (user) {
+      try {
+        const { authAPI } = await import('../lib/api');
+        const data = await authAPI.me();
+        if (data && data.user) {
+          if (data.user.role) setUserRole(data.user.role);
+          if (data.user.subscription) setSubscription(data.user.subscription);
+          if (data.user.wallet) setWallet(data.user.wallet);
+        }
+      } catch (error) {
+        console.warn('[AppContext] Failed to refresh SaaS data:', error);
+      }
+    }
+  };
 
   // Always load from server first (source of truth), localStorage as fallback
   useEffect(() => {
@@ -86,22 +111,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // Sync user profile/role from server on mount
   useEffect(() => {
-    const syncUser = async () => {
-      const user = localStorage.getItem('user');
-      if (user) {
-        try {
-          const authService = (await import('../lib/authService')).default;
-          const data = await authService.me();
-          if (data && data.user && data.user.role) {
-            setUserRole(data.user.role);
-          }
-        } catch (error) {
-          console.warn('[AppContext] Failed to sync user role:', error);
-        }
-      }
-    };
-
-    syncUser();
+    refreshSaaSData();
   }, []);
 
   const loadFromLocalStorage = () => {
@@ -128,7 +138,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AppContext.Provider value={{ settings, userRole, turnstileSiteKey: settings.turnstileSiteKey, updateSettings, setUserRole }}>
+    <AppContext.Provider value={{ settings, userRole, turnstileSiteKey: settings.turnstileSiteKey, subscription, wallet, updateSettings, setUserRole, refreshSaaSData }}>
       {children}
     </AppContext.Provider>
   );

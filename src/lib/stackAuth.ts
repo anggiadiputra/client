@@ -29,9 +29,11 @@ export function useUser() {
   // useSession adalah hook dari BetterAuthReactAdapter
   const session = authClient.useSession();
   const localUser = authService.getUser();
+  const localToken = localStorage.getItem('token');
+  const hasLocalAuth = !!(localUser && localToken);
   
   if (session.isPending) {
-    if (localUser) {
+    if (hasLocalAuth) {
       return {
         id: localUser.id,
         email: localUser.email,
@@ -49,7 +51,7 @@ export function useUser() {
     };
   }
 
-  if (localUser) {
+  if (hasLocalAuth) {
     return {
       id: localUser.id,
       email: localUser.email,
@@ -61,36 +63,51 @@ export function useUser() {
 }
 
 /**
- * Sign out menggunakan authClient.
+ * clearAllSessions
+ * Menghapus seluruh residu sesi baik dari Neon Auth maupun Local Storage
+ * untuk mencegah Session Hijacking/Pollution.
  */
-export async function neonSignOut() {
-  localStorage.removeItem('user');
-  localStorage.removeItem('token');
+export async function clearAllSessions() {
+  console.log('[Auth] Clearing all global sessions (Local + Neon)...');
   
+  // 1. Clear Local Cookies and LocalStorage via authService
   try {
-    await authClient.signOut();
-  } catch (error) {
-    console.error('Sign out failed:', error);
+    await authService.logout();
+  } catch (e) {
+    console.warn('[Auth] Local logout failed during cleanup, proceeding...');
   }
   
-  window.location.href = '/login';
+  // 2. Clear Neon session
+  try {
+    await authClient.signOut().catch(() => null);
+  } catch (e) {
+    // Ignore
+  }
 }
 
 export async function getJWTToken() {
-  // 1. Prioritaskan token lokal (HS256) untuk kecepatan (email/password login)
+  // 1. Cek sesi Neon Auth terlebih dahulu (Google/SSO login)
+  // Ini diprioritaskan untuk memastikan identitas modern selalu didahulukan
+  try {
+    const session = await authClient.getSession().catch(() => null);
+    const neonToken = session?.data?.token;
+    if (neonToken) {
+      // Jika ada token Neon, kita gunakan ini. 
+      // Untuk keamanan, kita juga hapus token lokal yang mungkin 'stale'
+      if (localStorage.getItem('token')) {
+        console.warn('[Auth] Found active Neon session, clearing stale local token.');
+        localStorage.removeItem('token');
+      }
+      return neonToken;
+    }
+  } catch (err) {
+    console.warn('[Auth] Neon session check failed:', err);
+  }
+
+  // 2. Fallback ke token lokal (HS256) untuk email/password login tradisional
   const localToken = localStorage.getItem('token');
   if (localToken && localToken !== 'null' && localToken !== 'undefined') {
     return localToken;
-  }
-
-  // 2. Fallback ke Neon Auth (Google/SSO login)
-  try {
-    // Gunakan getSession tapi dengan timeout/catch agar tidak menggantung
-    const session = await authClient.getSession().catch(() => null);
-    const neonToken = session?.data?.token;
-    if (neonToken) return neonToken;
-  } catch (err) {
-    console.warn('[Auth] Neon session check failed:', err);
   }
 
   return null;
@@ -104,3 +121,13 @@ export function getNeonLoginUrl(redirectTo = '/dashboard') {
 export function getNeonRegisterUrl(redirectTo = '/dashboard') {
   return `${NEON_AUTH_URL}/signup?redirect_to=${encodeURIComponent(window.location.origin + redirectTo)}`;
 }
+
+/**
+ * neonSignOut (Legacy Alias)
+ * Dialihkan ke clearAllSessions untuk pembersihan menyeluruh.
+ */
+export async function neonSignOut() {
+  await clearAllSessions();
+  window.location.href = '/login';
+}
+

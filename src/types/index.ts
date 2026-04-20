@@ -78,6 +78,9 @@ export interface DashboardLog {
 export interface AppSettings {
   appName: string;
   logoUrl?: string;
+  turnstileSiteKey?: string;
+  currency?: string;
+  taxRate?: number;
 }
 
 export interface User {

@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Eye, EyeOff } from 'lucide-react';
+import { Mail, Eye, EyeOff, Send } from 'lucide-react';
 import authService from '../lib/authService';
+import { authClient, clearAllSessions } from '../lib/stackAuth';
 import Navbar from '../components/Navbar';
 import GoogleIcon from '../components/GoogleIcon';
-import { getNeonLoginUrl } from '../lib/stackAuth';
 import { Turnstile } from '@marsidev/react-turnstile';
 import { useAppSettings } from '../context/AppContext';
 
@@ -16,8 +16,32 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [sendingOtp, setSendingOtp] = useState(false);
+  const [showOtpOption, setShowOtpOption] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const { turnstileSiteKey } = useAppSettings();
+
+  // For Neon Auth users who have no local password, send OTP instead
+  const handleSendOtp = async () => {
+    if (!email) {
+      setError('Please enter your email address first.');
+      return;
+    }
+    setSendingOtp(true);
+    setError('');
+    try {
+      const { error: otpError } = await authClient.emailOtp.sendVerificationCode({ email });
+      if (otpError) throw new Error(otpError.message || 'Failed to send OTP');
+
+      sessionStorage.setItem('pending_verification_email', email);
+      setSuccess('Verification code sent! Redirecting...');
+      setTimeout(() => navigate('/verify-email'), 800);
+    } catch (err: any) {
+      setError(err.message || 'Failed to send verification code');
+    } finally {
+      setSendingOtp(false);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,18 +57,23 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
     setSuccess('');
+    setShowOtpOption(false);
     try {
       await authService.login(email, password, turnstileToken);
       setSuccess('Signed in successfully!');
       setTimeout(() => {
-        navigate('/dashboard');
+        window.location.href = '/dashboard';
       }, 500);
-      // Reload the page so App.tsx checks authentication status
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 1000);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+    } catch (err: any) {
+      const errorMsg = err instanceof Error ? err.message : 'Login failed';
+      
+      // Detect Neon-Auth-only users who have no local password
+      if (errorMsg.includes('Neon Auth')) {
+        setShowOtpOption(true);
+        setError('Akun ini didaftarkan via Neon Auth. Gunakan kode OTP untuk login.');
+      } else {
+        setError(errorMsg);
+      }
     } finally {
       setLoading(false);
     }
@@ -60,22 +89,25 @@ export default function LoginPage() {
             <p className="text-sm text-gray-500">Sign in to your account to continue</p>
           </div>
 
-
-          {/* Google OAuth (legacy/placeholder) */}
-          <button
-            type="button"
-            onClick={() => window.location.href = getNeonLoginUrl('/dashboard')}
-            className="w-full flex items-center justify-center gap-2.5 border border-gray-200 rounded-lg py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors mb-5"
-          >
-            <GoogleIcon />
-            Sign in with Google
-          </button>
-
-          <div className="flex items-center gap-3 mb-5">
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-xs text-gray-400 whitespace-nowrap">Or continue with email</span>
-            <div className="flex-1 h-px bg-gray-200" />
+          <div className="mb-6">
+            <button 
+              type="button"
+              className="flex items-center justify-center gap-3 w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm cursor-not-allowed opacity-70"
+              title="Google login is currently for decoration only"
+            >
+              <GoogleIcon />
+              Sign in with Google
+            </button>
+            <div className="relative mt-6 mb-2">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-100"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-2 text-gray-400">Or continue with email</span>
+              </div>
+            </div>
           </div>
+
 
           <form onSubmit={handleLogin} className="flex flex-col gap-4">
             <div>
@@ -144,6 +176,19 @@ export default function LoginPage() {
               <p className="text-xs text-green-600 bg-green-50 border border-green-100 rounded-lg px-3 py-2">
                 {success}
               </p>
+            )}
+
+            {/* OTP fallback button for Neon Auth users without a local password */}
+            {showOtpOption && (
+              <button
+                type="button"
+                onClick={handleSendOtp}
+                disabled={sendingOtp}
+                className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-semibold py-2.5 rounded-lg text-sm transition-colors"
+              >
+                <Send size={14} />
+                {sendingOtp ? 'Sending OTP...' : 'Login via OTP (Email Verification)'}
+              </button>
             )}
 
             <button

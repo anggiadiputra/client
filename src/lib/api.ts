@@ -3,9 +3,18 @@ import { getJWTToken } from './stackAuth';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 const getOptions = async (): Promise<RequestInit> => {
-  const token = await getJWTToken();
+  let token = await getJWTToken();
+
+  // If no token found on first try, wait briefly and retry once.
+  // This handles the race condition where Neon Auth session hasn't settled yet
+  // when the dashboard first loads (right after OTP verification redirect).
   if (!token) {
-    console.warn('[API] No token found! Request will likely fail with 401.');
+    await new Promise(resolve => setTimeout(resolve, 800));
+    token = await getJWTToken();
+  }
+
+  if (!token) {
+    console.warn('[API] No token found after retry. Request will likely fail with 401.');
   }
 
   return {
@@ -16,6 +25,35 @@ const getOptions = async (): Promise<RequestInit> => {
     }
   };
 };
+
+/**
+ * handleResponse
+ * Centralized response handler to catch 401s and other errors.
+ *
+ * IMPORTANT: We do NOT auto-logout on every 401. This caused a critical bug where:
+ * - A race condition on dashboard load (session not yet settled) caused a 401
+ * - handleResponse then immediately nuked the Neon Auth session
+ * - User was effectively logged out right after signing in via OTP
+ *
+ * Instead: We just throw an error and let the component handle it gracefully.
+ * Only the explicit "logout" action should destroy the session.
+ */
+const handleResponse = async (response: Response, defaultErrorMessage: string) => {
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    
+    if (response.status === 401) {
+      // Log the 401 for debugging but DO NOT auto-logout.
+      // The session may still be valid - this could be a race condition startup issue.
+      console.warn(`[API] 401 on ${response.url} - session may be loading. Throwing error for caller to handle.`);
+    }
+    
+    throw new Error(errorData.error || errorData.details || defaultErrorMessage);
+  }
+  
+  return response.json();
+};
+
 
 // Customers
 export const customersAPI = {
@@ -30,8 +68,7 @@ export const customersAPI = {
     const response = await fetch(`${API_URL}/customers${queryString}`, {
       ...(await getOptions()),
     });
-    if (!response.ok) throw new Error('Failed to fetch customers');
-    return response.json();
+    return handleResponse(response, 'Failed to fetch customers');
   },
 
   create: async (data: any) => {
@@ -40,8 +77,7 @@ export const customersAPI = {
       ...(await getOptions()),
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error('Failed to create customer');
-    return response.json();
+    return handleResponse(response, 'Failed to create customer');
   },
 
   update: async (id: number, data: any) => {
@@ -87,11 +123,7 @@ export const servicesAPI = {
     const response = await fetch(`${API_URL}/services${queryString}`, {
       ...(await getOptions()),
     });
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || errorData.details || 'Failed to fetch services');
-    }
-    return response.json();
+    return handleResponse(response, 'Failed to fetch services');
   },
 
   create: async (data: any) => {
@@ -100,11 +132,7 @@ export const servicesAPI = {
       ...(await getOptions()),
       body: JSON.stringify(data),
     });
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || errorData.details || 'Failed to create service');
-    }
-    return response.json();
+    return handleResponse(response, 'Failed to create service');
   },
 
   update: async (id: number, data: any) => {
@@ -150,16 +178,14 @@ export const invoicesAPI = {
     const response = await fetch(`${API_URL}/invoices${queryString}`, {
       ...(await getOptions()),
     });
-    if (!response.ok) throw new Error('Failed to fetch invoices');
-    return response.json();
+    return handleResponse(response, 'Failed to fetch invoices');
   },
 
   getStats: async () => {
     const response = await fetch(`${API_URL}/invoices/stats/summary`, {
       ...(await getOptions()),
     });
-    if (!response.ok) throw new Error('Failed to fetch stats');
-    return response.json();
+    return handleResponse(response, 'Failed to fetch invoice stats');
   },
 
   getMonthlyStats: async () => {
@@ -174,8 +200,7 @@ export const invoicesAPI = {
     const response = await fetch(`${API_URL}/invoices/${id}`, {
       ...(await getOptions()),
     });
-    if (!response.ok) throw new Error('Failed to fetch invoice');
-    return response.json();
+    return handleResponse(response, 'Failed to fetch invoice');
   },
 
   create: async (data: any) => {
@@ -184,8 +209,7 @@ export const invoicesAPI = {
       ...(await getOptions()),
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error('Failed to create invoice');
-    return response.json();
+    return handleResponse(response, 'Failed to create invoice');
   },
 
   update: async (id: number | string, data: any) => {
@@ -247,8 +271,7 @@ export const settingsAPI = {
     const response = await fetch(`${API_URL}/settings`, {
       ...(await getOptions()),
     });
-    if (!response.ok) throw new Error('Failed to fetch settings');
-    return response.json();
+    return handleResponse(response, 'Failed to fetch settings');
   },
 
   update: async (data: any) => {
@@ -257,8 +280,7 @@ export const settingsAPI = {
       ...(await getOptions()),
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error('Failed to update settings');
-    return response.json();
+    return handleResponse(response, 'Failed to update settings');
   },
 
   testS3: async (data: any) => {
@@ -341,8 +363,7 @@ export const bankAccountsAPI = {
     const response = await fetch(`${API_URL}/bank-accounts`, {
       ...(await getOptions()),
     });
-    if (!response.ok) throw new Error('Failed to fetch bank accounts');
-    return response.json();
+    return handleResponse(response, 'Failed to fetch bank accounts');
   },
 
   create: async (data: any) => {
@@ -351,8 +372,7 @@ export const bankAccountsAPI = {
       ...(await getOptions()),
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error('Failed to create bank account');
-    return response.json();
+    return handleResponse(response, 'Failed to create bank account');
   },
 
   update: async (id: number, data: any) => {
@@ -379,18 +399,24 @@ export const bankAccountsAPI = {
       method: 'PATCH',
       ...(await getOptions()),
     });
-    if (!response.ok) throw new Error('Failed to set primary bank account');
-    return response.json();
+    return handleResponse(response, 'Failed to set primary bank account');
   },
 };
 
 // Logs
 export const logsAPI = {
   getRecent: async () => {
+    const options = await getOptions();
     const [waRes, emailRes] = await Promise.all([
-      fetch(`${API_URL}/fonnte/logs?limit=5`, { ...(await getOptions()) }),
-      fetch(`${API_URL}/emails/logs?limit=5`, { ...(await getOptions()) })
+      fetch(`${API_URL}/fonnte/logs?limit=5`, { ...options }),
+      fetch(`${API_URL}/emails/logs?limit=5`, { ...options })
     ]);
+
+    // Catch 401s specifically for both (but do NOT sign out, as it causes race condition false-logouts)
+    if (waRes.status === 401 || emailRes.status === 401) {
+      console.warn('[API] 401 on logsAPI.getRecent - session may still be loading. Returning empty logs.');
+      return [];
+    }
 
     const waData = waRes.ok ? await waRes.json() : { logs: [] };
     const emailData = emailRes.ok ? await emailRes.json() : { logs: [] };
@@ -411,8 +437,7 @@ export const authAPI = {
     const response = await fetch(`${API_URL}/auth/me`, {
       ...(await getOptions()),
     });
-    if (!response.ok) throw new Error('Failed to fetch user profile');
-    return response.json();
+    return handleResponse(response, 'Failed to fetch user profile');
   },
 
   syncNeon: async (token?: string) => {
@@ -578,6 +603,50 @@ export const regionsAPI = {
   },
 };
 
+// Wallet
+export const walletAPI = {
+  get: async () => {
+    const response = await fetch(`${API_URL}/wallet`, {
+      ...(await getOptions()),
+    });
+    if (!response.ok) throw new Error('Failed to fetch wallet data');
+    return response.json();
+  },
+
+  initiateTopup: async (amount: number) => {
+    const response = await fetch(`${API_URL}/wallet/topup`, {
+      method: 'POST',
+      ...(await getOptions()),
+      body: JSON.stringify({ amount }),
+    });
+    if (!response.ok) throw new Error('Failed to initiate top-up');
+    return response.json();
+  },
+};
+
+// Plans & Subscriptions
+export const plansAPI = {
+  getAll: async () => {
+    const response = await fetch(`${API_URL}/plans`, {
+      ...(await getOptions()),
+    });
+    return handleResponse(response, 'Failed to fetch plans');
+  },
+
+  upgrade: async (planId: number) => {
+    const response = await fetch(`${API_URL}/plans/upgrade`, {
+      method: 'POST',
+      ...(await getOptions()),
+      body: JSON.stringify({ planId }),
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to upgrade subscription');
+    }
+    return response.json();
+  },
+};
+
 // Users (Admin Only)
 export const usersAPI = {
   getAll: async (page?: number, limit?: number, search?: string, status?: string) => {
@@ -591,11 +660,7 @@ export const usersAPI = {
     const response = await fetch(`${API_URL}/users${queryString}`, {
       ...(await getOptions()),
     });
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || 'Failed to fetch users');
-    }
-    return response.json();
+    return handleResponse(response, 'Failed to fetch users');
   },
 
   update: async (id: number | string, data: any) => {

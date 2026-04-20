@@ -73,7 +73,12 @@ export default function StackVerifyEmailPage() {
       addToast('success', 'Email verified successfully!');
       setIsVerified(true);
       sessionStorage.removeItem('pending_verification_email');
-      window.location.href = '/';
+      // Wait for Neon Auth session to properly settle before redirecting.
+      // A direct window.location.href causes a race condition where the page
+      // reloads before the session cookie/state is fully written.
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 1500);
     } catch (err: any) {
       setError(err.message || 'Error verifying code');
     } finally {

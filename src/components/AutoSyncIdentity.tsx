@@ -18,9 +18,8 @@ export default function AutoSyncIdentity() {
   useEffect(() => {
     const syncIdentity = async () => {
       const localUser = authService.getUser();
-      
-      // If no local user or they already have a neon_user_id, no need to sync
-      if (!localUser || localUser.neon_user_id) {
+      // If the local user already exists AND has a neon_user_id, no need to sync
+      if (localUser && localUser.neon_user_id) {
         return;
       }
 

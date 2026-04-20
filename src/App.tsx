@@ -26,6 +26,8 @@ import WhatsAppLogDetailPage from './pages/WhatsAppLogDetailPage';
 import EmailLogDetailPage from './pages/EmailLogDetailPage';
 import ProfilePage from './pages/ProfilePage';
 import UsersPage from './pages/UsersPage';
+import PricingPage from './pages/PricingPage';
+import BillingPage from './pages/BillingPage';
 
 // Components
 import Sidebar from './components/Sidebar';
@@ -97,11 +99,20 @@ function SessionSync() {
 
 /**
  * ProtectedRoute component protects internal routes from unauthorized access.
+ * Includes a brief stabilization delay to prevent false-negative logouts immediately
+ * after Neon Auth OTP verification (race condition where session is not yet settled).
  */
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const user = useUser();
+  const [isStabilizing, setIsStabilizing] = useState(true);
 
-  if (user === undefined) {
+  useEffect(() => {
+    // Give the auth state 1 second to settle, especially after OTP redirects
+    const timer = setTimeout(() => setIsStabilizing(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (user === undefined || isStabilizing) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
@@ -134,6 +145,8 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
     if (path === '/logs') return 'logs';
     if (path === '/profile') return 'profile';
     if (path === '/users') return 'users';
+    if (path === '/pricing') return 'pricing';
+    if (path === '/billing') return 'billing';
     return 'dashboard';
   };
 
@@ -143,6 +156,8 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
       case 'dashboard': return 'Dashboard Overview';
       case 'customers': return 'Manage Customers';
       case 'services': return 'Our Services';
+      case 'pricing': return 'Subscription Plans';
+      case 'billing': return 'Billing & Wallet';
       case 'invoices': return 'Invoices & Billing';
       case 'settings': return 'System Settings';
       case 'templates': return 'Invoice Templates';
@@ -255,6 +270,8 @@ export default function App() {
               <Route path="/logs/whatsapp/:id" element={<ProtectedRoute><DashboardLayout><WhatsAppLogDetailPage /></DashboardLayout></ProtectedRoute>} />
               <Route path="/logs/email/:id" element={<ProtectedRoute><DashboardLayout><EmailLogDetailPage /></DashboardLayout></ProtectedRoute>} />
               <Route path="/users" element={<ProtectedRoute><DashboardLayout><UsersPage /></DashboardLayout></ProtectedRoute>} />
+              <Route path="/pricing" element={<ProtectedRoute><DashboardLayout><PricingPage /></DashboardLayout></ProtectedRoute>} />
+              <Route path="/billing" element={<ProtectedRoute><DashboardLayout><BillingPage /></DashboardLayout></ProtectedRoute>} />
 
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />

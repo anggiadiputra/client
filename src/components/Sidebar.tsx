@@ -1,5 +1,8 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, BarChart, FileText, Settings, BarChart3, LayoutTemplate, X, Plane } from 'lucide-react';
+import { 
+  LayoutDashboard, Users, BarChart, FileText, Settings, BarChart3, LayoutTemplate, X, Plane,
+  CreditCard, Crown, Wallet
+} from 'lucide-react';
 import { useAppSettings } from '../context/AppContext';
 
 interface SidebarProps {
@@ -9,13 +12,15 @@ interface SidebarProps {
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const location = useLocation();
-  const { settings, userRole } = useAppSettings();
+  const { settings, userRole, subscription, wallet } = useAppSettings();
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
     { id: 'customers', label: 'Customers', icon: Users, path: '/customers' },
     { id: 'services', label: 'Services', icon: BarChart, path: '/services' },
     { id: 'invoices', label: 'Invoices', icon: FileText, path: '/invoices' },
+    { id: 'billing', label: 'Billing & Wallet', icon: CreditCard, path: '/billing' },
+    { id: 'pricing', label: 'Subscription Plans', icon: Crown, path: '/pricing' },
     { id: 'logs', label: 'Log History', icon: BarChart3, path: '/logs' },
     { id: 'settings', label: 'Settings', icon: Settings, path: '/settings' },
     { id: 'templates', label: 'Templates', icon: LayoutTemplate, path: '/templates' },
@@ -61,9 +66,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         {/* Sections Mapping */}
         {[
           { title: 'Overview', items: ['dashboard'] },
+          { title: 'SaaS & Billing', items: ['pricing', 'billing'], adminHidden: true },
           { title: 'Business', items: ['invoices', 'customers', 'services'] },
           { title: 'System', items: ['templates', 'users', 'logs', 'settings'] }
-        ].map((section) => (
+        ]
+        .filter(section => !(section.adminHidden && userRole === 'admin'))
+        .map((section) => (
           <div key={section.title} className="mb-5">
             <h3 className="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
               {section.title}
@@ -93,6 +101,31 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           </div>
         ))}
       </nav>
+
+      {/* Wallet Balance Widget (Hidden for Admin) */}
+      {userRole !== 'admin' && (
+        <div className="p-4 border-t border-gray-50 bg-gray-50/50">
+          <Link to="/billing" className="group block p-3 bg-white rounded-xl border border-gray-100 shadow-sm hover:border-blue-300 transition-all duration-200">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 transition-colors group-hover:bg-blue-600 group-hover:text-white">
+                <Wallet size={16} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider leading-none mb-1">Saldo Anda</p>
+                <p className="text-sm font-extrabold text-gray-900 leading-none truncate">
+                  Rp {parseFloat(wallet?.balance || '0').toLocaleString('id-ID')}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-50">
+              <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase tracking-tight">
+                {subscription?.plan?.name || 'Free'}
+              </span>
+              <span className="text-[10px] font-medium text-gray-400 group-hover:text-blue-600 transition-colors">Top-up &rarr;</span>
+            </div>
+          </Link>
+        </div>
+      )}
 
       <div className="p-4 border-t border-gray-50">
         <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100/50">

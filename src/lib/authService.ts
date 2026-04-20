@@ -49,10 +49,14 @@ class AuthService {
   }
 
   async logout() {
+    console.log('[Auth] Performing complete local logout...');
     try {
-      await fetch(`${API_URL}/auth/logout`, { method: 'POST', credentials: 'include' });
+      await fetch(`${API_URL}/auth/logout`, { 
+        method: 'POST', 
+        credentials: 'include' // Ensure cookie is sent so it can be cleared
+      });
     } catch(e) {
-      // Ignored
+      console.warn('[Auth] Logout API call failed, clearing local state anyway');
     }
     localStorage.removeItem('token');
     localStorage.removeItem('user');
