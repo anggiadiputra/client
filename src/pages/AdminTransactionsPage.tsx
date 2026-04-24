@@ -10,6 +10,7 @@ import { walletAPI, usersAPI } from '../lib/api';
 import { WalletTransaction, User } from '../types';
 import { toast } from '../components/Toast';
 import KeyboardShortcutWrapper from '../components/KeyboardShortcutWrapper';
+import { SkeletonTable } from '../components/LoadingSkeleton';
 
 export default function AdminTransactionsPage() {
   const navigate = useNavigate();
@@ -179,10 +180,7 @@ export default function AdminTransactionsPage() {
       {/* Table Section */}
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden min-h-[400px]">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 text-gray-400 space-y-3">
-            <Loader2 className="animate-spin" size={32} />
-            <span className="text-sm font-medium">Memuat data transaksi...</span>
-          </div>
+          <SkeletonTable rows={10} columns={6} />
         ) : filteredTransactions.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-gray-400 space-y-3">
             <Clock size={48} className="opacity-20" />

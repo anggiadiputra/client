@@ -5,6 +5,7 @@ import { useAppSettings } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { toast } from '../components/Toast';
+import { SkeletonStatsCards } from '../components/LoadingSkeleton';
 
 interface ConfirmConfig {
   isOpen: boolean;
@@ -132,8 +133,12 @@ export default function PricingPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="mb-12">
+          <div className="h-8 bg-gray-200 animate-pulse rounded w-1/4 mb-4"></div>
+          <div className="h-4 bg-gray-200 animate-pulse rounded w-1/2"></div>
+        </div>
+        <SkeletonStatsCards count={3} />
       </div>
     );
   }

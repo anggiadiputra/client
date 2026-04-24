@@ -9,7 +9,7 @@ import { SkeletonTable } from '../components/LoadingSkeleton';
 import { toast } from '../components/Toast';
 import { Invoice } from '../types';
 import DropdownFilter from '../components/DropdownFilter';
-import CompactBatchActions from '../components/CompactBatchActions';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 const PAGE_SIZE = 10;
 
@@ -23,10 +23,12 @@ export default function InvoicesPage() {
   const [companySettings, setCompanySettings] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [totalItems, setTotalItems] = useState(0);
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
-  const [isBatchLoading, setIsBatchLoading] = useState(false);
+  const [confirmConfig, setConfirmConfig] = useState({
+    isOpen: false,
+    invoice: null as any
+  });
 
   useEffect(() => {
     fetchInvoices();
@@ -95,65 +97,29 @@ export default function InvoicesPage() {
     navigate(`/invoices/${invoice.invoice_number}/edit`);
   };
 
-  const handleDeleteInvoice = async (invoice: any) => {
-    if (confirm(`Are you sure you want to delete invoice ${invoice.invoice_number}?`)) {
-      setDeletingId(invoice.id);
-      try {
-        await invoicesAPI.delete(invoice.id);
-        fetchInvoices();
-      } catch (error: any) {
-        console.error('Error deleting invoice:', error);
-        alert('Failed to delete invoice: ' + (error.message || 'An error occurred'));
-      } finally {
-        setDeletingId(null);
-      }
-    }
+  const handleDeleteInvoice = (invoice: any) => {
+    setConfirmConfig({
+      isOpen: true,
+      invoice
+    });
   };
 
-  const handleBatchDelete = async () => {
-    if (!confirm(`Are you sure you want to delete ${selectedIds.length} invoices?`)) return;
-    
-    setIsBatchLoading(true);
+  const confirmDelete = async () => {
+    const invoice = confirmConfig.invoice;
+    if (!invoice) return;
+
+    setConfirmConfig({ ...confirmConfig, isOpen: false });
+    setDeletingId(invoice.id);
     try {
-      await invoicesAPI.batchDelete(selectedIds);
-      toast.success('Invoices deleted successfully');
-      setSelectedIds([]);
+      await invoicesAPI.delete(invoice.id);
+      toast.success(`Invoice ${invoice.invoice_number} berhasil dihapus`);
       fetchInvoices();
     } catch (error: any) {
-      console.error('Error batch deleting:', error);
-      toast.error(error.message || 'Failed to delete invoices');
+      console.error('Error deleting invoice:', error);
+      toast.error('Gagal menghapus invoice: ' + (error.message || 'Terjadi kesalahan'));
     } finally {
-      setIsBatchLoading(false);
+      setDeletingId(null);
     }
-  };
-
-  const handleBatchUpdateStatus = async (status: string) => {
-    setIsBatchLoading(true);
-    try {
-      await invoicesAPI.batchUpdateStatus(selectedIds, status);
-      toast.success(`Updated ${selectedIds.length} invoices to ${status}`);
-      setSelectedIds([]);
-      fetchInvoices();
-    } catch (error: any) {
-      console.error('Error batch updating status:', error);
-      toast.error(error.message || 'Failed to update invoices');
-    } finally {
-      setIsBatchLoading(false);
-    }
-  };
-
-  const toggleSelectAll = () => {
-    if (selectedIds.length === invoices.length) {
-      setSelectedIds([]);
-    } else {
-      setSelectedIds(invoices.map(i => i.id));
-    }
-  };
-
-  const toggleSelect = (id: number) => {
-    setSelectedIds(prev => 
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-    );
   };
 
   const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
@@ -215,20 +181,6 @@ export default function InvoicesPage() {
           />
         </div>
 
-        <CompactBatchActions
-          selectedCount={selectedIds.length}
-          onDelete={handleBatchDelete}
-          onUpdateStatus={handleBatchUpdateStatus}
-          statusOptions={[
-            { label: 'Draft', value: 'draft' },
-            { label: 'Sent', value: 'sent' },
-            { label: 'Paid', value: 'paid' },
-            { label: 'Overdue', value: 'overdue' },
-          ]}
-          onClear={() => setSelectedIds([])}
-          isLoading={isBatchLoading}
-        />
-
         {!loading && (
           <span className="text-xs text-gray-400 whitespace-nowrap">
             {totalItems} invoice{totalItems !== 1 ? 's' : ''}
@@ -246,18 +198,6 @@ export default function InvoicesPage() {
                 <table className="w-full text-left border-collapse">
                   <thead className="bg-gray-50 border-b border-gray-200 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
                     <tr>
-                      <th className="w-10 px-4 py-2">
-                        <button 
-                          onClick={toggleSelectAll}
-                          className="text-gray-400 hover:text-blue-600 transition-colors"
-                        >
-                          {selectedIds.length > 0 && selectedIds.length === invoices.length ? (
-                            <CheckSquare size={16} className="text-blue-600" />
-                          ) : (
-                            <Square size={16} />
-                          )}
-                        </button>
-                      </th>
                       <th className="px-4 py-2">No. Invoice</th>
                       <th className="px-4 py-2 hidden lg:table-cell">Pelanggan</th>
                       <th className="px-4 py-2 text-right">Total</th>
@@ -275,19 +215,7 @@ export default function InvoicesPage() {
                       </tr>
                     ) : (
                       invoices.map((invoice) => (
-                        <tr key={invoice.id} className={`hover:bg-gray-50 transition-colors ${selectedIds.includes(invoice.id) ? 'bg-blue-50/50' : ''}`}>
-                          <td className="px-4 py-2">
-                            <button 
-                              onClick={() => toggleSelect(invoice.id)}
-                              className="text-gray-400 hover:text-blue-600 transition-colors"
-                            >
-                              {selectedIds.includes(invoice.id) ? (
-                                <CheckSquare size={16} className="text-blue-600" />
-                              ) : (
-                                <Square size={16} />
-                              )}
-                            </button>
-                          </td>
+                        <tr key={invoice.id} className="hover:bg-gray-50 transition-colors">
                           <td className="px-4 py-3 text-sm font-bold text-gray-900 tabular-nums">
                             {invoice.invoice_number}
                           </td>
@@ -333,18 +261,8 @@ export default function InvoicesPage() {
                 </div>
               ) : (
                 invoices.map((invoice) => (
-                  <div key={invoice.id} className={`p-4 bg-white rounded-xl shadow-sm border border-gray-100 mb-3 mx-2 hover:shadow-md transition-all ${selectedIds.includes(invoice.id) ? 'bg-blue-50/50 border-blue-200 ring-1 ring-blue-100' : ''}`}>
+                  <div key={invoice.id} className="p-4 bg-white rounded-xl shadow-sm border border-gray-100 mb-3 mx-2 hover:shadow-md transition-all">
                     <div className="flex items-start gap-3 mb-3">
-                      <button 
-                        onClick={() => toggleSelect(invoice.id)}
-                        className="mt-1 text-gray-400 hover:text-blue-600 transition-colors"
-                      >
-                        {selectedIds.includes(invoice.id) ? (
-                          <CheckSquare size={20} className="text-blue-600" />
-                        ) : (
-                          <Square size={20} />
-                        )}
-                      </button>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
@@ -445,6 +363,17 @@ export default function InvoicesPage() {
           onSuccess={handleWhatsAppSuccess}
         />
       )}
+
+      <ConfirmDialog
+        isOpen={confirmConfig.isOpen}
+        title="Hapus Invoice"
+        message={`Apakah Anda yakin ingin menghapus invoice ${confirmConfig.invoice?.invoice_number}? Tindakan ini tidak dapat dibatalkan.`}
+        confirmLabel="Ya, Hapus"
+        cancelLabel="Batal"
+        type="danger"
+        onConfirm={confirmDelete}
+        onCancel={() => setConfirmConfig({ ...confirmConfig, isOpen: false })}
+      />
     </div>
   );
 }

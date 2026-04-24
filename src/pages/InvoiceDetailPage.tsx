@@ -7,6 +7,7 @@ import { servicesAPI, invoicesAPI, customersAPI, settingsAPI, bankAccountsAPI, e
 import html2pdf from 'html2pdf.js';
 import { toast } from '../components/Toast';
 import { toTitleCase } from '../lib/formatter';
+import { SkeletonBlock, SkeletonTable } from '../components/LoadingSkeleton';
 
 export default function InvoiceDetailPage() {
   const navigate = useNavigate();
@@ -231,8 +232,25 @@ export default function InvoiceDetailPage() {
 
   if (loading) {
     return (
-      <div className="p-8 bg-gray-50 min-h-[60vh] flex items-center justify-center">
-        <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+      <div className="max-w-4xl mx-auto p-4 sm:p-8 space-y-8">
+        <div className="flex justify-between items-start">
+          <div className="space-y-4">
+            <SkeletonBlock width="120px" height="40px" rounded />
+            <SkeletonBlock width="200px" height="24px" />
+          </div>
+          <SkeletonBlock width="150px" height="150px" rounded />
+        </div>
+        <div className="grid grid-cols-2 gap-8">
+          <div className="space-y-3">
+            <SkeletonBlock width="100px" height="16px" />
+            <SkeletonBlock width="100%" height="80px" rounded />
+          </div>
+          <div className="space-y-3">
+            <SkeletonBlock width="100px" height="16px" />
+            <SkeletonBlock width="100%" height="80px" rounded />
+          </div>
+        </div>
+        <SkeletonTable rows={4} columns={4} />
       </div>
     );
   }

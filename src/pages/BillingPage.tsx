@@ -9,6 +9,7 @@ import { walletAPI } from '../lib/api';
 import { useAppSettings as useGlobalContext } from '../context/AppContext';
 import { toast } from '../components/Toast';
 import KeyboardShortcutWrapper from '../components/KeyboardShortcutWrapper';
+import { SkeletonTable } from '../components/LoadingSkeleton';
 
 export default function BillingPage() {
   const navigate = useNavigate();
@@ -315,10 +316,7 @@ export default function BillingPage() {
 
             <div className="flex-1 overflow-x-auto min-h-[400px]">
               {loading ? (
-                <div className="flex flex-col items-center justify-center py-20 text-gray-400 space-y-3">
-                  <Loader2 className="animate-spin" size={24} />
-                  <span className="text-xs font-medium">Memuat riwayat...</span>
-                </div>
+                <SkeletonTable rows={5} columns={4} className="border-none shadow-none" />
               ) : history.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-gray-400 space-y-2">
                   <Clock size={32} className="opacity-20" />
