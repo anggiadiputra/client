@@ -613,15 +613,65 @@ export const walletAPI = {
     return response.json();
   },
 
-  initiateTopup: async (amount: number) => {
+  initiateTopup: async (amount: number, method: string) => {
     const response = await fetch(`${API_URL}/wallet/topup`, {
       method: 'POST',
       ...(await getOptions()),
-      body: JSON.stringify({ amount }),
+      body: JSON.stringify({ amount, method }),
     });
-    if (!response.ok) throw new Error('Failed to initiate top-up');
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to initiate top-up');
+    }
     return response.json();
   },
+
+  checkStatus: async (order_id: string, amount: number) => {
+    const response = await fetch(`${API_URL}/wallet/topup/check-status`, {
+      method: 'POST',
+      ...(await getOptions()),
+      body: JSON.stringify({ order_id, amount }),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to check status');
+    }
+    return response.json();
+  },
+
+  cancelTopup: async (order_id: string) => {
+    const response = await fetch(`${API_URL}/wallet/topup/cancel`, {
+      method: 'POST',
+      ...(await getOptions()),
+      body: JSON.stringify({ order_id }),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to cancel top-up');
+    }
+    return response.json();
+  },
+
+  getAllTransactions: async () => {
+    const response = await fetch(`${API_URL}/wallet/all-transactions`, {
+      ...(await getOptions()),
+    });
+    if (!response.ok) throw new Error('Failed to fetch all transactions');
+    return response.json();
+  },
+
+  manualAdjust: async (userId: number | null, amount: number, type: 'deposit' | 'deduction', description: string, email?: string) => {
+    const response = await fetch(`${API_URL}/wallet/manual-adjust`, {
+      method: 'POST',
+      ...(await getOptions()),
+      body: JSON.stringify({ userId, email, amount, type, description }),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to manually adjust balance');
+    }
+    return response.json();
+  }
 };
 
 // Plans & Subscriptions
@@ -633,6 +683,44 @@ export const plansAPI = {
     return handleResponse(response, 'Failed to fetch plans');
   },
 
+  create: async (data: any) => {
+    const response = await fetch(`${API_URL}/plans`, {
+      method: 'POST',
+      ...(await getOptions()),
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to create plan');
+    }
+    return response.json();
+  },
+
+  update: async (id: number | string, data: any) => {
+    const response = await fetch(`${API_URL}/plans/${id}`, {
+      method: 'PUT',
+      ...(await getOptions()),
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to update plan');
+    }
+    return response.json();
+  },
+
+  delete: async (id: number | string) => {
+    const response = await fetch(`${API_URL}/plans/${id}`, {
+      method: 'DELETE',
+      ...(await getOptions()),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to delete plan');
+    }
+    return response.json();
+  },
+
   upgrade: async (planId: number) => {
     const response = await fetch(`${API_URL}/plans/upgrade`, {
       method: 'POST',
@@ -640,7 +728,7 @@ export const plansAPI = {
       body: JSON.stringify({ planId }),
     });
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.error || 'Failed to upgrade subscription');
     }
     return response.json();
@@ -713,18 +801,6 @@ export const publicAPI = {
   getSettings: async () => {
     const response = await fetch(`${API_URL}/public/settings`);
     if (!response.ok) throw new Error('Failed to fetch public settings');
-    return response.json();
-  },
-
-  getBankAccounts: async () => {
-    const response = await fetch(`${API_URL}/public/bank-accounts`);
-    if (!response.ok) throw new Error('Failed to fetch public bank accounts');
-    return response.json();
-  },
-
-  getServices: async () => {
-    const response = await fetch(`${API_URL}/public/services`);
-    if (!response.ok) throw new Error('Failed to fetch public services');
     return response.json();
   },
 

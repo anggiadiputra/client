@@ -144,7 +144,7 @@ export default function CreateInvoicePage() {
       const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
       const invoice_number = `INV-${year}${month}-${random}`;
 
-      await invoicesAPI.create({
+      const createdInvoice = await invoicesAPI.create({
         customer_id: parseInt(formData.customer_id),
         invoice_number,
         issue_date: formData.issue_date,
@@ -163,8 +163,9 @@ export default function CreateInvoicePage() {
           tax_rate: item.tax_rate,
         })),
       });
-
-      navigate('/invoices');
+      
+      toast.success('Invoice berhasil dibuat');
+      navigate(`/invoices/${createdInvoice.invoice_number}/view`);
     } catch (error: any) {
       console.error('Error creating invoice:', error);
       setError(error.message || 'Gagal membuat invoice');

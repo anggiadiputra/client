@@ -28,6 +28,8 @@ import ProfilePage from './pages/ProfilePage';
 import UsersPage from './pages/UsersPage';
 import PricingPage from './pages/PricingPage';
 import BillingPage from './pages/BillingPage';
+import AdminPlansPage from './pages/AdminPlansPage';
+import AdminTransactionsPage from './pages/AdminTransactionsPage';
 
 // Components
 import Sidebar from './components/Sidebar';
@@ -60,13 +62,15 @@ function TitleUpdater() {
     else if (path === '/invoices') prefix = 'Invoices';
     else if (path === '/invoices/create') prefix = 'Create Invoice';
     else if (path.match(/^\/invoices\/[^/]+\/edit$/)) prefix = 'Edit Invoice';
-    else if (path.match(/^\/invoices\/[^/]+$/)) prefix = 'Invoice Detail';
-    else if (path.startsWith('/public/invoice/')) prefix = 'Invoice';
+    else if (path.match(/^\/invoices\/[^/]+\/view$/)) prefix = 'Invoice Detail';
+    else if (path.startsWith('/public/invoice/')) prefix = 'Kwitansi/Invoice';
     else if (path === '/settings') prefix = 'Settings';
     else if (path === '/templates' || path === '/template') prefix = 'Templates';
     else if (path === '/logs') prefix = 'Logs';
     else if (path === '/profile') prefix = 'Profile';
     else if (path === '/users') prefix = 'Users';
+    else if (path === '/admin/plans') prefix = 'All Plans';
+    else if (path === '/admin/transactions') prefix = 'All Transactions';
 
     document.title = prefix ? `${prefix} - ${title}` : title;
   }, [location.pathname, settings.appName]);
@@ -147,6 +151,8 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
     if (path === '/users') return 'users';
     if (path === '/pricing') return 'pricing';
     if (path === '/billing') return 'billing';
+    if (path === '/admin/plans') return 'admin-plans';
+    if (path === '/admin/transactions') return 'admin-transactions';
     return 'dashboard';
   };
 
@@ -164,6 +170,8 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
       case 'logs': return 'Operation Logs';
       case 'profile': return 'My Profile';
       case 'users': return 'Manage Users';
+      case 'admin-plans': return 'Plans Management';
+      case 'admin-transactions': return 'Global Transactions';
       default: return 'Overview';
     }
   };
@@ -252,6 +260,7 @@ export default function App() {
               <Route path="/login-legacy" element={<LoginPage />} />
               <Route path="/register-legacy" element={<RegisterPage />} />
               <Route path="/public/invoice/:id" element={<PublicInvoicePage />} />
+              <Route path="/invoice-view/:id" element={<ProtectedRoute><DashboardLayout><PublicInvoicePage /></DashboardLayout></ProtectedRoute>} />
 
               {/* Private Protected Routes */}
               <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout><DashboardPage /></DashboardLayout></ProtectedRoute>} />
@@ -259,8 +268,10 @@ export default function App() {
               <Route path="/services" element={<ProtectedRoute><DashboardLayout><ServicesPage /></DashboardLayout></ProtectedRoute>} />
               <Route path="/invoices" element={<ProtectedRoute><DashboardLayout><InvoicesPage /></DashboardLayout></ProtectedRoute>} />
               <Route path="/invoices/create" element={<ProtectedRoute><DashboardLayout><CreateInvoicePage /></DashboardLayout></ProtectedRoute>} />
-              <Route path="/invoices/:id" element={<ProtectedRoute><DashboardLayout><InvoiceDetailPage /></DashboardLayout></ProtectedRoute>} />
+              <Route path="/invoices/:id/view" element={<ProtectedRoute><DashboardLayout><InvoiceDetailPage /></DashboardLayout></ProtectedRoute>} />
               <Route path="/invoices/:id/edit" element={<ProtectedRoute><DashboardLayout><EditInvoicePage /></DashboardLayout></ProtectedRoute>} />
+              {/* Backward compatibility / Aliases */}
+              <Route path="/invoices/:id" element={<Navigate to="view" replace />} />
               <Route path="/settings" element={<ProtectedRoute><DashboardLayout><SettingsPage /></DashboardLayout></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><DashboardLayout><ProfilePage /></DashboardLayout></ProtectedRoute>} />
               <Route path="/templates" element={<ProtectedRoute><DashboardLayout><TemplatesPage /></DashboardLayout></ProtectedRoute>} />
@@ -272,6 +283,8 @@ export default function App() {
               <Route path="/users" element={<ProtectedRoute><DashboardLayout><UsersPage /></DashboardLayout></ProtectedRoute>} />
               <Route path="/pricing" element={<ProtectedRoute><DashboardLayout><PricingPage /></DashboardLayout></ProtectedRoute>} />
               <Route path="/billing" element={<ProtectedRoute><DashboardLayout><BillingPage /></DashboardLayout></ProtectedRoute>} />
+              <Route path="/admin/plans" element={<ProtectedRoute><DashboardLayout><AdminPlansPage /></DashboardLayout></ProtectedRoute>} />
+              <Route path="/admin/transactions" element={<ProtectedRoute><DashboardLayout><AdminTransactionsPage /></DashboardLayout></ProtectedRoute>} />
 
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />

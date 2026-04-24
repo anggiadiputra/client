@@ -103,6 +103,11 @@ export default function EditInvoicePage() {
       setShowDiscount(data.show_discount || false);
       setShowUnit(data.show_unit || false);
       setShowTax(data.show_tax || false);
+
+      // If the current URL has a numeric ID, replace it with the invoice number for SEO-friendly URLs
+      if (id && !isNaN(Number(id)) && data.invoice_number) {
+        navigate(`/invoices/${data.invoice_number}/edit`, { replace: true });
+      }
     } catch (error) {
       console.error('Error fetching invoice:', error);
       setError('Failed to load invoice data');
@@ -237,7 +242,7 @@ export default function EditInvoicePage() {
       });
 
       // Redirect to invoice detail
-      navigate(`/invoices/${id}`);
+      navigate(`/invoices/${formData.invoice_number}/view`);
     } catch (error: any) {
       console.error('Error updating invoice:', error);
       setError(error.message || 'Failed to update invoice');
@@ -259,7 +264,7 @@ export default function EditInvoicePage() {
       {/* Header */}
       <div className="mb-6 md:mb-8">
         <button
-          onClick={() => navigate(`/invoices/${id}`)}
+          onClick={() => navigate(`/invoices/${formData.invoice_number}/view`)}
           className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-2 transition-colors"
         >
           <ArrowLeft size={20} />
@@ -572,7 +577,7 @@ export default function EditInvoicePage() {
             </button>
             <button
               type="button"
-              onClick={() => navigate(`/invoices/${id}`)}
+              onClick={() => navigate(`/invoices/${formData.invoice_number}/view`)}
               className="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
             >
               Cancel

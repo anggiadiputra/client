@@ -61,6 +61,11 @@ export default function InvoiceDetailPage() {
       setCompanySettings(settingsData);
       setBankAccounts(bankData || []);
       setServices(servicesData || []);
+
+      // If the current URL has a numeric ID, replace it with the invoice number for SEO-friendly URLs
+      if (id && !isNaN(Number(id)) && invoiceData.invoice_number) {
+        navigate(`/invoices/${invoiceData.invoice_number}/view`, { replace: true });
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
       toast.error('Gagal memuat data invoice');
@@ -293,8 +298,8 @@ export default function InvoiceDetailPage() {
                 />
               </div>
             ) : (
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                {companySettings?.company_name?.[0] || 'I'}
+              <div className="text-2xl font-black text-blue-600 tracking-tighter uppercase">
+                {companySettings?.company_name || 'INVOICE'}
               </div>
             )}
             <div className="text-left md:text-right">
@@ -378,25 +383,38 @@ export default function InvoiceDetailPage() {
           {/* Summary */}
           <div className="flex flex-col md:flex-row justify-between gap-10">
             <div className="flex-1">
-              <div className="bg-gray-50 rounded-lg p-5">
-                <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Metode Pembayaran</p>
-                <div className="text-sm space-y-1">
-                  {bankAccounts.length > 0 ? (
-                    <>
-                      {bankAccounts.map((acc, i) => (
-                        <p key={i} className="font-semibold text-gray-800">{acc.bank_name} - {acc.account_number}</p>
-                      ))}
-                      <p className="text-gray-500 text-xs">A/N: {bankAccounts[0].account_name}</p>
-                    </>
-                  ) : (
-                    <p className="text-gray-500">Hubungi kami untuk detail pembayaran.</p>
-                  )}
+              {invoice.status !== 'paid' && (
+                <div className="bg-gray-50 rounded-lg p-5">
+                  <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Metode Pembayaran</p>
+                  <div className="text-sm space-y-1">
+                    {bankAccounts.length > 0 ? (
+                      <>
+                        {bankAccounts.map((acc, i) => (
+                          <p key={i} className="font-semibold text-gray-800">{acc.bank_name} - {acc.account_number}</p>
+                        ))}
+                        <p className="text-gray-500 text-xs">A/N: {bankAccounts[0].account_name}</p>
+                      </>
+                    ) : (
+                      <p className="text-gray-500">Hubungi kami untuk detail pembayaran.</p>
+                    )}
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-1">Terbilang</p>
+                    <p className="text-xs font-medium italic text-gray-600 leading-relaxed">{numberToWords(Math.round(grandTotal))} Rupiah</p>
+                  </div>
                 </div>
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-1">Terbilang</p>
-                  <p className="text-xs font-medium italic text-gray-600 leading-relaxed">{numberToWords(Math.round(grandTotal))} Rupiah</p>
+              )}
+              {invoice.status === 'paid' && (
+                <div className="bg-green-50 rounded-lg p-5 border border-green-100">
+                  <p className="text-[10px] uppercase tracking-widest font-bold text-green-600 mb-2">Status Pembayaran</p>
+                  <p className="text-sm font-bold text-green-800">LUNAS / PAID</p>
+                  <p className="text-xs text-green-600 mt-1">Terima kasih atas pembayaran Anda.</p>
+                  <div className="mt-4 pt-4 border-t border-green-200">
+                    <p className="text-[10px] uppercase tracking-widest font-bold text-green-400 mb-1">Terbilang</p>
+                    <p className="text-xs font-medium italic text-green-600 leading-relaxed">{numberToWords(Math.round(grandTotal))} Rupiah</p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
             <div className="w-full md:w-72">
               <div className="space-y-3">
@@ -424,7 +442,7 @@ export default function InvoiceDetailPage() {
           <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
             <div className="flex gap-2 w-full sm:w-auto">
               <button
-                onClick={() => navigate(`/invoices/${id}/edit`)}
+                onClick={() => navigate(`/invoices/${invoice.invoice_number}/edit`)}
                 className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-bold py-2.5 px-4 rounded-xl border border-gray-200 transition-all text-sm shadow-sm"
                 title="Edit Invoice"
               >

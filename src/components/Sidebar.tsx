@@ -25,10 +25,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     { id: 'settings', label: 'Settings', icon: Settings, path: '/settings' },
     { id: 'templates', label: 'Templates', icon: LayoutTemplate, path: '/templates' },
     { id: 'users', label: 'Users', icon: Users, path: '/users' },
+    { id: 'admin-transactions', label: 'Global Transactions', icon: BarChart, path: '/admin/transactions' },
+    { id: 'admin-plans', label: 'Plans Management', icon: Crown, path: '/admin/plans' },
   ];
 
   const filteredMenuItems = menuItems.filter(item => {
-    if (item.id === 'templates' || item.id === 'users') {
+    if (item.id === 'templates' || item.id === 'users' || item.id === 'admin-transactions' || item.id === 'admin-plans') {
       return userRole === 'admin';
     }
     return true;
@@ -68,9 +70,17 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           { title: 'Overview', items: ['dashboard'] },
           { title: 'SaaS & Billing', items: ['pricing', 'billing'], adminHidden: true },
           { title: 'Business', items: ['invoices', 'customers', 'services'] },
-          { title: 'System', items: ['templates', 'users', 'logs', 'settings'] }
+          { title: 'System', items: ['templates', 'users', 'logs', 'settings'] },
+          { title: 'Administration', items: ['admin-plans', 'admin-transactions'] }
         ]
-        .filter(section => !(section.adminHidden && userRole === 'admin'))
+        .filter(section => {
+          if (section.adminHidden && userRole === 'admin') return false;
+          // Only show section if it has at least one item that passed filteredMenuItems
+          const hasVisibleItems = section.items.some(itemId => 
+            filteredMenuItems.some(item => item.id === itemId)
+          );
+          return hasVisibleItems;
+        })
         .map((section) => (
           <div key={section.title} className="mb-5">
             <h3 className="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">

@@ -19,9 +19,9 @@ const Toast: React.FC<ToastProps> = ({ id, message, type, onClose }) => {
   }, [id, onClose]);
 
   const styles = {
-    success: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-    error: 'bg-red-50 text-red-800 border-red-200',
-    info: 'bg-blue-50 text-blue-800 border-blue-200',
+    success: 'bg-emerald-50/90 border-emerald-100 text-emerald-900 shadow-emerald-100/50',
+    error: 'bg-red-50/90 border-red-100 text-red-900 shadow-red-100/50',
+    info: 'bg-blue-50/90 border-blue-100 text-blue-900 shadow-blue-100/50',
   };
 
   const icons = {
@@ -31,10 +31,13 @@ const Toast: React.FC<ToastProps> = ({ id, message, type, onClose }) => {
   };
 
   return (
-    <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border shadow-lg animate-in slide-in-from-right-full mb-3 min-w-[300px] ${styles[type]}`}>
-      {icons[type]}
-      <div className="flex-1 font-semibold text-sm">{message}</div>
-      <button onClick={() => onClose(id)} className="p-1 hover:bg-black/5 rounded-lg transition-colors">
+    <div className={`flex items-center gap-3 px-5 py-4 rounded-2xl border backdrop-blur-md shadow-xl animate-in slide-in-from-right-8 fade-in duration-300 mb-3 min-w-[320px] max-w-md ${styles[type]}`}>
+      <div className="flex-shrink-0">{icons[type]}</div>
+      <div className="flex-1 font-bold text-[13px] leading-tight">{message}</div>
+      <button 
+        onClick={() => onClose(id)} 
+        className="p-1.5 hover:bg-black/5 rounded-full transition-colors text-gray-400 hover:text-gray-600"
+      >
         <X size={16} />
       </button>
     </div>

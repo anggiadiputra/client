@@ -16,6 +16,7 @@ export interface Customer {
   regency_name?: string;
   district_name?: string;
   village_name?: string;
+  status?: 'active' | 'inactive';
 }
 
 // Services
@@ -90,5 +91,37 @@ export interface User {
   last_name: string;
   company_name?: string;
   role: 'admin' | 'member';
+  status?: string;
+  created_at: string;
+}
+
+export interface Plan {
+  id: number;
+  slug: string;
+  name: string;
+  description?: string;
+  price_monthly: number | string;
+  max_invoices: number;
+  max_customers: number;
+  features: any;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface WalletTransaction {
+  id: number;
+  user_id: number;
+  email?: string; // For joined data
+  first_name?: string;
+  last_name?: string;
+  type: 'deposit' | 'deduction';
+  amount: number | string;
+  balance_after: number | string;
+  description: string;
+  pakasir_order_id?: string;
+  status: string;
+  expired_at?: string;
+  invoice_id?: number | string;
+  system_invoice_id?: string;
   created_at: string;
 }

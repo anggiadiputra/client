@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { 
   CheckCircle, XCircle, Loader2, ExternalLink, HardDrive, Mail, Edit, Plus, Trash2, Star, Palette,
-  MessageSquare, Monitor, CreditCard
+  Monitor, CreditCard
 } from 'lucide-react';
 import { settingsAPI, bankAccountsAPI, whatsappAPI } from '../lib/api';
 import { useAppSettings } from '../context/AppContext';
@@ -55,11 +55,6 @@ export default function SettingsPage() {
   const [smtpStatus, setSmtpStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [smtpMessage, setSmtpMessage] = useState('');
 
-  // Template states
-  const [editingTemplates, setEditingTemplates] = useState(false);
-  const [savingTemplates, setSavingTemplates] = useState(false);
-  const [templatesStatus, setTemplatesStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [templatesMessage, setTemplatesMessage] = useState('');
 
   // Bank accounts states
   const [bankAccounts, setBankAccounts] = useState<any[]>([]);
@@ -84,9 +79,6 @@ export default function SettingsPage() {
     fonnte_token: '',
     fonnte_test_target: '',
     fonnte_test_message: '',
-    wa_invoice_template: '',
-    wa_paid_template: '',
-    wa_reminder_template: '',
     s3_endpoint: '',
     s3_bucket_name: '',
     s3_region: '',
@@ -127,9 +119,6 @@ export default function SettingsPage() {
         fonnte_token: data.fonnte_token || '',
         fonnte_test_target: data.fonnte_test_target || '',
         fonnte_test_message: data.fonnte_test_message || '',
-        wa_invoice_template: data.wa_invoice_template || '',
-        wa_paid_template: data.wa_paid_template || '',
-        wa_reminder_template: data.wa_reminder_template || '',
         s3_endpoint: data.s3_endpoint || '',
         s3_bucket_name: data.s3_bucket_name || '',
         s3_region: data.s3_region || '',
@@ -157,29 +146,6 @@ export default function SettingsPage() {
     }
   };
 
-  const handleSaveTemplates = async () => {
-    setSavingTemplates(true);
-    setTemplatesStatus('idle');
-    try {
-      await settingsAPI.update({
-        wa_invoice_template: formData.wa_invoice_template,
-        wa_paid_template: formData.wa_paid_template,
-        wa_reminder_template: formData.wa_reminder_template,
-      });
-      
-      setTemplatesStatus('success');
-      setTemplatesMessage('Template pesan berhasil diperbarui!');
-      setEditingTemplates(false);
-      setTimeout(() => setTemplatesStatus('idle'), 3000);
-    } catch (error: any) {
-      console.error('Error saving templates:', error);
-      setTemplatesStatus('error');
-      setTemplatesMessage(error.message || 'Gagal memperbarui template');
-      setTimeout(() => setTemplatesStatus('idle'), 3000);
-    } finally {
-      setSavingTemplates(false);
-    }
-  };
 
 
 
@@ -493,9 +459,15 @@ export default function SettingsPage() {
         <div className="space-y-5">
           {/* Section 1: Company Information */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-            <h2 className="text-sm font-semibold text-gray-900 mb-4">
-              Informasi Perusahaan
-            </h2>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="bg-blue-100 text-blue-600 p-1.5 rounded-md">
+                <Monitor size={16} />
+              </div>
+              <div>
+                <h2 className="text-sm font-semibold text-gray-900">Profil Bisnis & Identitas</h2>
+                <p className="text-[10px] text-gray-500">Informasi ini akan muncul pada invoice Anda</p>
+              </div>
+            </div>
 
             <div className="space-y-4">
               <div>
@@ -794,7 +766,11 @@ export default function SettingsPage() {
 
           {/* BELOW ARE ADMIN-ONLY SECTIONS IN LEFT COLUMN */}
           {userRole === 'admin' && (
-            <>
+            <div className="space-y-5">
+              <div className="flex items-center gap-2 px-2">
+                <Palette size={16} className="text-gray-400" />
+                <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Pengaturan Sistem (Admin)</h2>
+              </div>
               {/* Section 1.5: Appearance Configuration */}
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
               <div className="flex items-center gap-2 mb-4">
@@ -1045,8 +1021,7 @@ export default function SettingsPage() {
                       type="tel"
                       value={formData.fonnte_test_target}
                       onChange={(e) => setFormData({ ...formData, fonnte_test_target: e.target.value })}
-                      disabled={!editingFonnte}
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500"
+                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                       placeholder="08xxxxxxxxxx"
                     />
                   </div>
@@ -1058,8 +1033,7 @@ export default function SettingsPage() {
                       type="text"
                       value={formData.fonnte_test_message}
                       onChange={(e) => setFormData({ ...formData, fonnte_test_message: e.target.value })}
-                      disabled={!editingFonnte}
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500"
+                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                       placeholder="Test message..."
                     />
                   </div>
@@ -1135,21 +1109,26 @@ export default function SettingsPage() {
                     {connectionMessage}
                   </div>
                 )}
+                </div>
               </div>
             </div>
-            </>
           )}
         </div>
         {/* RIGHT COLUMN */}
         <div className="space-y-6">
           {/* Section 8: Pakasir Payment Gateway Configuration (ADMIN ONLY) */}
           {userRole === 'admin' && (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <CreditCard size={16} className="text-blue-600" />
-                  <h2 className="text-sm font-semibold text-gray-900">Pakasir Payment Gateway</h2>
-                </div>
+            <div className="space-y-5">
+              <div className="flex items-center gap-2 px-2">
+                <CreditCard size={16} className="text-gray-400" />
+                <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Konfigurasi Sistem (Admin)</h2>
+              </div>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <CreditCard size={16} className="text-blue-600" />
+                    <h2 className="text-sm font-semibold text-gray-900">Pakasir Payment Gateway</h2>
+                  </div>
                 {!editingPakasir ? (
                   <button
                     type="button"
@@ -1261,123 +1240,23 @@ export default function SettingsPage() {
                 </div>
               </div>
             </div>
-          )}
-
-          {/* Section 6: WhatsApp Message Templates (ALL USERS except admin in Settings) */}
-        {userRole !== 'admin' && (
-          <>
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <MessageSquare size={16} className="text-blue-600" />
-                <h2 className="text-sm font-semibold text-gray-900">Template Pesan WhatsApp</h2>
-              </div>
-              <div className="flex items-center gap-2">
-                {!editingTemplates ? (
-                  <button
-                    type="button"
-                    onClick={() => setEditingTemplates(true)}
-                    className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors"
-                  >
-                    <Edit size={16} />
-                  </button>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEditingTemplates(false);
-                        fetchSettings();
-                      }}
-                      className="text-xs text-gray-500 hover:text-gray-700 font-medium"
-                    >
-                      Batal
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleSaveTemplates}
-                      disabled={savingTemplates}
-                      className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 disabled:bg-blue-400 font-semibold flex items-center gap-1"
-                    >
-                      {savingTemplates ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle size={12} />}
-                      Simpan
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                  Template Invoice Baru
-                </label>
-                <textarea
-                  value={formData.wa_invoice_template}
-                  onChange={(e) => setFormData({ ...formData, wa_invoice_template: e.target.value })}
-                  disabled={!editingTemplates}
-                  rows={4}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:bg-gray-50 disabled:text-gray-500"
-                  placeholder="Yth. {customer_name}, berikut invoice {invoice_number} sebesar {total_amount}..."
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                  Template Pelunasan (Paid)
-                </label>
-                <textarea
-                  value={formData.wa_paid_template}
-                  onChange={(e) => setFormData({ ...formData, wa_paid_template: e.target.value })}
-                  disabled={!editingTemplates}
-                  rows={4}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:bg-gray-50 disabled:text-gray-500"
-                  placeholder="Terima kasih {customer_name}, invoice {invoice_number} telah lunas..."
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                  Template Pengingat (Reminder)
-                </label>
-                <textarea
-                  value={formData.wa_reminder_template}
-                  onChange={(e) => setFormData({ ...formData, wa_reminder_template: e.target.value })}
-                  disabled={!editingTemplates}
-                  rows={4}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:bg-gray-50 disabled:text-gray-500"
-                  placeholder="Mengingatkan invoice {invoice_number} akan jatuh tempo pada {due_date}..."
-                />
-              </div>
-
-              <div className="p-3 bg-gray-50 rounded-lg">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Variabel Tersedia</p>
-                <div className="flex flex-wrap gap-2">
-                  {['{customer_name}', '{company_name}', '{invoice_number}', '{issue_date}', '{due_date}', '{total_amount}', '{public_invoice_url}'].map(tag => (
-                    <span key={tag} className="text-[10px] bg-white border border-gray-200 text-gray-600 px-1.5 py-0.5 rounded font-mono">{tag}</span>
-                  ))}
-                </div>
-              </div>
-
-              {templatesStatus !== 'idle' && (
-                <div className={`text-xs px-3 py-2 rounded-lg ${
-                  templatesStatus === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-                }`}>
-                  {templatesStatus === 'success' ? '✔ ' : '✘ '}{templatesMessage}
-                </div>
-              )}
-            </div>
-          </>
+          </div>
         )}
+
 
 
           {userRole === 'admin' && (
             <div className="space-y-6">
-            {/* Section 4: S3 Compatible Storage Configuration */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <HardDrive size={16} className="text-blue-600" />
-              <h2 className="text-sm font-semibold text-gray-900">S3 Compatible Storage</h2>
-            </div>
+              <div className="flex items-center gap-2 px-2">
+                <HardDrive size={16} className="text-gray-400" />
+                <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Storage & Email (Admin)</h2>
+              </div>
+              {/* Section 4: S3 Compatible Storage Configuration */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+                <div className="flex items-center gap-2 mb-4">
+                  <HardDrive size={16} className="text-blue-600" />
+                  <h2 className="text-sm font-semibold text-gray-900">S3 Compatible Storage</h2>
+                </div>
 
             <div className="space-y-4">
               <div>

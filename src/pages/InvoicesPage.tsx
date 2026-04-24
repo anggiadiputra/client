@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Trash2, Eye, Edit2, Loader2, Mail, Search, ChevronLeft, ChevronRight, CheckSquare, Square, Hash, User as UserIcon, Calendar, CreditCard } from 'lucide-react';
+import { Plus, Trash2, Eye, Edit2, Loader2, Mail, Search, ChevronLeft, ChevronRight, CheckSquare, Square, Hash, User as UserIcon, Calendar } from 'lucide-react';
 import { invoicesAPI, emailsAPI } from '../lib/api';
 import { formatRupiah, formatDate } from '../lib/formatter';
 import SendWhatsAppModal from '../components/SendWhatsAppModal';
@@ -88,7 +88,7 @@ export default function InvoicesPage() {
   };
 
   const handleViewInvoice = (invoice: any) => {
-    navigate(`/invoices/${invoice.invoice_number}`);
+    navigate(`/invoices/${invoice.invoice_number}/view`);
   };
 
   const handleEditInvoice = (invoice: any) => {
@@ -243,82 +243,86 @@ export default function InvoicesPage() {
         ) : (
           <>
             <div className="overflow-x-auto hidden md:block">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <th className="w-10 px-6 py-3">
-                      <button 
-                        onClick={toggleSelectAll}
-                        className="text-gray-400 hover:text-blue-600 transition-colors"
-                      >
-                        {selectedIds.length > 0 && selectedIds.length === invoices.length ? (
-                          <CheckSquare size={18} className="text-blue-600" />
-                        ) : (
-                          <Square size={18} />
-                        )}
-                      </button>
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Invoice #</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Customer</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden xl:table-cell">Due Date</th>
-                    <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {invoices.length === 0 ? (
+                <table className="w-full text-left border-collapse">
+                  <thead className="bg-gray-50 border-b border-gray-200 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
                     <tr>
-                      <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
-                        {searchTerm || statusFilter ? 'No invoices match your filters.' : 'No invoices yet. Click "Create Invoice" to get started.'}
-                      </td>
+                      <th className="w-10 px-4 py-2">
+                        <button 
+                          onClick={toggleSelectAll}
+                          className="text-gray-400 hover:text-blue-600 transition-colors"
+                        >
+                          {selectedIds.length > 0 && selectedIds.length === invoices.length ? (
+                            <CheckSquare size={16} className="text-blue-600" />
+                          ) : (
+                            <Square size={16} />
+                          )}
+                        </button>
+                      </th>
+                      <th className="px-4 py-2">Invoice #</th>
+                      <th className="px-4 py-2 hidden lg:table-cell">Customer</th>
+                      <th className="px-4 py-2 text-right">Total</th>
+                      <th className="px-4 py-2 text-center">Status</th>
+                      <th className="px-4 py-2 hidden xl:table-cell">Jatuh Tempo</th>
+                      <th className="px-4 py-2 text-right">Aksi</th>
                     </tr>
-                  ) : (
-                    invoices.map((invoice) => (
-                      <tr key={invoice.id} className={`hover:bg-gray-50 transition-colors ${selectedIds.includes(invoice.id) ? 'bg-blue-50/50' : ''}`}>
-                        <td className="px-6 py-4">
-                          <button 
-                            onClick={() => toggleSelect(invoice.id)}
-                            className="text-gray-400 hover:text-blue-600 transition-colors"
-                          >
-                            {selectedIds.includes(invoice.id) ? (
-                              <CheckSquare size={18} className="text-blue-600" />
-                            ) : (
-                              <Square size={18} />
-                            )}
-                          </button>
-                        </td>
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">{invoice.invoice_number}</td>
-                        <td className="px-6 py-4 whitespace-nowrap hidden lg:table-cell">
-                          <div className="text-sm text-gray-700">{invoice.customer_name}</div>
-                        </td>
-                        <td className="px-6 py-4 text-sm font-semibold text-gray-900 whitespace-nowrap">
-                          {formatRupiah(parseFloat(String(invoice.grand_total ?? invoice.total_amount ?? 0)))}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${getStatusColor(invoice.status)}`}>
-                            {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap hidden xl:table-cell">
-                          {formatDate(invoice.due_date, { day: 'numeric', month: 'short', year: 'numeric' })}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-right whitespace-nowrap">
-                          <div className="flex items-center justify-end gap-1">
-                            <button onClick={() => handleSendEmail(invoice.id)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Send via Email"><Mail size={16} /></button>
-                            <button onClick={() => handleOpenWhatsApp(invoice)} className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Send WhatsApp"><WhatsAppIcon size={16} /></button>
-                            <button onClick={() => handleViewInvoice(invoice)} className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors" title="View"><Eye size={16} /></button>
-                            <button onClick={() => handleEditInvoice(invoice)} className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Edit"><Edit2 size={16} /></button>
-                            <button onClick={() => handleDeleteInvoice(invoice)} disabled={deletingId === invoice.id} className="p-1.5 text-red-600 hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition-colors" title="Delete">
-                              {deletingId === invoice.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
-                            </button>
-                          </div>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {invoices.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="px-4 py-12 text-center text-gray-400 text-xs italic">
+                          {searchTerm || statusFilter ? 'Tidak ada invoice yang cocok.' : 'Belum ada invoice. Klik "Create Invoice" untuk mulai.'}
                         </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                    ) : (
+                      invoices.map((invoice) => (
+                        <tr key={invoice.id} className={`hover:bg-gray-50 transition-colors ${selectedIds.includes(invoice.id) ? 'bg-blue-50/50' : ''}`}>
+                          <td className="px-4 py-2">
+                            <button 
+                              onClick={() => toggleSelect(invoice.id)}
+                              className="text-gray-400 hover:text-blue-600 transition-colors"
+                            >
+                              {selectedIds.includes(invoice.id) ? (
+                                <CheckSquare size={16} className="text-blue-600" />
+                              ) : (
+                                <Square size={16} />
+                              )}
+                            </button>
+                          </td>
+                          <td className="px-4 py-2 text-[12px] font-bold text-gray-900 tabular-nums">
+                            {invoice.invoice_number}
+                          </td>
+                          <td className="px-4 py-2 hidden lg:table-cell">
+                            <span className="text-[11px] text-gray-700 font-medium">{invoice.customer_name}</span>
+                          </td>
+                          <td className="px-4 py-2 text-right text-[12px] font-black text-gray-900 tabular-nums">
+                            {formatRupiah(parseFloat(String(invoice.grand_total ?? invoice.total_amount ?? 0)))}
+                          </td>
+                          <td className="px-4 py-2 text-center">
+                            <div className="flex justify-center">
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-[4px] text-[9px] font-black uppercase tracking-tighter ${getStatusColor(invoice.status)}`}>
+                                {invoice.status}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-2 hidden xl:table-cell text-[10px] text-gray-500">
+                            {formatDate(invoice.due_date, { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </td>
+                          <td className="px-4 py-2 text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <button onClick={() => handleSendEmail(invoice.id)} className="p-1 text-blue-600 hover:bg-blue-50 rounded border border-blue-50 transition-colors" title="Email"><Mail size={12} /></button>
+                              <button onClick={() => handleOpenWhatsApp(invoice)} className="p-1 text-green-600 hover:bg-green-50 rounded border border-green-50 transition-colors" title="WA"><WhatsAppIcon size={12} /></button>
+                              <button onClick={() => handleViewInvoice(invoice)} className="p-1 text-gray-600 hover:bg-gray-50 rounded border border-gray-50 transition-colors" title="View"><Eye size={12} /></button>
+                              <button onClick={() => handleEditInvoice(invoice)} className="p-1 text-amber-600 hover:bg-amber-50 rounded border border-amber-50 transition-colors" title="Edit"><Edit2 size={12} /></button>
+                              <button onClick={() => handleDeleteInvoice(invoice)} disabled={deletingId === invoice.id} className="p-1 text-red-600 hover:bg-red-50 rounded border border-red-50 transition-colors disabled:opacity-40" title="Delete">
+                                {deletingId === invoice.id ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
             </div>
 
             {/* Mobile View (Cards) */}

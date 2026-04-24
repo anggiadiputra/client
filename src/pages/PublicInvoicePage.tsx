@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download } from 'lucide-react';
+import { ArrowLeft, Download, X } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 import { toTitleCase } from '../lib/formatter';
 import { publicAPI } from '../lib/api';
@@ -10,7 +10,6 @@ export default function PublicInvoicePage() {
   const { id } = useParams();
   const invoiceRef = useRef<HTMLDivElement>(null);
   const [invoice, setInvoice] = useState<any>(null);
-  const [companySettings, setCompanySettings] = useState<any>(null);
   const [bankAccounts, setBankAccounts] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,20 +25,18 @@ export default function PublicInvoicePage() {
     setLoading(true);
     setError('');
     try {
-      // Fetch invoice using centralized public API
+      // Fetch invoice using centralized public API (returns inlined bank accounts and services)
       const invoiceData = await publicAPI.getInvoice(id);
       setInvoice(invoiceData);
+      
+      // Use inlined data from invoiceData
+      if (invoiceData.bank_accounts) setBankAccounts(invoiceData.bank_accounts);
+      if (invoiceData.services) setServices(invoiceData.services);
 
-      // Fetch company settings, bank accounts, and services in parallel using centralized public API
-      const [settingsData, bankData, servicesData] = await Promise.all([
-        publicAPI.getSettings().catch(() => null),
-        publicAPI.getBankAccounts().catch(() => []),
-        publicAPI.getServices().catch(() => []),
-      ]);
-
-      if (settingsData) setCompanySettings(settingsData);
-      if (bankData) setBankAccounts(bankData);
-      if (servicesData) setServices(servicesData);
+      // If the current URL has a numeric ID, replace it with the invoice number for SEO-friendly URLs
+      if (id && !isNaN(Number(id)) && invoiceData.invoice_number) {
+        navigate(`/public/invoice/${invoiceData.invoice_number}`, { replace: true });
+      }
     } catch (err: any) {
       setError(err.message || 'An error occurred');
     } finally {
@@ -48,8 +45,14 @@ export default function PublicInvoicePage() {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toISOString().split('T')[0];
+    if (!dateString) return '-';
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '-';
+      return date.toISOString().split('T')[0];
+    } catch (e) {
+      return '-';
+    }
   };
 
   const formatCurrency = (amount: number) => {
@@ -77,6 +80,10 @@ export default function PublicInvoicePage() {
     if (num < 1000000000) return numberToWords(Math.floor(num / 1000000)) + ' Million' + (num % 1000000 ? ' ' + numberToWords(num % 1000000) : '');
     if (num < 1000000000000) return numberToWords(Math.floor(num / 1000000000)) + ' Billion' + (num % 1000000000 ? ' ' + numberToWords(num % 1000000000) : '');
     return numberToWords(Math.floor(num / 1000000000000)) + ' Trillion' + (num % 1000000000000 ? ' ' + numberToWords(num % 1000000000000) : '');
+  };
+
+  const capitalizeWords = (str: string) => {
+    return str.replace(/\b\w/g, (l) => l.toUpperCase());
   };
 
   const handleDownloadPDF = async () => {
@@ -215,32 +222,46 @@ export default function PublicInvoicePage() {
   const totalTax = parseFloat(invoice.tax_amount || 0);
   const grandTotal = subtotal + totalTax;
 
+  const isPublicRoute = window.location.pathname.startsWith('/public/');
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Back Button */}
-      <div className="p-4">
-        <button
-          onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
-        >
-          <ArrowLeft size={20} />
-          <span className="text-sm font-medium">Back</span>
-        </button>
-      </div>
+    <div className={`min-h-screen ${isPublicRoute ? 'bg-gray-50' : 'bg-transparent p-0'}`}>
+      {/* Back Button - Only show on public route */}
+      {isPublicRoute && (
+        <div className="p-4">
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <ArrowLeft size={20} />
+            <span className="text-sm font-medium">Back</span>
+          </button>
+        </div>
+      )}
 
       {/* Invoice Card */}
-      <div className="max-w-4xl mx-auto px-4 pb-8">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="max-w-4xl mx-auto px-4 py-4">
+        <div className="bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden relative">
+          {/* Close Button - Only show inside dashboard */}
+          {!isPublicRoute && (
+            <button
+              onClick={() => navigate('/billing')}
+              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all z-10"
+              title="Close"
+            >
+              <X size={24} />
+            </button>
+          )}
           {/* Invoice Content */}
           <div ref={invoiceRef} className="p-8 relative">
             {/* Invoice Header */}
-            <div className="flex justify-between items-start mb-8">
-              {companySettings?.company_logo ? (
+            <div className="flex justify-between items-start mb-10">
+              {invoice.sender?.logo ? (
                 <div className="flex-shrink-0">
                   <img 
-                    src={companySettings.company_logo} 
+                    src={invoice.sender.logo} 
                     alt="Logo" 
-                    className="max-h-24 max-w-[200px] object-contain"
+                    className="max-h-20 max-w-[200px] object-contain"
                     crossOrigin="anonymous"
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = 'none';
@@ -248,25 +269,37 @@ export default function PublicInvoicePage() {
                   />
                 </div>
               ) : (
-                <div />
+                <div className="text-2xl font-black text-blue-600 tracking-tighter uppercase">
+                  {invoice.sender?.name || 'INVOICE'}
+                </div>
               )}
               <div className="text-right">
-                <h1 className="text-3xl font-bold text-gray-800 uppercase tracking-wider">Invoice</h1>
-                <div className="mt-4 space-y-1 text-gray-700" style={{ fontSize: '14px' }}>
-                  <p><span className="inline-block w-24 text-left">Reference</span>: <span className="font-semibold text-gray-900">{invoice.invoice_number}</span></p>
-                  <p><span className="inline-block w-24 text-left">Date</span>: <span className="font-semibold text-gray-900">{formatDate(invoice.issue_date)}</span></p>
-                  <p><span className="inline-block w-24 text-left">Due Date</span>: <span className="font-semibold text-gray-900">{formatDate(invoice.due_date)}</span></p>
-                  {invoice.status === 'paid' && (
-                    <p><span className="inline-block w-24 text-left">Status</span>: <span className="font-bold text-emerald-600">PAID</span></p>
+                <h1 className="text-4xl font-black text-gray-900 uppercase tracking-tighter mb-4">
+                  {invoice.is_system 
+                    ? (invoice.system_type === 'refund' ? 'Refund' : 'Kwitansi')
+                    : 'Invoice'
+                  }
+                </h1>
+                <div className="inline-block text-left space-y-1.5 text-gray-700" style={{ fontSize: '13px' }}>
+                  <div className="flex border-b border-gray-100 pb-1">
+                    <span className="w-24 font-medium text-gray-500">No. Ref</span>
+                    <span className="font-bold text-gray-900">: {invoice.invoice_number}</span>
+                  </div>
+                  <div className="flex border-b border-gray-100 pb-1">
+                    <span className="w-24 font-medium text-gray-500">Tanggal</span>
+                    <span className="font-bold text-gray-900">: {formatDate(invoice.issue_date)}</span>
+                  </div>
+                  {!invoice.is_system && (
+                    <div className="flex border-b border-gray-100 pb-1">
+                      <span className="w-24 font-medium text-gray-500">Jatuh Tempo</span>
+                      <span className="font-bold text-gray-900">: {formatDate(invoice.due_date)}</span>
+                    </div>
                   )}
-                  {invoice.expires_at && (
-                    <p className="text-xs text-gray-500 mt-2">
-                      Link valid until: {new Date(invoice.expires_at).toLocaleDateString('en-US', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric'
-                      })}
-                    </p>
+                  {invoice.status === 'paid' && (
+                    <div className="flex">
+                      <span className="w-24 font-medium text-gray-500">Status</span>
+                      <span className="font-black text-emerald-600">: LUNAS</span>
+                    </div>
                   )}
                 </div>
               </div>
@@ -274,27 +307,27 @@ export default function PublicInvoicePage() {
 
             {/* Company & Client Info */}
             <div className="grid grid-cols-2 gap-8 mb-8">
-              {/* Company Info */}
+              {/* Company Info (The Sender) */}
               <div>
                 <h3 className="font-bold text-gray-800 mb-2 pb-2 border-b-2 border-gray-300">
-                  Company Information
+                  {invoice.is_system ? 'Diterbitkan Oleh' : 'Diterbitkan Oleh'}
                 </h3>
                 <div className="text-sm text-gray-700 space-y-1">
-                  <p className="font-semibold">{companySettings?.company_name || '-'}</p>
-                  <p className="whitespace-pre-line">{toTitleCase(companySettings?.company_address || '-')}</p>
-                  {companySettings?.company_phone && (
-                    <p>Ph: {companySettings.company_phone}</p>
+                  <p className="font-semibold">{invoice.sender?.name || '-'}</p>
+                  <p className="whitespace-pre-line">{toTitleCase(invoice.sender?.address || '-')}</p>
+                  {invoice.sender?.phone && (
+                    <p>Ph: {invoice.sender.phone}</p>
                   )}
-                  {companySettings?.company_email && (
-                    <p>Email: {companySettings.company_email}</p>
+                  {invoice.sender?.email && (
+                    <p>Email: {invoice.sender.email}</p>
                   )}
                 </div>
               </div>
 
-              {/* Client Info */}
+              {/* Client Info (The Receiver) */}
               <div>
                 <h3 className="font-bold text-gray-800 mb-2 pb-2 border-b-2 border-gray-300">
-                  Bill To
+                  {invoice.is_system ? 'Ditujukan Kepada' : 'Ditujukan Kepada'}
                 </h3>
                 <div className="text-sm text-gray-700 space-y-1">
                   <p className="font-semibold">{invoice.customer?.name || '-'}</p>
@@ -313,31 +346,37 @@ export default function PublicInvoicePage() {
             <div className="mb-8">
               <table className="w-full text-sm border-collapse">
                 <thead>
-                  <tr className="bg-gray-700 text-white">
-                    <th className="px-4 py-3 text-left font-semibold">Product</th>
-                    <th className="px-4 py-3 text-left font-semibold">Description</th>
-                    <th className="px-4 py-3 text-center font-semibold">Qty</th>
-                    <th className="px-4 py-3 text-right font-semibold">Price</th>
-                    {showDiscount && <th className="px-4 py-3 text-right font-semibold">Discount</th>}
-                    <th className="px-4 py-3 text-right font-semibold">Amount</th>
+                  <tr className="bg-slate-800 text-white font-bold uppercase tracking-tighter text-[11px]">
+                    <th className="px-4 py-3 text-left first:rounded-tl-lg">Product</th>
+                    <th className="px-4 py-3 text-left">Description</th>
+                    <th className="px-4 py-3 text-center">Qty</th>
+                    <th className="px-4 py-3 text-right">Price</th>
+                    {showDiscount && <th className="px-4 py-3 text-right">Disc</th>}
+                    <th className="px-4 py-3 text-right last:rounded-tr-lg">Amount</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-300">
                   {invoice.items?.map((item: any, index: number) => {
-                    const qty = parseFloat(item.quantity) || 0;
-                    const price = parseFloat(item.unit_price) || 0;
-                    const discountPercent = parseFloat(item.discount) || 0;
+                    const isSystem = invoice.is_system;
+                    const qty = isSystem ? 1 : (parseFloat(item.quantity) || 0);
+                    const price = isSystem ? (parseFloat(item.amount) || 0) : (parseFloat(item.unit_price) || 0);
+                    const discountPercent = isSystem ? 0 : (parseFloat(item.discount) || 0);
                     
                     const lineTotal = qty * price;
                     const discountAmount = lineTotal * (discountPercent / 100);
                     const itemTotal = lineTotal - discountAmount;
 
-                    const service = services.find((s: any) => s.id === item.service_id);
-                    const serviceName = service ? service.name : '-';
+                    let productName = '-';
+                    if (isSystem) {
+                      productName = (invoice.system_type || 'System').toUpperCase();
+                    } else {
+                      const service = services.find((s: any) => s.id === item.service_id);
+                      productName = service ? service.name : '-';
+                    }
 
                     return (
                       <tr key={index} className="align-top">
-                        <td className="px-4 py-3">{serviceName}</td>
+                        <td className="px-4 py-3">{productName}</td>
                         <td className="px-4 py-3 text-gray-600 whitespace-pre-line">{item.description || '-'}</td>
                         <td className="px-4 py-3 text-center">{qty}</td>
                         <td className="px-4 py-3 text-right whitespace-nowrap">{formatCurrency(price)}</td>
@@ -371,17 +410,24 @@ export default function PublicInvoicePage() {
             </div>
 
             {/* Terbilang */}
-            <div className="mb-6">
-              <h4 className="font-semibold text-gray-800 mb-1 italic">Amount in Words</h4>
-              <p className="text-sm italic text-gray-700 lowercase">
-                {numberToWords(Math.round(grandTotal))} Rupiah only
-              </p>
+            <div className="mb-8 p-4 bg-gray-50 rounded-lg border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h4 className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-1">Amount in Words</h4>
+                <p className="text-sm italic text-gray-800 font-medium">
+                  {capitalizeWords(numberToWords(Math.round(grandTotal)))} Rupiah Only
+                </p>
+              </div>
+              {invoice.status === 'paid' && (
+                <div className="bg-green-100 text-green-700 px-4 py-2 rounded-lg font-black text-xl border-2 border-green-200 rotate-[-2deg]">
+                  PAID / LUNAS
+                </div>
+              )}
             </div>
 
-            {/* Payment Info */}
-            {bankAccounts && bankAccounts.length > 0 && (
+            {/* Payment Info - Only show if NOT paid */}
+            {invoice.status !== 'paid' && bankAccounts && bankAccounts.length > 0 && (
               <div className="mb-6">
-                <h4 className="font-semibold text-gray-800 mb-2">Payment</h4>
+                <h4 className="font-semibold text-gray-800 mb-2">Payment Instructions</h4>
                 <div className="text-sm text-gray-700 space-y-1">
                   {bankAccounts.map((account: any, index: number) => (
                     <p key={index}>

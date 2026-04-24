@@ -10,10 +10,31 @@ import CompactBatchActions from '../components/CompactBatchActions';
 import { CheckSquare, Square } from 'lucide-react';
 
 import { Customer } from '../types';
+import ConfirmDialog from '../components/ConfirmDialog';
+import { toast } from '../components/Toast';
+
+interface ConfirmConfig {
+  isOpen: boolean;
+  title: string;
+  message: string;
+  onConfirm: () => void;
+  confirmLabel?: string;
+  type: 'info' | 'warning' | 'danger' | 'success';
+}
 
 export default function CustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Confirm Modal State
+  const [confirmConfig, setConfirmConfig] = useState<ConfirmConfig>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+    type: 'warning'
+  });
+
   const [saving, setSaving] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit' | 'view'>('create');
@@ -114,15 +135,17 @@ export default function CustomersPage() {
 
       if (modalMode === 'create') {
         await customersAPI.create(customerData);
+        toast.success('Customer berhasil ditambahkan');
       } else if (modalMode === 'edit' && selectedCustomer) {
         await customersAPI.update(selectedCustomer.id, customerData);
+        toast.success('Data customer berhasil diperbarui');
       }
 
       resetForm();
       fetchCustomers(page, searchTerm);
     } catch (error: any) {
       console.error('Error saving customer:', error);
-      setError(error.message || 'Gagal menyimpan customer. Coba lagi.');
+      toast.error(error.message || 'Gagal menyimpan customer. Coba lagi.');
     } finally {
       setSaving(false);
     }
@@ -144,6 +167,7 @@ export default function CustomersPage() {
       regency_name: '',
       district_name: '',
       village_name: '',
+      status: 'active',
     });
     setShowModal(false);
     setSelectedCustomer(null);
@@ -151,18 +175,30 @@ export default function CustomersPage() {
   };
 
   const handleBatchDelete = async () => {
-    if (!confirm(`Apakah Anda yakin ingin menghapus ${selectedIds.length} customer?`)) return;
-    setIsBatchLoading(true);
-    try {
-      await customersAPI.batchDelete(selectedIds);
-      setSelectedIds([]);
-      fetchCustomers(page, searchTerm, statusFilter);
-    } catch (error: any) {
-      console.error('Error batch deleting:', error);
-      setError(error.message || 'Gagal menghapus beberapa customer');
-    } finally {
-      setIsBatchLoading(false);
-    }
+    if (selectedIds.length === 0) return;
+    
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Hapus Massal',
+      message: `Apakah Anda yakin ingin menghapus ${selectedIds.length} customer terpilih? Tindakan ini tidak dapat dibatalkan.`,
+      confirmLabel: 'Ya, Hapus Semua',
+      type: 'danger',
+      onConfirm: async () => {
+        setConfirmConfig((prev: ConfirmConfig) => ({ ...prev, isOpen: false }));
+        setIsBatchLoading(true);
+        try {
+          await customersAPI.batchDelete(selectedIds);
+          setSelectedIds([]);
+          fetchCustomers(page, searchTerm, statusFilter);
+          toast.success(`${selectedIds.length} customer berhasil dihapus`);
+        } catch (error: any) {
+          console.error('Error batch deleting:', error);
+          toast.error(error.message || 'Gagal menghapus beberapa customer');
+        } finally {
+          setIsBatchLoading(false);
+        }
+      }
+    });
   };
 
   const toggleSelectAll = () => {
@@ -197,6 +233,7 @@ export default function CustomersPage() {
       regency_name: customer.regency_name || '',
       district_name: customer.district_name || '',
       village_name: customer.village_name || '',
+      status: customer.status || 'active',
     });
     setShowModal(true);
   };
@@ -208,18 +245,27 @@ export default function CustomersPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (confirm('Apakah Anda yakin ingin menghapus customer ini?')) {
-      try {
-        await customersAPI.delete(id);
-        // If last item on page > 1, go back one page
-        const newPage = customers.length === 1 && page > 1 ? page - 1 : page;
-        setPage(newPage);
-        fetchCustomers(newPage, searchTerm);
-      } catch (error) {
-        console.error('Error deleting customer:', error);
-        setError('Gagal menghapus customer');
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Hapus Customer',
+      message: 'Apakah Anda yakin ingin menghapus customer ini? Semua data invoice terkait mungkin akan terpengaruh.',
+      confirmLabel: 'Ya, Hapus',
+      type: 'danger',
+      onConfirm: async () => {
+        setConfirmConfig((prev: ConfirmConfig) => ({ ...prev, isOpen: false }));
+        try {
+          await customersAPI.delete(id);
+          toast.success('Customer berhasil dihapus');
+          // If last item on page > 1, go back one page
+          const newPage = customers.length === 1 && page > 1 ? page - 1 : page;
+          setPage(newPage);
+          fetchCustomers(newPage, searchTerm);
+        } catch (error: any) {
+          console.error('Error deleting customer:', error);
+          toast.error(error.message || 'Gagal menghapus customer');
+        }
       }
-    }
+    });
   };
 
   const openCreateModal = () => {
@@ -331,71 +377,76 @@ export default function CustomersPage() {
         ) : (
           <>
             <div className="overflow-x-auto hidden md:block">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+              <table className="w-full text-left border-collapse">
+                <thead className="bg-gray-50 border-b border-gray-200 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
                   <tr>
-                    <th className="w-10 px-6 py-3">
+                    <th className="w-10 px-4 py-2">
                       <button 
                         onClick={toggleSelectAll}
                         className="text-gray-400 hover:text-blue-600 transition-colors"
                       >
                         {selectedIds.length > 0 && selectedIds.length === customers.length ? (
-                          <CheckSquare size={18} className="text-blue-600" />
+                          <CheckSquare size={16} className="text-blue-600" />
                         ) : (
-                          <Square size={18} />
+                          <Square size={16} />
                         )}
                       </button>
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Contact Info</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden xl:table-cell">Address</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th className="px-4 py-2">Nama</th>
+                    <th className="px-4 py-2 hidden lg:table-cell">Kontak</th>
+                    <th className="px-4 py-2 hidden xl:table-cell">Alamat</th>
+                    <th className="px-4 py-2 text-center">Status</th>
+                    <th className="px-4 py-2 text-right">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {customers.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
-                        {searchTerm || statusFilter ? 'No customers match your filters' : 'No customers yet'}
+                      <td colSpan={6} className="px-4 py-12 text-center text-gray-400 text-xs italic">
+                        {searchTerm || statusFilter ? 'Tidak ada customer yang cocok.' : 'Belum ada customer.'}
                       </td>
                     </tr>
                   ) : (
                     customers.map((customer) => (
                       <tr key={customer.id} className={`hover:bg-gray-50 transition-colors ${selectedIds.includes(customer.id) ? 'bg-blue-50/50' : ''}`}>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-4 py-2">
                           <button 
                             onClick={() => toggleSelect(customer.id)}
                             className="text-gray-400 hover:text-blue-600 transition-colors"
                           >
                             {selectedIds.includes(customer.id) ? (
-                              <CheckSquare size={18} className="text-blue-600" />
+                              <CheckSquare size={16} className="text-blue-600" />
                             ) : (
-                              <Square size={18} />
+                              <Square size={16} />
                             )}
                           </button>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap hidden lg:table-cell">
+                        <td className="px-4 py-2">
+                          <span className="text-[12px] font-bold text-gray-900">{customer.name}</span>
+                        </td>
+                        <td className="px-4 py-2 hidden lg:table-cell">
                           <div className="flex flex-col">
-                            <span className="text-sm text-gray-700">{customer.email || '-'}</span>
-                            <span className="text-xs text-gray-400">{customer.phone || '-'}</span>
+                            <span className="text-[11px] text-gray-700 font-medium">{customer.email || '-'}</span>
+                            <span className="text-[9px] text-gray-400">{customer.phone || '-'}</span>
                           </div>
                         </td>
-                        <td className="px-6 py-4 hidden xl:table-cell">
-                          <div className="text-xs text-gray-500 max-w-xs line-clamp-2">{getFullAddress(customer)}</div>
+                        <td className="px-4 py-2 hidden xl:table-cell">
+                          <span className="text-[10px] text-gray-500 line-clamp-1">{getFullAddress(customer)}</span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                            (customer.status || 'active') === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                          }`}>
-                            {customer.status || 'active'}
-                          </span>
+                        <td className="px-4 py-2 text-center">
+                          <div className="flex justify-center">
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-[4px] text-[9px] font-black uppercase tracking-tighter ${
+                              (customer.status || 'active') === 'active' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-700 border border-red-100'
+                            }`}>
+                              {customer.status || 'active'}
+                            </span>
+                          </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <td className="px-4 py-2 text-right">
                           <div className="flex items-center justify-end gap-1">
-                            <button onClick={() => handleView(customer)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View"><Eye size={16} /></button>
-                            <button onClick={() => handleEdit(customer)} className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Edit"><Edit2 size={16} /></button>
-                            <button onClick={() => handleDelete(customer.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete"><Trash2 size={16} /></button>
+                            <button onClick={() => handleView(customer)} className="p-1 text-blue-600 hover:bg-blue-50 rounded border border-blue-50 transition-colors" title="View"><Eye size={12} /></button>
+                            <button onClick={() => handleEdit(customer)} className="p-1 text-amber-600 hover:bg-amber-50 rounded border border-amber-50 transition-colors" title="Edit"><Edit2 size={12} /></button>
+                            <button onClick={() => handleDelete(customer.id)} className="p-1 text-red-600 hover:bg-red-50 rounded border border-red-50 transition-colors" title="Delete"><Trash2 size={12} /></button>
                           </div>
                         </td>
                       </tr>
@@ -498,6 +549,11 @@ export default function CustomersPage() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        {...confirmConfig}
+        onCancel={() => setConfirmConfig((prev: ConfirmConfig) => ({ ...prev, isOpen: false }))}
+      />
 
       {/* Modal */}
       {showModal && (
