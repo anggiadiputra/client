@@ -309,8 +309,8 @@ export default function PublicInvoicePage() {
             <div className="grid grid-cols-2 gap-8 mb-8">
               {/* Company Info (The Sender) */}
               <div>
-                <h3 className="font-bold text-gray-800 mb-2 pb-2 border-b-2 border-gray-300">
-                  {invoice.is_system ? 'Diterbitkan Oleh' : 'Diterbitkan Oleh'}
+                <h3 className="font-bold text-gray-800 mb-2 pb-2 border-b-2 border-gray-300 uppercase tracking-wider text-[10px]">
+                  Diterbitkan Oleh
                 </h3>
                 <div className="text-sm text-gray-700 space-y-1">
                   <p className="font-semibold">{invoice.sender?.name || '-'}</p>
@@ -326,8 +326,8 @@ export default function PublicInvoicePage() {
 
               {/* Client Info (The Receiver) */}
               <div>
-                <h3 className="font-bold text-gray-800 mb-2 pb-2 border-b-2 border-gray-300">
-                  {invoice.is_system ? 'Ditujukan Kepada' : 'Ditujukan Kepada'}
+                <h3 className="font-bold text-gray-800 mb-2 pb-2 border-b-2 border-gray-300 uppercase tracking-wider text-[10px]">
+                  Ditujukan Kepada
                 </h3>
                 <div className="text-sm text-gray-700 space-y-1">
                   <p className="font-semibold">{invoice.customer?.name || '-'}</p>
@@ -347,12 +347,12 @@ export default function PublicInvoicePage() {
               <table className="w-full text-sm border-collapse">
                 <thead>
                   <tr className="bg-slate-800 text-white font-bold uppercase tracking-tighter text-[11px]">
-                    <th className="px-4 py-3 text-left first:rounded-tl-lg">Product</th>
-                    <th className="px-4 py-3 text-left">Description</th>
-                    <th className="px-4 py-3 text-center">Qty</th>
-                    <th className="px-4 py-3 text-right">Price</th>
+                    <th className="px-4 py-3 text-left first:rounded-tl-lg">Layanan / Produk</th>
+                    <th className="px-4 py-3 text-left">Deskripsi</th>
+                    <th className="px-4 py-3 text-center">Jumlah</th>
+                    <th className="px-4 py-3 text-right">Harga</th>
                     {showDiscount && <th className="px-4 py-3 text-right">Disc</th>}
-                    <th className="px-4 py-3 text-right last:rounded-tr-lg">Amount</th>
+                    <th className="px-4 py-3 text-right last:rounded-tr-lg">Total</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-300">
@@ -397,13 +397,13 @@ export default function PublicInvoicePage() {
                   </div>
                   {showTax && totalTax > 0 && (
                     <div className="flex justify-between py-2 text-sm border-b border-gray-300">
-                      <span className="font-semibold text-gray-700">Tax</span>
+                      <span className="font-semibold text-gray-700">Pajak (PPN)</span>
                       <span className="font-semibold whitespace-nowrap">+ {formatCurrency(totalTax)}</span>
                     </div>
                   )}
                   <div className="flex justify-between py-2 text-sm">
-                    <span className="font-bold text-gray-900">Total</span>
-                    <span className="font-bold whitespace-nowrap">{formatCurrency(grandTotal)}</span>
+                    <span className="font-bold text-gray-900 uppercase">Total Akhir</span>
+                    <span className="font-bold whitespace-nowrap text-blue-600">{formatCurrency(grandTotal)}</span>
                   </div>
                 </div>
               </div>

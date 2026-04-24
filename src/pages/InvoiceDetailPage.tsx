@@ -288,7 +288,7 @@ export default function InvoiceDetailPage() {
         <div ref={invoiceRef} className="p-6 md:p-10 relative">
           {/* Invoice Header */}
           <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-10">
-            {companySettings?.company_logo ? (
+            {companySettings?.company_logo && !invoice.is_system ? (
               <div className="flex-shrink-0">
                 <img 
                   src={companySettings.company_logo} 
@@ -299,18 +299,25 @@ export default function InvoiceDetailPage() {
               </div>
             ) : (
               <div className="text-2xl font-black text-blue-600 tracking-tighter uppercase">
-                {companySettings?.company_name || 'INVOICE'}
+                {invoice.is_system ? 'Kwitansi Pembayaran' : (companySettings?.company_name || 'INVOICE')}
               </div>
             )}
             <div className="text-left md:text-right">
-              <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-4">INVOICE</h1>
+              <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-4 uppercase">
+                {invoice.is_system 
+                  ? (invoice.system_type === 'refund' ? 'Refund' : 'Receipt')
+                  : 'Invoice'
+                }
+              </h1>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center md:justify-end gap-2 text-gray-500">
-                  <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-mono text-[10px] uppercase">No. Tagihan</span>
+                  <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-mono text-[10px] uppercase">No. Ref</span>
                   <span className="font-bold text-gray-900">{invoice.invoice_number}</span>
                 </div>
                 <p className="text-gray-500">Tanggal: <span className="font-semibold text-gray-900">{formatDate(invoice.issue_date)}</span></p>
-                <p className="text-gray-500">Jatuh Tempo: <span className="font-semibold text-gray-900">{formatDate(invoice.due_date)}</span></p>
+                {!invoice.is_system && (
+                  <p className="text-gray-500">Jatuh Tempo: <span className="font-semibold text-gray-900">{formatDate(invoice.due_date)}</span></p>
+                )}
                 {invoice.status === 'paid' && (
                   <p className="text-gray-500">Status: <span className="font-bold text-emerald-600">PAID</span></p>
                 )}
@@ -323,22 +330,37 @@ export default function InvoiceDetailPage() {
             <div>
               <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-3">Diterbitkan Oleh</p>
               <div className="text-sm space-y-1.5">
-                <p className="font-bold text-gray-900 text-base">{companySettings?.company_name || '-'}</p>
-                <p className="text-gray-600 leading-relaxed max-w-xs">{toTitleCase(companySettings?.company_address || '-')}</p>
-                {companySettings?.company_phone && <p className="text-gray-600">Telp: {companySettings.company_phone}</p>}
-                {companySettings?.company_email && <p className="text-gray-600">Email: {companySettings.company_email}</p>}
+                <p className="font-bold text-gray-900 text-base">
+                  {invoice.is_system ? 'Sistem Billing' : (companySettings?.company_name || '-')}
+                </p>
+                <p className="text-gray-600 leading-relaxed max-w-xs">
+                  {invoice.is_system ? 'Platform Management' : toTitleCase(companySettings?.company_address || '-')}
+                </p>
+                {!invoice.is_system && companySettings?.company_phone && <p className="text-gray-600">Telp: {companySettings.company_phone}</p>}
+                {!invoice.is_system && companySettings?.company_email && <p className="text-gray-600">Email: {companySettings.company_email}</p>}
               </div>
             </div>
             <div className="md:text-left">
               <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-3">Ditujukan Kepada</p>
               <div className="text-sm space-y-1.5">
-                <p className="font-bold text-gray-900 text-base">{invoice.customer?.name || invoice.customer_name || '-'}</p>
-                {invoice.customer?.address && <p className="text-gray-600 leading-relaxed max-w-xs">{toTitleCase(invoice.customer.address)}</p>}
-                {(invoice.customer?.city || invoice.customer?.province_name) && (
-                  <p className="text-gray-600">{toTitleCase([invoice.customer?.city, invoice.customer?.province_name].filter(Boolean).join(', '))}</p>
+                <p className="font-bold text-gray-900 text-base">
+                  {invoice.is_system 
+                    ? (companySettings?.company_name || 'User') 
+                    : (invoice.customer?.name || invoice.customer_name || '-')
+                  }
+                </p>
+                {invoice.is_system ? (
+                   <p className="text-gray-600 leading-relaxed max-w-xs">{toTitleCase(companySettings?.company_address || '-')}</p>
+                ) : (
+                  <>
+                    {invoice.customer?.address && <p className="text-gray-600 leading-relaxed max-w-xs">{toTitleCase(invoice.customer.address)}</p>}
+                    {(invoice.customer?.city || invoice.customer?.province_name) && (
+                      <p className="text-gray-600">{toTitleCase([invoice.customer?.city, invoice.customer?.province_name].filter(Boolean).join(', '))}</p>
+                    )}
+                  </>
                 )}
-                {invoice.customer?.phone && <p className="text-gray-600">Telp: {invoice.customer.phone}</p>}
-                {invoice.customer?.email && <p className="text-gray-600">Email: {invoice.customer.email}</p>}
+                <p className="text-gray-600">Telp: {invoice.is_system ? companySettings?.company_phone : invoice.customer?.phone || '-'}</p>
+                <p className="text-gray-600">Email: {invoice.is_system ? companySettings?.company_email : invoice.customer?.email || '-'}</p>
               </div>
             </div>
           </div>
@@ -441,6 +463,7 @@ export default function InvoiceDetailPage() {
         <div className="bg-gray-50 border-t border-gray-100 p-6 flex justify-end items-center">
           <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
             <div className="flex gap-2 w-full sm:w-auto">
+              {!invoice.is_system && (
               <button
                 onClick={() => navigate(`/invoices/${invoice.invoice_number}/edit`)}
                 className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-bold py-2.5 px-4 rounded-xl border border-gray-200 transition-all text-sm shadow-sm"
@@ -448,6 +471,7 @@ export default function InvoiceDetailPage() {
               >
                 <Edit size={16} /> <span>Edit</span>
               </button>
+            )}
               
               <button
                 onClick={handleDownloadPDF}

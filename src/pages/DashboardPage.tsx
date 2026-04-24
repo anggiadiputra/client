@@ -85,7 +85,7 @@ export default function DashboardPage() {
     <div className="max-w-7xl mx-auto px-6 py-8">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-1">Dashboard</h1>
-        <p className="text-sm text-gray-500">Welcome to {settings.appName}. Here's your business overview.</p>
+        <p className="text-sm text-gray-500">Selamat datang di {settings.appName}. Berikut adalah ringkasan bisnis Anda.</p>
       </div>
 
       {loading ? (

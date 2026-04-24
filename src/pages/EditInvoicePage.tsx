@@ -67,6 +67,12 @@ export default function EditInvoicePage() {
     try {
       const data = await invoicesAPI.getById(id);
       
+      // Prevent editing of system invoices
+      if (data.is_system) {
+        navigate(`/invoices/${data.invoice_number || data.id}/view`, { replace: true });
+        return;
+      }
+      
       // Format dates to YYYY-MM-DD for input type="date"
       const formatDate = (dateStr: string) => {
         if (!dateStr) return '';

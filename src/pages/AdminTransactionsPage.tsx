@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Search, PlusCircle, 
   ArrowUpRight, ArrowDownLeft, Clock,
@@ -11,6 +12,7 @@ import { toast } from '../components/Toast';
 import KeyboardShortcutWrapper from '../components/KeyboardShortcutWrapper';
 
 export default function AdminTransactionsPage() {
+  const navigate = useNavigate();
   const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -141,15 +143,15 @@ export default function AdminTransactionsPage() {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Global Transactions</h1>
-          <p className="text-sm text-gray-500">Monitor and manage wallet transactions across all users</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Transaksi Global</h1>
+          <p className="text-sm text-gray-500">Pantau dan kelola semua transaksi saldo dompet dari seluruh pengguna</p>
         </div>
         <button
           onClick={() => handleOpenAdjust()}
           className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg text-sm transition-colors shrink-0"
         >
           <PlusCircle size={16} />
-          Adjust Manual Balance
+          Penyesuaian Saldo Manual
         </button>
       </div>
 
@@ -256,7 +258,7 @@ export default function AdminTransactionsPage() {
                           <div className="flex items-center justify-end gap-1">
                             {(tx.invoice_id || tx.system_invoice_id) && (
                               <button
-                                onClick={() => window.open(`/public/invoice/${tx.invoice_number || tx.invoice_id || tx.system_invoice_id}`, '_blank')}
+                                onClick={() => navigate(`/invoices/${tx.invoice_number || tx.invoice_id || tx.system_invoice_id}/view`)}
                                 className="p-1 text-blue-600 hover:bg-blue-50 rounded border border-blue-100 transition-colors"
                                 title="Lihat Kwitansi"
                               >

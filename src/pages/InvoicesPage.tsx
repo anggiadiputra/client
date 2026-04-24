@@ -178,15 +178,15 @@ export default function InvoicesPage() {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Invoices</h1>
-          <p className="text-sm text-gray-500">Manage and track all your client invoices</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Daftar Invoice</h1>
+          <p className="text-sm text-gray-500">Kelola dan lacak semua invoice pelanggan Anda</p>
         </div>
         <button
           onClick={() => navigate('/invoices/create')}
           className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg text-sm transition-colors shrink-0"
         >
           <Plus size={16} />
-          Create Invoice
+          Buat Invoice Baru
         </button>
       </div>
 
@@ -258,8 +258,8 @@ export default function InvoicesPage() {
                           )}
                         </button>
                       </th>
-                      <th className="px-4 py-2">Invoice #</th>
-                      <th className="px-4 py-2 hidden lg:table-cell">Customer</th>
+                      <th className="px-4 py-2">No. Invoice</th>
+                      <th className="px-4 py-2 hidden lg:table-cell">Pelanggan</th>
                       <th className="px-4 py-2 text-right">Total</th>
                       <th className="px-4 py-2 text-center">Status</th>
                       <th className="px-4 py-2 hidden xl:table-cell">Jatuh Tempo</th>
@@ -288,33 +288,33 @@ export default function InvoicesPage() {
                               )}
                             </button>
                           </td>
-                          <td className="px-4 py-2 text-[12px] font-bold text-gray-900 tabular-nums">
+                          <td className="px-4 py-3 text-sm font-bold text-gray-900 tabular-nums">
                             {invoice.invoice_number}
                           </td>
-                          <td className="px-4 py-2 hidden lg:table-cell">
-                            <span className="text-[11px] text-gray-700 font-medium">{invoice.customer_name}</span>
+                          <td className="px-4 py-3 hidden lg:table-cell">
+                            <span className="text-xs text-gray-700 font-medium">{invoice.customer_name}</span>
                           </td>
-                          <td className="px-4 py-2 text-right text-[12px] font-black text-gray-900 tabular-nums">
+                          <td className="px-4 py-3 text-right text-sm font-black text-gray-900 tabular-nums">
                             {formatRupiah(parseFloat(String(invoice.grand_total ?? invoice.total_amount ?? 0)))}
                           </td>
-                          <td className="px-4 py-2 text-center">
+                          <td className="px-4 py-3 text-center">
                             <div className="flex justify-center">
-                              <span className={`inline-flex items-center px-2 py-0.5 rounded-[4px] text-[9px] font-black uppercase tracking-tighter ${getStatusColor(invoice.status)}`}>
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-[4px] text-[10px] font-black uppercase tracking-tight border ${getStatusColor(invoice.status)}`}>
                                 {invoice.status}
                               </span>
                             </div>
                           </td>
-                          <td className="px-4 py-2 hidden xl:table-cell text-[10px] text-gray-500">
+                          <td className="px-4 py-3 hidden xl:table-cell text-xs text-gray-500">
                             {formatDate(invoice.due_date, { day: 'numeric', month: 'short', year: 'numeric' })}
                           </td>
-                          <td className="px-4 py-2 text-right">
+                          <td className="px-4 py-3 text-right">
                             <div className="flex items-center justify-end gap-1">
-                              <button onClick={() => handleSendEmail(invoice.id)} className="p-1 text-blue-600 hover:bg-blue-50 rounded border border-blue-50 transition-colors" title="Email"><Mail size={12} /></button>
-                              <button onClick={() => handleOpenWhatsApp(invoice)} className="p-1 text-green-600 hover:bg-green-50 rounded border border-green-50 transition-colors" title="WA"><WhatsAppIcon size={12} /></button>
-                              <button onClick={() => handleViewInvoice(invoice)} className="p-1 text-gray-600 hover:bg-gray-50 rounded border border-gray-50 transition-colors" title="View"><Eye size={12} /></button>
-                              <button onClick={() => handleEditInvoice(invoice)} className="p-1 text-amber-600 hover:bg-amber-50 rounded border border-amber-50 transition-colors" title="Edit"><Edit2 size={12} /></button>
-                              <button onClick={() => handleDeleteInvoice(invoice)} disabled={deletingId === invoice.id} className="p-1 text-red-600 hover:bg-red-50 rounded border border-red-50 transition-colors disabled:opacity-40" title="Delete">
-                                {deletingId === invoice.id ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+                              <button onClick={() => handleSendEmail(invoice.id)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded border border-blue-50 transition-colors" title="Email"><Mail size={16} /></button>
+                              <button onClick={() => handleOpenWhatsApp(invoice)} className="p-1.5 text-green-600 hover:bg-green-50 rounded border border-green-50 transition-colors" title="WA"><WhatsAppIcon size={16} /></button>
+                              <button onClick={() => handleViewInvoice(invoice)} className="p-1.5 text-gray-600 hover:bg-gray-50 rounded border border-gray-50 transition-colors" title="View"><Eye size={16} /></button>
+                              <button onClick={() => handleEditInvoice(invoice)} className="p-1.5 text-amber-600 hover:bg-amber-50 rounded border border-amber-50 transition-colors" title="Edit"><Edit2 size={16} /></button>
+                              <button onClick={() => handleDeleteInvoice(invoice)} disabled={deletingId === invoice.id} className="p-1.5 text-red-600 hover:bg-red-50 rounded border border-red-50 transition-colors disabled:opacity-40" title="Delete">
+                                {deletingId === invoice.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
                               </button>
                             </div>
                           </td>

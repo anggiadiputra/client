@@ -438,7 +438,7 @@ export default function BillingPage() {
                             )}
                              {(tx.system_invoice_id || tx.invoice_id) && (
                                <button
-                                 onClick={() => navigate(`/invoice-view/${tx.invoice_number || tx.system_invoice_id || tx.invoice_id}`)}
+                                 onClick={() => navigate(`/invoices/${tx.invoice_number || tx.system_invoice_id || tx.invoice_id}/view`)}
                                  className="p-1 text-blue-600 hover:bg-blue-50 rounded border border-blue-100 transition-colors"
                                  title="Lihat Kwitansi"
                                >

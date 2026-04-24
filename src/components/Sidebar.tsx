@@ -16,17 +16,17 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
-    { id: 'customers', label: 'Customers', icon: Users, path: '/customers' },
-    { id: 'services', label: 'Services', icon: BarChart, path: '/services' },
-    { id: 'invoices', label: 'Invoices', icon: FileText, path: '/invoices' },
-    { id: 'billing', label: 'Billing & Wallet', icon: CreditCard, path: '/billing' },
-    { id: 'pricing', label: 'Subscription Plans', icon: Crown, path: '/pricing' },
-    { id: 'logs', label: 'Log History', icon: BarChart3, path: '/logs' },
-    { id: 'settings', label: 'Settings', icon: Settings, path: '/settings' },
-    { id: 'templates', label: 'Templates', icon: LayoutTemplate, path: '/templates' },
-    { id: 'users', label: 'Users', icon: Users, path: '/users' },
-    { id: 'admin-transactions', label: 'Global Transactions', icon: BarChart, path: '/admin/transactions' },
-    { id: 'admin-plans', label: 'Plans Management', icon: Crown, path: '/admin/plans' },
+    { id: 'customers', label: 'Pelanggan', icon: Users, path: '/customers' },
+    { id: 'services', label: 'Layanan', icon: BarChart, path: '/services' },
+    { id: 'invoices', label: 'Daftar Invoice', icon: FileText, path: '/invoices' },
+    { id: 'billing', label: 'Tagihan & Saldo', icon: CreditCard, path: '/billing' },
+    { id: 'pricing', label: 'Paket Langganan', icon: Crown, path: '/pricing' },
+    { id: 'logs', label: 'Riwayat Log', icon: BarChart3, path: '/logs' },
+    { id: 'settings', label: 'Pengaturan', icon: Settings, path: '/settings' },
+    { id: 'templates', label: 'Template', icon: LayoutTemplate, path: '/templates' },
+    { id: 'users', label: 'Pengguna', icon: Users, path: '/users' },
+    { id: 'admin-transactions', label: 'Transaksi Global', icon: BarChart, path: '/admin/transactions' },
+    { id: 'admin-plans', label: 'Kelola Paket', icon: Crown, path: '/admin/plans' },
   ];
 
   const filteredMenuItems = menuItems.filter(item => {
@@ -67,11 +67,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
         {/* Sections Mapping */}
         {[
-          { title: 'Overview', items: ['dashboard'] },
+          { title: 'Ringkasan', items: ['dashboard'] },
           { title: 'SaaS & Billing', items: ['pricing', 'billing'], adminHidden: true },
-          { title: 'Business', items: ['invoices', 'customers', 'services'] },
-          { title: 'System', items: ['templates', 'users', 'logs', 'settings'] },
-          { title: 'Administration', items: ['admin-plans', 'admin-transactions'] }
+          { title: 'Bisnis', items: ['invoices', 'customers', 'services'] },
+          { title: 'Sistem', items: ['templates', 'users', 'logs', 'settings'] },
+          { title: 'Administrasi', items: ['admin-plans', 'admin-transactions'] }
         ]
         .filter(section => {
           if (section.adminHidden && userRole === 'admin') return false;

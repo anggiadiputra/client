@@ -260,7 +260,7 @@ export default function App() {
               <Route path="/login-legacy" element={<LoginPage />} />
               <Route path="/register-legacy" element={<RegisterPage />} />
               <Route path="/public/invoice/:id" element={<PublicInvoicePage />} />
-              <Route path="/invoice-view/:id" element={<ProtectedRoute><DashboardLayout><PublicInvoicePage /></DashboardLayout></ProtectedRoute>} />
+              <Route path="/invoice-view/:id" element={<Navigate to="/invoices/:id/view" replace />} />
 
               {/* Private Protected Routes */}
               <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout><DashboardPage /></DashboardLayout></ProtectedRoute>} />
@@ -270,6 +270,7 @@ export default function App() {
               <Route path="/invoices/create" element={<ProtectedRoute><DashboardLayout><CreateInvoicePage /></DashboardLayout></ProtectedRoute>} />
               <Route path="/invoices/:id/view" element={<ProtectedRoute><DashboardLayout><InvoiceDetailPage /></DashboardLayout></ProtectedRoute>} />
               <Route path="/invoices/:id/edit" element={<ProtectedRoute><DashboardLayout><EditInvoicePage /></DashboardLayout></ProtectedRoute>} />
+              
               {/* Backward compatibility / Aliases */}
               <Route path="/invoices/:id" element={<Navigate to="view" replace />} />
               <Route path="/settings" element={<ProtectedRoute><DashboardLayout><SettingsPage /></DashboardLayout></ProtectedRoute>} />

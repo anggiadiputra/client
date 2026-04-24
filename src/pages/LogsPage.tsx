@@ -7,7 +7,7 @@ export default function LogsPage() {
 
   const categories = [
     {
-      title: 'WhatsApp Logs',
+      title: 'Log WhatsApp',
       description: 'Riwayat pengiriman notifikasi invoice melalui WhatsApp.',
       path: '/logs/whatsapp',
       icon: WhatsAppIcon,
@@ -15,7 +15,7 @@ export default function LogsPage() {
       stats: 'Fonnte API',
     },
     {
-      title: 'Email Logs',
+      title: 'Log Email',
       description: 'Riwayat pengiriman notifikasi invoice melalui Email (SMTP/Brevo).',
       path: '/logs/emails',
       icon: Mail,
@@ -27,7 +27,7 @@ export default function LogsPage() {
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Log History</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">Riwayat Log</h1>
         <p className="text-sm text-gray-500">Pilih kategori log untuk melihat rincian pengiriman notifikasi.</p>
       </div>
 

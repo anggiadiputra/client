@@ -178,15 +178,15 @@ export default function ServicesPage() {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Services</h1>
-          <p className="text-sm text-gray-500">Manage your service catalog and pricing</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Layanan / Produk</h1>
+          <p className="text-sm text-gray-500">Kelola katalog layanan dan harga produk Anda</p>
         </div>
         <button
           onClick={openCreateModal}
           className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg text-sm transition-colors shrink-0"
         >
           <Plus size={16} />
-          Add Service
+          Tambah Layanan
         </button>
       </div>
 
@@ -296,9 +296,9 @@ export default function ServicesPage() {
                         </td>
                         <td className="px-6 py-4 text-right whitespace-nowrap">
                           <div className="flex items-center justify-end gap-1">
-                            <button onClick={() => handleView(service)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View"><Eye size={16} /></button>
-                            <button onClick={() => handleEdit(service)} className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Edit"><Edit2 size={16} /></button>
-                            <button onClick={() => handleDelete(service.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete"><Trash2 size={16} /></button>
+                            <button onClick={() => handleView(service)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View"><Eye size={18} /></button>
+                            <button onClick={() => handleEdit(service)} className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Edit"><Edit2 size={18} /></button>
+                            <button onClick={() => handleDelete(service.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete"><Trash2 size={18} /></button>
                           </div>
                         </td>
                       </tr>

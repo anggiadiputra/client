@@ -323,15 +323,15 @@ export default function CustomersPage() {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Customers</h1>
-          <p className="text-sm text-gray-500">Manage your customer database and billing addresses</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Daftar Pelanggan</h1>
+          <p className="text-sm text-gray-500">Kelola database pelanggan dan alamat penagihan Anda</p>
         </div>
         <button
           onClick={openCreateModal}
           className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg text-sm transition-colors shrink-0"
         >
           <Plus size={16} />
-          Add Customer
+          Tambah Pelanggan
         </button>
       </div>
 
@@ -421,32 +421,34 @@ export default function CustomersPage() {
                             )}
                           </button>
                         </td>
-                        <td className="px-4 py-2">
-                          <span className="text-[12px] font-bold text-gray-900">{customer.name}</span>
+                        <td className="px-4 py-3">
+                          <span className="text-sm font-bold text-gray-900">{customer.name}</span>
                         </td>
-                        <td className="px-4 py-2 hidden lg:table-cell">
+                        <td className="px-4 py-3 hidden lg:table-cell">
                           <div className="flex flex-col">
-                            <span className="text-[11px] text-gray-700 font-medium">{customer.email || '-'}</span>
-                            <span className="text-[9px] text-gray-400">{customer.phone || '-'}</span>
+                            <span className="text-xs text-gray-700 font-medium">{customer.email || '-'}</span>
+                            <span className="text-[11px] text-gray-400">{customer.phone || '-'}</span>
                           </div>
                         </td>
-                        <td className="px-4 py-2 hidden xl:table-cell">
-                          <span className="text-[10px] text-gray-500 line-clamp-1">{getFullAddress(customer)}</span>
+                        <td className="px-4 py-3 hidden xl:table-cell">
+                          <span className="text-xs text-gray-500 line-clamp-1">
+                            {[customer.regency_name || customer.city, customer.province_name].filter(Boolean).map(toTitleCase).join(', ')}
+                          </span>
                         </td>
-                        <td className="px-4 py-2 text-center">
+                        <td className="px-4 py-3 text-center">
                           <div className="flex justify-center">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-[4px] text-[9px] font-black uppercase tracking-tighter ${
-                              (customer.status || 'active') === 'active' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-700 border border-red-100'
+                            <span className={`inline-flex items-center px-2.5 py-1 rounded-[4px] text-[10px] font-black uppercase tracking-tight border ${
+                              (customer.status || 'active') === 'active' ? 'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100'
                             }`}>
                               {customer.status || 'active'}
                             </span>
                           </div>
                         </td>
-                        <td className="px-4 py-2 text-right">
+                        <td className="px-4 py-3 text-right">
                           <div className="flex items-center justify-end gap-1">
-                            <button onClick={() => handleView(customer)} className="p-1 text-blue-600 hover:bg-blue-50 rounded border border-blue-50 transition-colors" title="View"><Eye size={12} /></button>
-                            <button onClick={() => handleEdit(customer)} className="p-1 text-amber-600 hover:bg-amber-50 rounded border border-amber-50 transition-colors" title="Edit"><Edit2 size={12} /></button>
-                            <button onClick={() => handleDelete(customer.id)} className="p-1 text-red-600 hover:bg-red-50 rounded border border-red-50 transition-colors" title="Delete"><Trash2 size={12} /></button>
+                            <button onClick={() => handleView(customer)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded border border-blue-50 transition-colors" title="View"><Eye size={16} /></button>
+                            <button onClick={() => handleEdit(customer)} className="p-1.5 text-amber-600 hover:bg-amber-50 rounded border border-amber-50 transition-colors" title="Edit"><Edit2 size={16} /></button>
+                            <button onClick={() => handleDelete(customer.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded border border-red-50 transition-colors" title="Delete"><Trash2 size={16} /></button>
                           </div>
                         </td>
                       </tr>
@@ -501,9 +503,9 @@ export default function CustomersPage() {
                               <span className="font-medium">{customer.phone}</span>
                             </div>
                           )}
-                          <div className="flex items-start gap-2.5 text-[11px] text-gray-500 leading-relaxed">
+                          <div className="flex items-start gap-2.5 text-xs text-gray-500 leading-relaxed">
                             <div className="w-5 h-5 bg-blue-50 rounded flex items-center justify-center shrink-0 mt-0.5">
-                              <MapPin size={10} className="text-blue-600" />
+                              <MapPin size={12} className="text-blue-600" />
                             </div>
                             <span className="line-clamp-2">{getFullAddress(customer)}</span>
                           </div>
@@ -563,11 +565,11 @@ export default function CustomersPage() {
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
               <div>
                 <h2 className="text-lg font-bold text-gray-900">
-                  {modalMode === 'create' && 'Add Customer'}
-                  {modalMode === 'edit' && 'Edit Customer'}
-                  {modalMode === 'view' && 'Customer Details'}
+                  {modalMode === 'create' && 'Tambah Customer Baru'}
+                  {modalMode === 'edit' && 'Edit Data Customer'}
+                  {modalMode === 'view' && 'Detail Customer'}
                 </h2>
-                <p className="text-sm text-gray-500">Complete the information below</p>
+                <p className="text-sm text-gray-500">Lengkapi informasi detail customer di bawah ini</p>
               </div>
               <button
                 onClick={resetForm}
@@ -605,14 +607,14 @@ export default function CustomersPage() {
                   </p>
                 )}
 
-                {/* Personal Information */}
+                {/* Informasi Pelanggan */}
                 <div className="space-y-4">
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Personal Information</h3>
+                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Ditujukan Kepada</h3>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="col-span-2 md:col-span-1">
                       <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Name <span className="text-red-500">*</span>
+                        Nama Lengkap <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
@@ -634,7 +636,7 @@ export default function CustomersPage() {
                       />
                     </div>
                     <div className="col-span-2 md:col-span-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Phone</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">No. Telepon / WhatsApp</label>
                       <div className="relative">
                         <input
                           type="tel"
@@ -677,7 +679,7 @@ export default function CustomersPage() {
                       )}
                     </div>
                     <div className="col-span-2 md:col-span-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Postal Code</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Kode Pos</label>
                       <input
                         type="text"
                         value={formData.postal_code}
@@ -702,11 +704,11 @@ export default function CustomersPage() {
 
                 {/* Address Information */}
                 <div className="space-y-4">
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Address Details</h3>
+                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Detail Alamat</h3>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Street Address <span className="text-red-500">*</span>
+                      Alamat Jalan / No. Rumah <span className="text-red-500">*</span>
                     </label>
                     <textarea
                       value={formData.address}
@@ -733,7 +735,7 @@ export default function CustomersPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Country</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Negara</label>
                     <input
                       type="text"
                       value={formData.country}
@@ -750,14 +752,14 @@ export default function CustomersPage() {
                     disabled={saving}
                     className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-2.5 px-6 rounded-lg text-sm transition-colors"
                   >
-                    {saving ? 'Saving...' : (modalMode === 'create' ? 'Save Customer' : 'Update Customer')}
+                    {saving ? 'Menyimpan...' : (modalMode === 'create' ? 'Simpan Customer' : 'Perbarui Customer')}
                   </button>
                   <button
                     type="button"
                     onClick={resetForm}
                     className="border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold py-2.5 px-6 rounded-lg text-sm transition-colors"
                   >
-                    Cancel
+                    Batal
                   </button>
                 </div>
               </form>

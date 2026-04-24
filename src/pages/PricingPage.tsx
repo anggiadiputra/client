@@ -141,7 +141,7 @@ export default function PricingPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Pricing Plans</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">Pilihan Paket Langganan</h1>
         <p className="text-sm text-gray-500">Pilih paket yang sesuai untuk mengelola bisnis Anda dengan efisien.</p>
       </div>
 
