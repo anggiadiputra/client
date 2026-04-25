@@ -45,7 +45,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return defaultSettings;
   });
   const [userRole, setUserRole] = useState<'admin' | 'member' | null>(() => {
-    const user = localStorage.getItem('user');
+    const user = sessionStorage.getItem('user');
     if (user) {
       try {
         return JSON.parse(user).role || 'member';
@@ -59,7 +59,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [wallet, setWallet] = useState<any | null>(null);
 
   const refreshSaaSData = async () => {
-    const user = localStorage.getItem('user');
+    const user = sessionStorage.getItem('user');
     if (user) {
       try {
         const { authAPI } = await import('../lib/api');

@@ -29,7 +29,7 @@ export function useUser() {
   // useSession adalah hook dari BetterAuthReactAdapter
   const session = authClient.useSession();
   const localUser = authService.getUser();
-  const localToken = localStorage.getItem('token');
+  const localToken = sessionStorage.getItem('token');
   const hasLocalAuth = !!(localUser && localToken);
   
   if (session.isPending) {
@@ -94,9 +94,9 @@ export async function getJWTToken() {
     if (neonToken) {
       // Jika ada token Neon, kita gunakan ini. 
       // Untuk keamanan, kita juga hapus token lokal yang mungkin 'stale'
-      if (localStorage.getItem('token')) {
+      if (sessionStorage.getItem('token')) {
         console.warn('[Auth] Found active Neon session, clearing stale local token.');
-        localStorage.removeItem('token');
+        sessionStorage.removeItem('token');
       }
       return neonToken;
     }
@@ -105,7 +105,7 @@ export async function getJWTToken() {
   }
 
   // 2. Fallback ke token lokal (HS256) untuk email/password login tradisional
-  const localToken = localStorage.getItem('token');
+  const localToken = sessionStorage.getItem('token');
   if (localToken && localToken !== 'null' && localToken !== 'undefined') {
     return localToken;
   }
