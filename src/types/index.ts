@@ -123,5 +123,6 @@ export interface WalletTransaction {
   expired_at?: string;
   invoice_id?: number | string;
   system_invoice_id?: string;
+  invoice_number?: string;
   created_at: string;
 }

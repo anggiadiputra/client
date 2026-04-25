@@ -605,8 +605,13 @@ export const regionsAPI = {
 
 // Wallet
 export const walletAPI = {
-  get: async () => {
-    const response = await fetch(`${API_URL}/wallet`, {
+  get: async (page = 1, limit = 10, search = '') => {
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(limit),
+      search
+    });
+    const response = await fetch(`${API_URL}/wallet?${params.toString()}`, {
       ...(await getOptions()),
     });
     if (!response.ok) throw new Error('Failed to fetch wallet data');
@@ -652,15 +657,20 @@ export const walletAPI = {
     return response.json();
   },
 
-  getAllTransactions: async () => {
-    const response = await fetch(`${API_URL}/wallet/all-transactions`, {
+  getAllTransactions: async (page = 1, limit = 10, search = '') => {
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(limit),
+      search
+    });
+    const response = await fetch(`${API_URL}/wallet/all-transactions?${params.toString()}`, {
       ...(await getOptions()),
     });
     if (!response.ok) throw new Error('Failed to fetch all transactions');
     return response.json();
   },
 
-  manualAdjust: async (userId: number | null, amount: number, type: 'deposit' | 'deduction', description: string, email?: string) => {
+  manualAdjust: async (userId: number | null, amount: number, type: 'deposit' | 'deduction' | 'refund', description: string, email?: string) => {
     const response = await fetch(`${API_URL}/wallet/manual-adjust`, {
       method: 'POST',
       ...(await getOptions()),

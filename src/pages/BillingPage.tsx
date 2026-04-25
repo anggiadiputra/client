@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { 
   Wallet, RefreshCw, ArrowUpRight, ArrowDownLeft, Clock, 
   ExternalLink, Loader2, CheckCircle2, QrCode, CreditCard, 
-  Building2, X, Info, Copy, AlertCircle, Trash2
+  Building2, X, Info, Copy, AlertCircle, Trash2,
+  Search, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { walletAPI } from '../lib/api';
@@ -28,18 +29,36 @@ export default function BillingPage() {
   // Checkout Modal State
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const limit = 10;
   const [checkoutData, setCheckoutData] = useState<any>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCheckingStatus, setIsCheckingStatus] = useState(false);
 
   useEffect(() => {
     fetchHistory();
-  }, []);
+  }, [page]);
+
+  // Handle search with debounce
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (page === 1) {
+        fetchHistory();
+      } else {
+        setPage(1);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   const fetchHistory = async () => {
+    setLoading(true);
     try {
-      const data = await walletAPI.get();
+      const data = await walletAPI.get(page, limit, searchTerm);
       setHistory(data.history || []);
+      setTotal(data.total || 0);
     } catch (error) {
       console.error('Failed to fetch wallet history:', error);
     } finally {
@@ -304,11 +323,21 @@ export default function BillingPage() {
         {/* RIGHT: Transaction History */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden flex flex-col h-full">
-            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-              <h3 className="text-sm font-semibold text-gray-900">Riwayat Transaksi</h3>
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-3">
+              <div className="relative flex-1 max-w-xs">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+                <input
+                  type="text"
+                  placeholder="Cari riwayat..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-8 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
+                />
+              </div>
               <button 
                 onClick={fetchHistory}
                 className="p-1.5 hover:bg-gray-200 rounded text-gray-400 hover:text-gray-600 transition-colors"
+                title="Refresh"
               >
                 <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
               </button>
@@ -451,6 +480,31 @@ export default function BillingPage() {
                 </table>
               )}
             </div>
+
+            {/* Pagination */}
+            {total > limit && (
+              <div className="px-4 py-3 border-t border-gray-100 flex items-center justify-between bg-white">
+                <div className="text-[11px] text-gray-500 font-medium">
+                  {Math.min(page * limit, total)} dari {total}
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page === 1 || loading}
+                    className="p-1 border border-gray-200 rounded hover:bg-gray-50 disabled:opacity-40 transition-colors"
+                  >
+                    <ChevronLeft size={14} />
+                  </button>
+                  <button
+                    onClick={() => setPage(p => p + 1)}
+                    disabled={page * limit >= total || loading}
+                    className="p-1 border border-gray-200 rounded hover:bg-gray-50 disabled:opacity-40 transition-colors"
+                  >
+                    <ChevronRight size={14} />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

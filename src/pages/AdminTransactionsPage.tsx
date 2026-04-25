@@ -4,7 +4,7 @@ import {
   Search, PlusCircle, 
   ArrowUpRight, ArrowDownLeft, Clock,
   Loader2, RefreshCw, X, AlertTriangle,
-  ExternalLink, Info, Trash2
+  ExternalLink, Trash2, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { walletAPI, usersAPI } from '../lib/api';
 import { WalletTransaction, User } from '../types';
@@ -19,11 +19,14 @@ export default function AdminTransactionsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showAdjustModal, setShowAdjustModal] = useState(false);
   const [adjusting, setAdjusting] = useState(false);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const limit = 10;
   const [formData, setFormData] = useState({
     userId: '',
     email: '', // for display
     amount: '',
-    type: 'deposit' as 'deposit' | 'deduction',
+    type: 'deposit' as 'deposit' | 'deduction' | 'refund',
     description: ''
   });
 
@@ -58,13 +61,26 @@ export default function AdminTransactionsPage() {
 
   useEffect(() => {
     fetchTransactions();
-  }, []);
+  }, [page]);
+
+  // Handle search with debounce
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (page === 1) {
+        fetchTransactions();
+      } else {
+        setPage(1); // Changing page to 1 will trigger the first useEffect
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   const fetchTransactions = async () => {
     setLoading(true);
     try {
-      const data = await walletAPI.getAllTransactions();
-      setTransactions(data);
+      const data = await walletAPI.getAllTransactions(page, limit, searchTerm);
+      setTransactions(data.transactions || []);
+      setTotal(data.total || 0);
     } catch (err: any) {
       toast.error(err.message || 'Failed to fetch transactions');
     } finally {
@@ -84,11 +100,7 @@ export default function AdminTransactionsPage() {
     }
   };
 
-  const filteredTransactions = transactions.filter(tx => 
-    (tx.first_name + ' ' + tx.last_name).toLowerCase().includes(searchTerm.toLowerCase()) ||
-    tx.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    tx.pakasir_order_id?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredTransactions = transactions;
 
   const handleOpenAdjust = (tx?: WalletTransaction) => {
     setFormData({
@@ -189,7 +201,7 @@ export default function AdminTransactionsPage() {
         ) : (
           <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
-                  <thead className="bg-gray-50 border-b border-gray-200 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                  <thead className="bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wider">
                     <tr>
                       <th className="px-4 py-2">User</th>
                       <th className="px-4 py-2">Transaksi</th>
@@ -202,26 +214,26 @@ export default function AdminTransactionsPage() {
                   <tbody className="divide-y divide-gray-100">
                     {filteredTransactions.map((tx) => (
                       <tr key={tx.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-4 py-2">
+                        <td className="px-4 py-3">
                           <div className="flex flex-col">
-                            <span className="text-[11px] font-bold text-gray-900">{tx.first_name} {tx.last_name}</span>
-                            <span className="text-[9px] text-gray-400 font-mono">{tx.email}</span>
+                            <span className="text-sm font-bold text-gray-900">{tx.first_name} {tx.last_name}</span>
+                            <span className="text-xs text-gray-400 font-mono">{tx.email}</span>
                           </div>
                         </td>
-                        <td className="px-4 py-2">
+                        <td className="px-4 py-3">
                           <div className="flex flex-col">
-                            <span className="text-[11px] font-medium text-gray-800">{tx.description}</span>
-                            <span className="text-[9px] text-gray-400 font-mono">{tx.pakasir_order_id || 'SYSTEM'}</span>
+                            <span className="text-sm font-medium text-gray-800">{tx.description}</span>
+                            <span className="text-xs text-gray-400 font-mono">{tx.pakasir_order_id || 'SYSTEM'}</span>
                           </div>
                         </td>
-                        <td className="px-4 py-2 text-[10px] text-gray-500">
+                        <td className="px-4 py-3 text-xs text-gray-500">
                           {new Date(tx.created_at).toLocaleString('id-ID', {
                             day: 'numeric', month: 'short', year: 'numeric',
                             hour: '2-digit', minute: '2-digit'
                           })}
                         </td>
-                        <td className="px-4 py-2 text-right">
-                          <span className={`text-[11px] font-bold ${
+                        <td className="px-4 py-3 text-right">
+                          <span className={`text-sm font-bold ${
                             tx.status === 'failed' || (tx.status === 'pending' && tx.expired_at && new Date(tx.expired_at) < new Date())
                               ? 'text-gray-400' 
                               : tx.type === 'deposit' ? 'text-green-600' : 'text-red-600'
@@ -229,62 +241,81 @@ export default function AdminTransactionsPage() {
                             Rp {tx.type === 'deposit' ? (tx.status === 'completed' || (tx.status === 'pending' && (!tx.expired_at || new Date(tx.expired_at) > new Date())) ? '+' : '') : '-'} {Math.abs(parseFloat(String(tx.amount))).toLocaleString('id-ID')}
                           </span>
                         </td>
-                        <td className="px-4 py-2 text-center">
+                        <td className="px-4 py-3 text-center">
                           <div className="flex justify-center">
                             {tx.status === 'pending' && (
-                              <span className={`px-1.5 py-0.5 rounded-[4px] text-[9px] font-black uppercase tracking-tighter border ${
+                              <span className={`px-2 py-0.5 rounded-[4px] text-[11px] font-black uppercase tracking-tight border ${
                                 tx.expired_at && new Date(tx.expired_at) < new Date() 
-                                  ? 'bg-red-50 text-red-600 border-red-100' 
+                                  ? 'bg-gray-50 text-gray-400 border-gray-100' 
                                   : 'bg-amber-50 text-amber-600 border-amber-100'
                               }`}>
-                                {tx.expired_at && new Date(tx.expired_at) < new Date() ? 'Gagal' : 'Pending'}
+                                {tx.expired_at && new Date(tx.expired_at) < new Date() ? 'Kadaluarsa' : 'Pending'}
                               </span>
                             )}
                             {tx.status === 'completed' && (
-                              <span className="px-1.5 py-0.5 rounded-[4px] text-[9px] font-black uppercase tracking-tighter bg-green-50 text-green-700 border border-green-100">
+                              <span className="px-2 py-0.5 rounded-[4px] text-[11px] font-black uppercase tracking-tight bg-green-50 text-green-700 border border-green-100">
                                 Berhasil
                               </span>
                             )}
                             {tx.status === 'failed' && (
-                              <span className="px-1.5 py-0.5 rounded-[4px] text-[9px] font-black uppercase tracking-tighter bg-red-50 text-red-700 border border-red-100">
+                              <span className="px-2 py-0.5 rounded-[4px] text-[11px] font-black uppercase tracking-tight bg-red-50 text-red-700 border border-red-100">
                                 Gagal
                               </span>
                             )}
                           </div>
                         </td>
-                        <td className="px-4 py-2 text-right">
+                        <td className="px-4 py-3 text-right">
                           <div className="flex items-center justify-end gap-1">
                             {(tx.invoice_id || tx.system_invoice_id) && (
                               <button
                                 onClick={() => navigate(`/invoices/${tx.invoice_number || tx.invoice_id || tx.system_invoice_id}/view`)}
-                                className="p-1 text-blue-600 hover:bg-blue-50 rounded border border-blue-100 transition-colors"
+                                className="p-1.5 text-blue-600 hover:bg-blue-50 rounded border border-blue-100 transition-colors"
                                 title="Lihat Kwitansi"
                               >
-                                <ExternalLink size={14} />
+                                <ExternalLink size={16} />
                               </button>
                             )}
-                            {tx.status === 'pending' && tx.pakasir_order_id && (
+                            {tx.status === 'pending' && tx.pakasir_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date()) && (
                               <button
                                 onClick={() => handleCancelTransaction(tx.pakasir_order_id!)}
-                                className="p-1 text-red-600 hover:bg-red-50 rounded border border-red-100 transition-colors"
+                                className="p-1.5 text-red-600 hover:bg-red-50 rounded border border-red-100 transition-colors"
                                 title="Batalkan Transaksi"
                               >
-                                <Trash2 size={14} />
+                                <Trash2 size={16} />
                               </button>
                             )}
-                            <button
-                              onClick={() => handleOpenAdjust(tx)}
-                              className="p-1 text-gray-500 hover:bg-gray-100 rounded border border-gray-200 transition-colors"
-                              title="Detail / Adjust"
-                            >
-                              <Info size={12} />
-                            </button>
+                            {/* Detail / Adjust removed as it was confusing */}
                           </div>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {total > limit && (
+          <div className="px-4 py-3 border-t border-gray-100 flex items-center justify-between bg-white">
+            <div className="text-xs text-gray-500 font-medium">
+              Menampilkan {(page - 1) * limit + 1} sampai {Math.min(page * limit, total)} dari {total} transaksi
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1 || loading}
+                className="p-1.5 border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-40 transition-colors"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <button
+                onClick={() => setPage(p => p + 1)}
+                disabled={page * limit >= total || loading}
+                className="p-1.5 border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-40 transition-colors"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -342,7 +373,7 @@ export default function AdminTransactionsPage() {
                           className="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors flex flex-col border-b border-gray-50 last:border-0"
                         >
                           <span className="text-sm font-bold text-gray-900">{user.email}</span>
-                          <span className="text-[10px] text-gray-500">{user.first_name} {user.last_name}</span>
+                          <span className="text-[11px] text-gray-500">{user.first_name} {user.last_name}</span>
                         </button>
                       ))}
                     </div>
@@ -357,7 +388,7 @@ export default function AdminTransactionsPage() {
               ) : (
                 <div className="bg-blue-50 p-3 rounded-lg border border-blue-100 flex items-center justify-between">
                   <div>
-                    <p className="text-[10px] font-bold text-blue-400 uppercase mb-1">Target Pengguna</p>
+                    <p className="text-[11px] font-bold text-blue-400 uppercase mb-1">Target Pengguna</p>
                     <p className="text-sm font-bold text-blue-900">{formData.email}</p>
                   </div>
                   {formData.userId && (
@@ -383,6 +414,7 @@ export default function AdminTransactionsPage() {
                   >
                     <option value="deposit">Penambahan (+)</option>
                     <option value="deduction">Pengurangan (-)</option>
+                    <option value="refund">Refund (Kembalikan)</option>
                   </select>
                 </div>
                 <div className="col-span-2 sm:col-span-1">
