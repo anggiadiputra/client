@@ -22,9 +22,9 @@ class AuthService {
     }
 
     const data = await response.json();
-    // Save both user data and token for reliable frontend access
-    localStorage.setItem('user', JSON.stringify(data.user));
-    if (data.token) localStorage.setItem('token', data.token);
+    // Save both user data and token for reliable frontend access - Session based
+    sessionStorage.setItem('user', JSON.stringify(data.user));
+    if (data.token) sessionStorage.setItem('token', data.token);
     return data;
   }
 
@@ -42,9 +42,9 @@ class AuthService {
     }
 
     const data = await response.json();
-    // Save both user data and token for reliable frontend access
-    localStorage.setItem('user', JSON.stringify(data.user));
-    if (data.token) localStorage.setItem('token', data.token);
+    // Save both user data and token for reliable frontend access - Session based
+    sessionStorage.setItem('user', JSON.stringify(data.user));
+    if (data.token) sessionStorage.setItem('token', data.token);
     return data;
   }
 
@@ -58,8 +58,8 @@ class AuthService {
     } catch(e) {
       console.warn('[Auth] Logout API call failed, clearing local state anyway');
     }
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
   }
 
   async forgotPassword(email, turnstileToken) {
@@ -93,11 +93,11 @@ class AuthService {
   }
 
   getToken() {
-    return localStorage.getItem('token');
+    return sessionStorage.getItem('token');
   }
 
   getUser() {
-    const user = localStorage.getItem('user');
+    const user = sessionStorage.getItem('user');
     return user ? JSON.parse(user) : null;
   }
 
@@ -109,7 +109,7 @@ class AuthService {
     const { authAPI } = await import('./api');
     const data = await authAPI.me();
     if (data.user) {
-      localStorage.setItem('user', JSON.stringify(data.user));
+      sessionStorage.setItem('user', JSON.stringify(data.user));
     }
     return data;
   }

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 
 // Pages
+import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import StackSignInPage from './pages/StackSignInPage';
@@ -54,7 +55,8 @@ function TitleUpdater() {
     let title = settings.appName;
     let prefix = '';
 
-    if (path === '/login') prefix = 'Login';
+    if (path === '/') prefix = 'Home';
+    else if (path === '/login') prefix = 'Login';
     else if (path === '/register') prefix = 'Register';
     else if (path === '/dashboard') prefix = 'Dashboard';
     else if (path === '/customers') prefix = 'Customers';
@@ -86,9 +88,9 @@ function TitleUpdater() {
 function SessionSync() {
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      // Sync on user, token, or settings changes
+      // SessionStorage doesn't trigger 'storage' events across tabs easily,
+      // but we still want to keep this for any manual localStorage triggers if needed.
       if (e.key === 'token' || e.key === 'user') {
-        // Force reload to refresh auth state from localStorage and Neon session
         window.location.reload();
       }
     };
@@ -96,6 +98,43 @@ function SessionSync() {
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
+
+  return null;
+}
+
+/**
+ * IdleTimer handles automatic logout after a period of inactivity
+ */
+function IdleTimer() {
+  const { user, logout } = useAppSettings();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) return;
+
+    let timeout: any;
+    const idleTime = 30 * 60 * 1000; // 30 minutes
+
+    const resetTimer = () => {
+      if (timeout) clearTimeout(timeout);
+      timeout = setTimeout(async () => {
+        console.log('[IdleTimer] Session idle for 30m. Logging out...');
+        await logout();
+        navigate('/login', { state: { message: 'Sesi Anda telah berakhir karena tidak ada aktivitas.' } });
+      }, idleTime);
+    };
+
+    // Events to monitor for activity
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    events.forEach(event => window.addEventListener(event, resetTimer));
+
+    resetTimer(); // Initial timer start
+
+    return () => {
+      if (timeout) clearTimeout(timeout);
+      events.forEach(event => window.removeEventListener(event, resetTimer));
+    };
+  }, [user, logout, navigate]);
 
   return null;
 }
@@ -233,6 +272,7 @@ export default function App() {
           <AuthWrapper>
             <TitleUpdater />
             <SessionSync />
+            <IdleTimer />
             <AutoSyncIdentity />
             <Routes>
               {/* Stack Auth routes */}
@@ -287,7 +327,7 @@ export default function App() {
               <Route path="/admin/plans" element={<ProtectedRoute><DashboardLayout><AdminPlansPage /></DashboardLayout></ProtectedRoute>} />
               <Route path="/admin/transactions" element={<ProtectedRoute><DashboardLayout><AdminTransactionsPage /></DashboardLayout></ProtectedRoute>} />
 
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/" element={<LandingPage />} />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
             <ToastContainer />
