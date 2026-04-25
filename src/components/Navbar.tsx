@@ -1,9 +1,11 @@
 import { Plane, LogIn } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAppSettings } from '../context/AppContext';
 
 interface NavbarProps {
   onLoginClick: () => void;
   onGetStartedClick: () => void;
+  onSectionClick?: (sectionId: string) => void;
   showLogin?: boolean;
   showRegister?: boolean;
 }
@@ -11,10 +13,20 @@ interface NavbarProps {
 export default function Navbar({ 
   onLoginClick, 
   onGetStartedClick, 
+  onSectionClick,
   showLogin = true, 
   showRegister = true 
 }: NavbarProps) {
   const { settings } = useAppSettings();
+  const navigate = useNavigate();
+
+  const handleMenuClick = (id: string) => {
+    if (onSectionClick) {
+      onSectionClick(id);
+    } else {
+      navigate('/#' + id);
+    }
+  };
 
   return (
     <nav className="bg-white border-b border-gray-100 sticky top-0 z-50">
@@ -42,6 +54,7 @@ export default function Navbar({
             {['Home', 'Templates', 'Pricing', 'Features'].map((item) => (
               <button
                 key={item}
+                onClick={() => handleMenuClick(item.toLowerCase())}
                 className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors"
               >
                 {item}
