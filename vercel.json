@@ -1,15 +1,5 @@
 {
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Permissions-Policy",
-          "value": "xr-spatial-tracking=()"
-        }
-      ]
-    }
-  ],
+  "version": 2,
   "rewrites": [
     {
       "source": "/(.*)",
