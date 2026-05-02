@@ -1,7 +1,7 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 class AuthService {
-  async register(email, password, firstName, lastName, companyName, turnstileToken) {
+  async register(email: string, password: string, firstName: string, lastName: string, companyName: string, turnstileToken: string) {
     const response = await fetch(`${API_URL}/auth/register`, {
       method: 'POST',
       credentials: 'include',
@@ -28,7 +28,7 @@ class AuthService {
     return data;
   }
 
-  async login(email, password, turnstileToken) {
+  async login(email: string, password: string, turnstileToken: string) {
     const response = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
       credentials: 'include',
@@ -62,7 +62,7 @@ class AuthService {
     sessionStorage.removeItem('user');
   }
 
-  async forgotPassword(email, turnstileToken) {
+  async forgotPassword(email: string, turnstileToken: string) {
     const response = await fetch(`${API_URL}/auth/forgot-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -77,7 +77,7 @@ class AuthService {
     return await response.json();
   }
 
-  async resetPassword(email, password, token) {
+  async resetPassword(email: string, password: string, token: string) {
     const response = await fetch(`${API_URL}/auth/reset-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

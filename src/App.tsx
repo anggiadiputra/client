@@ -106,8 +106,12 @@ function SessionSync() {
  * IdleTimer handles automatic logout after a period of inactivity
  */
 function IdleTimer() {
-  const { user, logout } = useAppSettings();
+  const user = useUser();
   const navigate = useNavigate();
+  const logout = async () => {
+    const { neonSignOut } = await import('./lib/stackAuth');
+    await neonSignOut();
+  };
 
   useEffect(() => {
     if (!user) return;
