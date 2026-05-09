@@ -45,7 +45,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return defaultSettings;
   });
   const [userRole, setUserRole] = useState<'admin' | 'member' | null>(() => {
-    const user = sessionStorage.getItem('user');
+    // Check both sessionStorage and localStorage
+    const user = sessionStorage.getItem('user') || localStorage.getItem('user');
     if (user) {
       try {
         return JSON.parse(user).role || 'member';
@@ -59,8 +60,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [wallet, setWallet] = useState<any | null>(null);
 
   const refreshSaaSData = async () => {
-    const user = sessionStorage.getItem('user');
-    if (user) {
+    // Check both sessionStorage and localStorage for an active session
+    const user = sessionStorage.getItem('user') || localStorage.getItem('user');
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    if (user && token) {
       try {
         const { authAPI } = await import('../lib/api');
         const data = await authAPI.me();

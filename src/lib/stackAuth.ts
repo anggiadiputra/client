@@ -38,16 +38,19 @@ export function useUser() {
         id: localUser.id,
         email: localUser.email,
         displayName: localUser.firstName ? `${localUser.firstName} ${localUser.lastName}` : localUser.email,
+        role: localUser.role || 'member',
       };
     }
     return undefined;
   }
   
   if (session.data?.user) {
+    // For Neon Auth (SSO) users, role comes from localUser if available
     return {
       id: session.data.user.id,
       email: session.data.user.email,
       displayName: session.data.user.name || session.data.user.email,
+      role: localUser?.role || 'member',
     };
   }
 
@@ -56,6 +59,7 @@ export function useUser() {
       id: localUser.id,
       email: localUser.email,
       displayName: localUser.firstName ? `${localUser.firstName} ${localUser.lastName}` : localUser.email,
+      role: localUser.role || 'member',
     };
   }
   
