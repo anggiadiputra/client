@@ -54,6 +54,24 @@ const handleResponse = async (response: Response, defaultErrorMessage: string) =
   return response.json();
 };
 
+/**
+ * requestJSON
+ * Convenience helper: builds request options, calls fetch, and handles the response.
+ * Used by walletAPI and other sections that need a compact fetch wrapper.
+ */
+const requestJSON = async (
+  path: string,
+  options: { method?: string; body?: object } = {}
+) => {
+  const baseOptions = await getOptions();
+  const response = await fetch(`${API_URL}${path}`, {
+    ...baseOptions,
+    method: options.method || 'GET',
+    ...(options.body ? { body: JSON.stringify(options.body) } : {}),
+  });
+  return handleResponse(response, `Request to ${path} failed`);
+};
+
 
 // Customers
 export const customersAPI = {
