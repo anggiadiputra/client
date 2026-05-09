@@ -20,6 +20,7 @@ export default function EditInvoicePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [customers, setCustomers] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
   const [showDiscount, setShowDiscount] = useState(false);
@@ -199,6 +200,7 @@ export default function EditInvoicePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setSaving(true);
 
     try {
@@ -247,8 +249,14 @@ export default function EditInvoicePage() {
         })),
       });
 
-      // Redirect to invoice detail
-      navigate(`/invoices/${formData.invoice_number}/view`);
+      // Show success message and stay on the page
+      setSuccess('Invoice updated successfully');
+      setTimeout(() => setSuccess(''), 3000);
+
+      // Update URL if invoice number changed
+      if (id !== formData.invoice_number) {
+        navigate(`/invoices/${formData.invoice_number}/edit`, { replace: true });
+      }
     } catch (error: any) {
       console.error('Error updating invoice:', error);
       setError(error.message || 'Failed to update invoice');
@@ -286,6 +294,13 @@ export default function EditInvoicePage() {
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
               {error}
+            </div>
+          )}
+          
+          {success && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center gap-2">
+              <CheckCircle size={18} />
+              {success}
             </div>
           )}
 
