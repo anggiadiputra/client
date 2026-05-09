@@ -1,6 +1,49 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 class AuthService {
+  private safeParse<T>(value: string | null): T | null {
+    if (!value) return null;
+    try {
+      return JSON.parse(value) as T;
+    } catch {
+      return null;
+    }
+  }
+
+  private persistAuth(user: any, token?: string) {
+    const userJson = JSON.stringify(user);
+    const currentUser = localStorage.getItem('user');
+    const currentToken = localStorage.getItem('token');
+    
+    // Only update auth_sync if user or token actually changed
+    let hasChanged = false;
+
+    if (currentUser !== userJson) {
+      hasChanged = true;
+      sessionStorage.setItem('user', userJson);
+      localStorage.setItem('user', userJson);
+    }
+
+    if (token && currentToken !== token) {
+      hasChanged = true;
+      sessionStorage.setItem('token', token);
+      localStorage.setItem('token', token);
+    }
+
+    // Only signal other tabs if there was an actual change
+    if (hasChanged) {
+      localStorage.setItem('auth_sync', Date.now().toString());
+    }
+  }
+
+  private clearLocalAuthState() {
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.setItem('auth_sync', Date.now().toString());
+  }
+
   async register(email: string, password: string, firstName: string, lastName: string, companyName: string, turnstileToken: string) {
     const response = await fetch(`${API_URL}/auth/register`, {
       method: 'POST',
@@ -12,19 +55,17 @@ class AuthService {
         firstName,
         lastName,
         companyName,
-        turnstileToken
+        turnstileToken,
       }),
     });
 
     if (!response.ok) {
-      const error = await response.json();
+      const error = await response.json().catch(() => ({}));
       throw new Error(error.error || 'Registration failed');
     }
 
     const data = await response.json();
-    // Save both user data and token for reliable frontend access - Session based
-    sessionStorage.setItem('user', JSON.stringify(data.user));
-    if (data.token) sessionStorage.setItem('token', data.token);
+    this.persistAuth(data.user, data.token);
     return data;
   }
 
@@ -37,29 +78,27 @@ class AuthService {
     });
 
     if (!response.ok) {
-      const error = await response.json();
+      const error = await response.json().catch(() => ({}));
       throw new Error(error.error || 'Login failed');
     }
 
     const data = await response.json();
-    // Save both user data and token for reliable frontend access - Session based
-    sessionStorage.setItem('user', JSON.stringify(data.user));
-    if (data.token) sessionStorage.setItem('token', data.token);
+    this.persistAuth(data.user, data.token);
     return data;
   }
 
   async logout() {
     console.log('[Auth] Performing complete local logout...');
     try {
-      await fetch(`${API_URL}/auth/logout`, { 
-        method: 'POST', 
-        credentials: 'include' // Ensure cookie is sent so it can be cleared
+      await fetch(`${API_URL}/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
       });
-    } catch(e) {
+    } catch (e) {
       console.warn('[Auth] Logout API call failed, clearing local state anyway');
     }
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('user');
+
+    this.clearLocalAuthState();
   }
 
   async forgotPassword(email: string, turnstileToken: string) {
@@ -70,11 +109,11 @@ class AuthService {
     });
 
     if (!response.ok) {
-      const error = await response.json();
+      const error = await response.json().catch(() => ({}));
       throw new Error(error.error || 'Failed to request password reset');
     }
 
-    return await response.json();
+    return response.json();
   }
 
   async resetPassword(email: string, password: string, token: string) {
@@ -85,31 +124,31 @@ class AuthService {
     });
 
     if (!response.ok) {
-      const error = await response.json();
+      const error = await response.json().catch(() => ({}));
       throw new Error(error.error || 'Failed to reset password');
     }
 
-    return await response.json();
+    return response.json();
   }
 
   getToken() {
-    return sessionStorage.getItem('token');
+    return sessionStorage.getItem('token') || localStorage.getItem('token');
   }
 
   getUser() {
-    const user = sessionStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
+    const user = sessionStorage.getItem('user') || localStorage.getItem('user');
+    return this.safeParse<any>(user);
   }
 
   isAuthenticated() {
-    return !!this.getUser();
+    return !!this.getUser() && !!this.getToken();
   }
 
   async me() {
     const { authAPI } = await import('./api');
     const data = await authAPI.me();
     if (data.user) {
-      sessionStorage.setItem('user', JSON.stringify(data.user));
+      this.persistAuth(data.user);
     }
     return data;
   }

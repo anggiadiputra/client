@@ -29,7 +29,7 @@ export function useUser() {
   // useSession adalah hook dari BetterAuthReactAdapter
   const session = authClient.useSession();
   const localUser = authService.getUser();
-  const localToken = sessionStorage.getItem('token');
+  const localToken = sessionStorage.getItem('token') || localStorage.getItem('token');
   const hasLocalAuth = !!(localUser && localToken);
   
   if (session.isPending) {
@@ -67,6 +67,13 @@ export function useUser() {
  * Menghapus seluruh residu sesi baik dari Neon Auth maupun Local Storage
  * untuk mencegah Session Hijacking/Pollution.
  */
+function clearStaleLocalAuth() {
+  sessionStorage.removeItem('token');
+  sessionStorage.removeItem('user');
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+}
+
 export async function clearAllSessions() {
   console.log('[Auth] Clearing all global sessions (Local + Neon)...');
   
@@ -92,11 +99,9 @@ export async function getJWTToken() {
     const session = await authClient.getSession().catch(() => null);
     const neonToken = session?.data?.token;
     if (neonToken) {
-      // Jika ada token Neon, kita gunakan ini. 
-      // Untuk keamanan, kita juga hapus token lokal yang mungkin 'stale'
-      if (sessionStorage.getItem('token')) {
-        console.warn('[Auth] Found active Neon session, clearing stale local token.');
-        sessionStorage.removeItem('token');
+      if (sessionStorage.getItem('token') || localStorage.getItem('token') || sessionStorage.getItem('user') || localStorage.getItem('user')) {
+        console.warn('[Auth] Found active Neon session, clearing stale local auth state.');
+        clearStaleLocalAuth();
       }
       return neonToken;
     }
@@ -105,7 +110,7 @@ export async function getJWTToken() {
   }
 
   // 2. Fallback ke token lokal (HS256) untuk email/password login tradisional
-  const localToken = sessionStorage.getItem('token');
+  const localToken = sessionStorage.getItem('token') || localStorage.getItem('token');
   if (localToken && localToken !== 'null' && localToken !== 'undefined') {
     return localToken;
   }

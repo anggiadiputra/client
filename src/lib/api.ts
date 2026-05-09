@@ -609,79 +609,55 @@ export const walletAPI = {
     const params = new URLSearchParams({
       page: String(page),
       limit: String(limit),
-      search
+      search,
     });
-    const response = await fetch(`${API_URL}/wallet?${params.toString()}`, {
+    return requestJSON(`/wallet?${params.toString()}`, {
       ...(await getOptions()),
-    });
-    if (!response.ok) throw new Error('Failed to fetch wallet data');
-    return response.json();
+    }, 'Failed to fetch wallet data');
   },
 
   initiateTopup: async (amount: number, method: string) => {
-    const response = await fetch(`${API_URL}/wallet/topup`, {
+    return requestJSON('/wallet/topup', {
       method: 'POST',
       ...(await getOptions()),
       body: JSON.stringify({ amount, method }),
-    });
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error(err.error || 'Failed to initiate top-up');
-    }
-    return response.json();
+    }, 'Failed to initiate top-up');
   },
 
   checkStatus: async (order_id: string, amount: number) => {
-    const response = await fetch(`${API_URL}/wallet/topup/check-status`, {
+    return requestJSON('/wallet/topup/check-status', {
       method: 'POST',
       ...(await getOptions()),
       body: JSON.stringify({ order_id, amount }),
-    });
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error(err.error || 'Failed to check status');
-    }
-    return response.json();
+    }, 'Failed to check status');
   },
 
   cancelTopup: async (order_id: string) => {
-    const response = await fetch(`${API_URL}/wallet/topup/cancel`, {
+    return requestJSON('/wallet/topup/cancel', {
       method: 'POST',
       ...(await getOptions()),
       body: JSON.stringify({ order_id }),
-    });
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error(err.error || 'Failed to cancel top-up');
-    }
-    return response.json();
+    }, 'Failed to cancel top-up');
   },
 
   getAllTransactions: async (page = 1, limit = 10, search = '') => {
     const params = new URLSearchParams({
       page: String(page),
       limit: String(limit),
-      search
+      search,
     });
-    const response = await fetch(`${API_URL}/wallet/all-transactions?${params.toString()}`, {
+    return requestJSON(`/wallet/all-transactions?${params.toString()}`, {
       ...(await getOptions()),
-    });
-    if (!response.ok) throw new Error('Failed to fetch all transactions');
-    return response.json();
+    }, 'Failed to fetch all transactions');
   },
 
   manualAdjust: async (userId: number | null, amount: number, type: 'deposit' | 'deduction' | 'refund', description: string, email?: string) => {
-    const response = await fetch(`${API_URL}/wallet/manual-adjust`, {
+    return requestJSON('/wallet/manual-adjust', {
       method: 'POST',
       ...(await getOptions()),
       body: JSON.stringify({ userId, email, amount, type, description }),
-    });
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error(err.error || 'Failed to manually adjust balance');
-    }
-    return response.json();
-  }
+    }, 'Failed to manually adjust balance');
+  },
 };
 
 // Plans & Subscriptions

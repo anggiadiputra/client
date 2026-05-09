@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 // Pages
 import LandingPage from './pages/LandingPage';
@@ -88,9 +88,11 @@ function TitleUpdater() {
 function SessionSync() {
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      // SessionStorage doesn't trigger 'storage' events across tabs easily,
-      // but we still want to keep this for any manual localStorage triggers if needed.
-      if (e.key === 'token' || e.key === 'user') {
+      if (e.key === 'token' || e.key === 'user' || e.key === 'auth_sync') {
+        if (e.key === 'auth_sync') {
+          sessionStorage.removeItem('token');
+          sessionStorage.removeItem('user');
+        }
         window.location.reload();
       }
     };
@@ -172,6 +174,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
 
   return <>{children}</>;
+}
+
+function InvoiceRedirect() {
+  const { id } = useParams();
+  return id ? <Navigate to={`/invoices/${id}/view`} replace /> : <Navigate to="/invoices" replace />;
 }
 
 /**
@@ -316,7 +323,7 @@ export default function App() {
               <Route path="/invoices/:id/edit" element={<ProtectedRoute><DashboardLayout><EditInvoicePage /></DashboardLayout></ProtectedRoute>} />
               
               {/* Backward compatibility / Aliases */}
-              <Route path="/invoices/:id" element={<Navigate to="view" replace />} />
+              <Route path="/invoices/:id" element={<InvoiceRedirect />} />
               <Route path="/settings" element={<ProtectedRoute><DashboardLayout><SettingsPage /></DashboardLayout></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><DashboardLayout><ProfilePage /></DashboardLayout></ProtectedRoute>} />
               <Route path="/templates" element={<ProtectedRoute><DashboardLayout><TemplatesPage /></DashboardLayout></ProtectedRoute>} />
