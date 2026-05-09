@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Check } from 'lucide-react';
 import { invoicesAPI, customersAPI, servicesAPI } from '../lib/api';
+import { toast } from '../components/Toast';
 
 interface InvoiceItem {
   id: number;
