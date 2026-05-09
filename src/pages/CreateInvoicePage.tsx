@@ -603,15 +603,15 @@ export default function CreateInvoicePage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+              className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-2.5 px-5 rounded-lg transition-colors text-sm"
             >
-              <Check size={18} />
+              <Check size={16} />
               {loading ? 'Menyimpan...' : 'Simpan Invoice'}
             </button>
             <button
               type="button"
               onClick={() => navigate('/invoices')}
-              className="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center justify-center px-5 py-2.5 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors text-sm"
             >
               Batal
             </button>
