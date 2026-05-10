@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Plus, Trash2, Loader2, CheckCircle } from 'lucide-react';
 import { customersAPI, servicesAPI, invoicesAPI } from '../lib/api';
+import { SkeletonBlock, SkeletonForm, SkeletonTable } from '../components/LoadingSkeleton';
 
 interface InvoiceItem {
   id?: number;
@@ -267,8 +268,34 @@ export default function EditInvoicePage() {
 
   if (loading) {
     return (
-      <div className="p-8 bg-gray-50 min-h-screen flex items-center justify-center">
-        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="p-4 md:p-8 bg-gray-50 min-h-screen">
+        <div className="mb-6 md:mb-8">
+          <SkeletonBlock width="120px" height="24px" className="mb-4" />
+          <SkeletonBlock width="300px" height="36px" />
+        </div>
+        
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
+          <div className="p-6 border-b border-gray-200">
+            <SkeletonBlock width="150px" height="24px" />
+          </div>
+          <div className="p-6">
+             <SkeletonForm fields={4} />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
+          <div className="p-6 border-b border-gray-200">
+            <SkeletonBlock width="150px" height="24px" />
+          </div>
+          <div className="p-6">
+            <SkeletonTable rows={3} columns={5} />
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-3">
+          <SkeletonBlock width="120px" height="40px" rounded />
+          <SkeletonBlock width="150px" height="40px" rounded />
+        </div>
       </div>
     );
   }

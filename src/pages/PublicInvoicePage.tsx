@@ -4,6 +4,7 @@ import { ArrowLeft, Download, X } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 import { toTitleCase } from '../lib/formatter';
 import { publicAPI } from '../lib/api';
+import { SkeletonBlock, SkeletonTable } from '../components/LoadingSkeleton';
 
 export default function PublicInvoicePage() {
   const navigate = useNavigate();
@@ -162,10 +163,35 @@ export default function PublicInvoicePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-          <p className="text-gray-600">Loading invoice...</p>
+      <div className="min-h-screen bg-gray-50 flex flex-col p-4 sm:p-8">
+        <div className="max-w-4xl mx-auto w-full bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden">
+          <div className="p-8">
+            <div className="flex justify-between items-start mb-10">
+              <SkeletonBlock width="150px" height="60px" />
+              <div className="flex flex-col items-end space-y-2">
+                <SkeletonBlock width="120px" height="32px" />
+                <SkeletonBlock width="180px" height="20px" />
+                <SkeletonBlock width="180px" height="20px" />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-8 mb-8">
+              <div className="space-y-2">
+                <SkeletonBlock width="100px" height="16px" />
+                <SkeletonBlock width="60%" height="80px" rounded />
+              </div>
+              <div className="space-y-2">
+                <SkeletonBlock width="100px" height="16px" />
+                <SkeletonBlock width="60%" height="80px" rounded />
+              </div>
+            </div>
+
+            <SkeletonTable rows={3} columns={4} />
+
+            <div className="mt-8 flex justify-end">
+               <SkeletonBlock width="250px" height="100px" rounded />
+            </div>
+          </div>
         </div>
       </div>
     );

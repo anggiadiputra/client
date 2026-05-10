@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Check } from 'lucide-react';
 import { invoicesAPI, customersAPI, servicesAPI } from '../lib/api';
 import { toast } from '../components/Toast';
+import { SkeletonBlock, SkeletonForm, SkeletonTable } from '../components/LoadingSkeleton';
 
 interface InvoiceItem {
   id: number;
@@ -17,6 +18,7 @@ interface InvoiceItem {
 
 export default function CreateInvoicePage() {
   const navigate = useNavigate();
+  const [initialLoading, setInitialLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [customers, setCustomers] = useState<any[]>([]);
@@ -38,8 +40,21 @@ export default function CreateInvoicePage() {
   const textareaRefs = useRef<{ [key: number]: HTMLTextAreaElement | null }>({});
 
   useEffect(() => {
-    fetchCustomers();
-    fetchServices();
+    const fetchInitialData = async () => {
+      try {
+        const [customersData, servicesData] = await Promise.all([
+          customersAPI.getAll(),
+          servicesAPI.getAll()
+        ]);
+        setCustomers(customersData);
+        setServices(servicesData);
+      } catch (err) {
+        console.error('Failed to load initial data:', err);
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+    fetchInitialData();
   }, []);
 
   // Auto-resize textareas when items change
@@ -52,24 +67,6 @@ export default function CreateInvoicePage() {
       }
     });
   }, [items]);
-
-  const fetchCustomers = async () => {
-    try {
-      const data = await customersAPI.getAll();
-      setCustomers(data);
-    } catch (error) {
-      console.error('Error fetching customers:', error);
-    }
-  };
-
-  const fetchServices = async () => {
-    try {
-      const data = await servicesAPI.getAll();
-      setServices(data);
-    } catch (error) {
-      console.error('Error fetching services:', error);
-    }
-  };
 
   const addItem = () => {
     setItems([
@@ -196,6 +193,40 @@ export default function CreateInvoicePage() {
   const formatCurrency = (amount: number) => {
     return `Rp ${amount.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
   };
+
+  if (initialLoading) {
+    return (
+      <div className="p-4 md:p-8 bg-gray-50 min-h-screen">
+        <div className="mb-6 md:mb-8">
+          <SkeletonBlock width="120px" height="24px" className="mb-4" />
+          <SkeletonBlock width="300px" height="36px" />
+        </div>
+        
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
+          <div className="p-6 border-b border-gray-200">
+            <SkeletonBlock width="150px" height="24px" />
+          </div>
+          <div className="p-6">
+             <SkeletonForm fields={4} />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
+          <div className="p-6 border-b border-gray-200">
+            <SkeletonBlock width="150px" height="24px" />
+          </div>
+          <div className="p-6">
+            <SkeletonTable rows={3} columns={5} />
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-3">
+          <SkeletonBlock width="120px" height="40px" rounded />
+          <SkeletonBlock width="150px" height="40px" rounded />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 md:p-8 bg-gray-50 min-h-screen">

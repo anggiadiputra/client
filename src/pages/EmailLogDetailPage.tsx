@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, Mail, Clock, CheckCircle, XCircle, User, FileText, Send } from 'lucide-react';
 import { emailsAPI } from '../lib/api';
+import { SkeletonBlock } from '../components/LoadingSkeleton';
 
 export default function EmailLogDetailPage() {
   const { id } = useParams();
@@ -25,7 +26,31 @@ export default function EmailLogDetailPage() {
     }
   };
 
-  if (loading) return <div className="p-8 text-center">Memuat...</div>;
+  if (loading) return (
+    <div className="p-8 bg-gray-50 min-h-screen">
+      <SkeletonBlock width="100px" height="24px" className="mb-8" />
+      <div className="max-w-3xl bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
+        <div className="flex items-center gap-4 mb-8">
+          <SkeletonBlock width="56px" height="56px" rounded />
+          <div>
+            <SkeletonBlock width="200px" height="32px" className="mb-2" />
+            <SkeletonBlock width="120px" height="20px" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+          <div className="space-y-6">
+            <SkeletonBlock width="100%" height="40px" />
+            <SkeletonBlock width="100%" height="40px" />
+          </div>
+          <div className="space-y-6">
+            <SkeletonBlock width="100%" height="40px" />
+            <SkeletonBlock width="100%" height="40px" />
+          </div>
+        </div>
+        <SkeletonBlock width="100%" height="64px" rounded />
+      </div>
+    </div>
+  );
   if (!log) return <div className="p-8 text-center">Log tidak ditemukan.</div>;
 
   return (

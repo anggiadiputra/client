@@ -3,6 +3,7 @@ import { User, ShieldCheck, Mail, Globe, MapPin, Phone, Smartphone, CheckCircle,
 import { useUser } from '../lib/stackAuth';
 import { settingsAPI } from '../lib/api';
 import RegionSelect from '../components/RegionSelect';
+import { SkeletonBlock, SkeletonCard, SkeletonForm } from '../components/LoadingSkeleton';
 
 export default function ProfilePage() {
   const user = useUser();
@@ -115,11 +116,26 @@ export default function ProfilePage() {
     }
   };
 
-  if (loading) return (
-    <div className="flex items-center justify-center min-h-[60vh]">
-      <Loader2 className="animate-spin text-blue-600" size={32} />
-    </div>
-  );
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        <div className="mb-6 border-b border-gray-200 pb-5">
+          <SkeletonBlock width="150px" height="32px" className="mb-2" />
+          <SkeletonBlock width="250px" height="20px" />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div className="space-y-5">
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+          </div>
+          <div className="space-y-5">
+            <SkeletonCard />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
