@@ -261,7 +261,6 @@ export default function PublicInvoicePage() {
   const isPublicRoute = window.location.pathname.startsWith('/public/');
 
   const [scale, setScale] = useState(1);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleResize = () => {

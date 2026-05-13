@@ -6,7 +6,7 @@ import SendWhatsAppModal from '../components/SendWhatsAppModal';
 import { servicesAPI, invoicesAPI, customersAPI, settingsAPI, bankAccountsAPI, emailsAPI } from '../lib/api';
 import html2pdf from 'html2pdf.js';
 import { toast } from '../components/Toast';
-import { formatAddress, formatDate, formatRupiah } from '../lib/formatter';
+import { formatAddress } from '../lib/formatter';
 import { SkeletonBlock, SkeletonTable } from '../components/LoadingSkeleton';
 
 export default function InvoiceDetailPage() {
@@ -46,17 +46,14 @@ export default function InvoiceDetailPage() {
     if (!id) return;
     setLoading(true);
     try {
-      // 1. Fetch invoice with customer details using centralized API
       const invoiceData = await invoicesAPI.getById(id);
       
-      // 2. Fetch dependencies in parallel using centralized API
       const [servicesData, settingsData, bankData] = await Promise.all([
         servicesAPI.getAll().catch(() => []),
         settingsAPI.get().catch(() => null),
         bankAccountsAPI.getAll().catch(() => []),
       ]);
       
-      // Fetch customer details if they're not fully embedded
       if (invoiceData.customer_id && !invoiceData.customer) {
         try {
           const customers = await customersAPI.getAll();
@@ -73,7 +70,6 @@ export default function InvoiceDetailPage() {
       setBankAccounts(bankData || []);
       setServices(servicesData || []);
 
-      // If the current URL has a numeric ID, replace it with the invoice number for SEO-friendly URLs
       if (id && !isNaN(Number(id)) && invoiceData.invoice_number) {
         navigate(`/invoices/${invoiceData.invoice_number}/view`, { replace: true });
       }
@@ -131,7 +127,6 @@ export default function InvoiceDetailPage() {
     } catch (error: any) {
       console.error('Error sending email:', error);
       
-      // More helpful error message for SMTP issues
       if (error.message?.includes('SMTP settings not configured')) {
         toast.error('SMTP belum dikonfigurasi. Silakan hubungi Admin atau atur di Menu Pengaturan.');
       } else {
@@ -154,7 +149,6 @@ export default function InvoiceDetailPage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      // Fallback
       const textArea = document.createElement('textarea');
       textArea.value = publicUrl;
       document.body.appendChild(textArea);
@@ -180,18 +174,15 @@ export default function InvoiceDetailPage() {
         letterRendering: true,
         scrollY: 0,
         onclone: (clonedDoc: Document) => {
-          // Force desktop width for PDF capture so it always uses the table layout
           const clonedElement = clonedDoc.getElementById('invoice-content');
           if (clonedElement) {
             clonedElement.style.width = '1024px';
-            // Ensure any mobile-only cards are hidden and table is visible in PDF
             const cards = clonedElement.querySelectorAll('.mobile-item-card');
             cards.forEach(c => (c as HTMLElement).style.display = 'none');
             const table = clonedElement.querySelector('.desktop-item-table');
             if (table) (table as HTMLElement).style.display = 'table';
           }
 
-          // Exhaustive fix for oklch colors which crash html2canvas
           const elements = clonedDoc.getElementsByTagName('*');
           for (let i = 0; i < elements.length; i++) {
             const el = elements[i] as HTMLElement;
@@ -221,18 +212,14 @@ export default function InvoiceDetailPage() {
     };
  
     const forceCleanup = () => {
-      // Emergency cleanup for html2canvas containers that might block the UI
       const containers = document.querySelectorAll('.html2canvas-container');
       containers.forEach(container => container.remove());
-      
-      // Also check for any iframes left by the library
       const iframes = document.querySelectorAll('iframe[id^="html2canvas"]');
       iframes.forEach(iframe => iframe.remove());
     };
  
     setIsDownloading(true);
     try {
-      // Add a safety timeout to prevent permanent UI lockup
       const pdfPromise = html2pdf().set(opt).from(element).save();
       const timeoutPromise = new Promise((_, reject) => 
         setTimeout(() => reject(new Error('PDF generation timed out')), 30000)
@@ -245,7 +232,6 @@ export default function InvoiceDetailPage() {
       forceCleanup();
     } finally {
       setIsDownloading(false);
-      // Ensure cleanup runs even on success just in case
       setTimeout(forceCleanup, 1000);
     }
   };
@@ -323,7 +309,6 @@ export default function InvoiceDetailPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
-      {/* Back Button */}
       <button
         onClick={() => navigate('/billing')}
         className="group flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-all mb-8"
@@ -334,20 +319,20 @@ export default function InvoiceDetailPage() {
         <span className="text-sm font-medium">Kembali ke Daftar</span>
       </button>
 
-      {/* Invoice Card Container */}
-      <div className="bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
-        {/* Invoice Content - Ref for PDF */}
+      <div className="max-w-5xl mx-auto overflow-hidden">
         <div 
-          ref={invoiceRef} 
-          id="invoice-content" 
-          className="p-8 md:p-12 relative bg-white"
+          className="bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden"
           style={{ 
             transform: scale < 1 ? `scale(${scale})` : 'none',
             transformOrigin: 'top left',
             width: scale < 1 ? '800px' : 'auto',
           }}
         >
-          {/* Invoice Header */}
+          <div 
+            ref={invoiceRef} 
+            id="invoice-content" 
+            className="p-8 md:p-12 relative bg-white"
+          >
           <div className="flex flex-col sm:flex-row justify-between items-start gap-8 mb-12">
             {companySettings?.company_logo && !invoice.is_system ? (
               <div className="flex-shrink-0">
@@ -395,7 +380,6 @@ export default function InvoiceDetailPage() {
             </div>
           </div>
 
-          {/* Company & Client Info */}
           <div className="grid grid-cols-2 gap-12 mb-12">
             <div>
               <h3 className="font-bold text-gray-800 mb-3 pb-2 border-b-2 border-gray-300 uppercase tracking-wider text-[11px]">
@@ -420,7 +404,6 @@ export default function InvoiceDetailPage() {
               </div>
             </div>
 
-            {/* Client Info (The Receiver) */}
             <div>
               <h3 className="font-bold text-gray-800 mb-3 pb-2 border-b-2 border-gray-300 uppercase tracking-wider text-[11px]">
                 Ditujukan Kepada
@@ -450,7 +433,6 @@ export default function InvoiceDetailPage() {
             </div>
           </div>
 
-          {/* Items Table - Always Desktop Layout */}
           <div className="mb-10 overflow-hidden rounded-lg border border-gray-200 desktop-item-table">
             <table className="w-full text-sm border-collapse">
               <thead>
@@ -504,10 +486,8 @@ export default function InvoiceDetailPage() {
             </table>
           </div>
 
-          {/* Summary & Terbilang Block */}
           <div className="flex flex-col md:flex-row justify-between gap-12 mb-8">
             <div className="flex-1">
-              {/* Terbilang Box */}
               <div className="mb-8 p-6 bg-gray-50 rounded-2xl border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative overflow-hidden">
                 <div className="relative z-10">
                   <h4 className="text-[10px] uppercase tracking-widest font-black text-gray-400 mb-2">Terbilang</h4>
@@ -522,7 +502,6 @@ export default function InvoiceDetailPage() {
                 )}
               </div>
 
-              {/* Payment Instructions */}
               {invoice.status !== 'paid' && bankAccounts.length > 0 && (
                 <div className="p-6 bg-blue-50/50 rounded-2xl border border-blue-100/50">
                   <h4 className="text-[10px] uppercase tracking-widest font-black text-blue-400 mb-3">Instruksi Pembayaran</h4>
@@ -541,7 +520,6 @@ export default function InvoiceDetailPage() {
               )}
             </div>
 
-            {/* Totals Summary */}
             <div className="w-full md:w-80">
               <div className="space-y-4">
                 <div className="flex justify-between items-center text-sm px-2">
@@ -562,7 +540,6 @@ export default function InvoiceDetailPage() {
             </div>
           </div>
 
-          {/* Footer Note */}
           <div className="mt-12 pt-8 border-t border-gray-100 text-center">
             <p className="text-xs text-gray-400 font-medium italic">
               Terima kasih atas kepercayaan Anda menggunakan layanan kami.
@@ -570,10 +547,9 @@ export default function InvoiceDetailPage() {
           </div>
         </div>
 
-        {/* Actions Bar */}
         <div className="bg-gray-50 border-t border-gray-100 p-6 flex justify-end items-center">
-          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-            <div className="flex gap-2 w-full sm:w-auto">
+          <div className="flex items-center gap-3 w-auto">
+            <div className="flex gap-2 w-auto">
               {!invoice.is_system && (
               <button
                 onClick={() => navigate(`/invoices/${invoice.invoice_number}/edit`)}
@@ -601,20 +577,20 @@ export default function InvoiceDetailPage() {
               <button
                 onClick={handleShareLink}
                 disabled={isDownloading}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-bold py-2.5 px-4 rounded-xl border border-gray-200 transition-all text-sm shadow-sm disabled:opacity-50"
+                className="flex-none flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-bold py-2.5 px-4 rounded-xl border border-gray-200 transition-all text-sm shadow-sm disabled:opacity-50"
                 title="Share Link"
               >
                 <Share2 size={16} /> <span>Bagikan</span>
               </button>
             </div>
 
-            <div className="w-full sm:w-px sm:h-8 bg-gray-200 mx-1 hidden sm:block"></div>
+            <div className="w-px h-8 bg-gray-200 mx-1"></div>
 
-            <div className="flex gap-2 w-full sm:w-auto">
+            <div className="flex gap-2 w-auto">
               <button
                 onClick={handleSendEmail}
                 disabled={isDownloading || isActionLoading.email}
-                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-xl transition-all text-sm shadow-md shadow-blue-200 disabled:opacity-50 ${(isDownloading || isActionLoading.email) ? 'cursor-wait' : ''}`}
+                className={`flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-xl transition-all text-sm shadow-md shadow-blue-200 disabled:opacity-50 ${(isDownloading || isActionLoading.email) ? 'cursor-wait' : ''}`}
               >
                 {isActionLoading.email ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
@@ -627,16 +603,16 @@ export default function InvoiceDetailPage() {
               <button
                 onClick={handleWhatsApp}
                 disabled={isDownloading}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 px-5 rounded-xl transition-all text-sm shadow-md shadow-green-200 disabled:opacity-50"
+                className="flex-none flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 px-5 rounded-xl transition-all text-sm shadow-md shadow-green-200 disabled:opacity-50"
               >
                 <WhatsAppIcon size={16} className="fill-current" /> WhatsApp
               </button>
             </div>
           </div>
         </div>
+        </div>
       </div>
 
-      {/* Modals */}
       {showShareLink && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
