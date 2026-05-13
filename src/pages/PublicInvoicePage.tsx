@@ -264,8 +264,10 @@ export default function PublicInvoicePage() {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 800) {
-        setScale(window.innerWidth / 800);
+      const horizontalPadding = window.innerWidth < 640 ? 32 : 64;
+      const availableWidth = window.innerWidth - horizontalPadding;
+      if (window.innerWidth < 800 + horizontalPadding) {
+        setScale(availableWidth / 800);
       } else {
         setScale(1);
       }
@@ -296,9 +298,10 @@ export default function PublicInvoicePage() {
           className="bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden relative"
           style={{ 
             transform: scale < 1 ? `scale(${scale})` : 'none',
-            transformOrigin: 'top left',
+            transformOrigin: 'top center',
             width: scale < 1 ? '800px' : 'auto',
-            height: scale < 1 ? 'auto' : 'auto'
+            height: scale < 1 ? 'auto' : 'auto',
+            margin: scale < 1 ? '0 auto' : '0'
           }}
         >
           {/* Close Button - Only show inside dashboard */}
