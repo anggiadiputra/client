@@ -123,7 +123,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex items-center gap-1.5">
                     <div className="w-3 h-3 bg-red-400 rounded-sm"></div>
-                    <span className="text-[10px] font-bold text-gray-500 uppercase">Unpaid</span>
+                    <span className="text-[10px] font-bold text-gray-500 uppercase">Pending</span>
                   </div>
                 </div>
               </div>
@@ -156,7 +156,7 @@ export default function DashboardPage() {
                             className="w-[12px] sm:w-[18px] bg-red-400 rounded-t-sm transition-all relative group/unpaid"
                           >
                             <div className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-[10px] rounded opacity-0 group-hover/unpaid:opacity-100 whitespace-nowrap z-20">
-                              Belum Lunas: {formatIDR(unpaid)}
+                              Tertunda: {formatIDR(unpaid)}
                             </div>
                           </div>
                         </div>

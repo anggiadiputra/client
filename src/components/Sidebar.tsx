@@ -68,8 +68,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         {/* Sections Mapping */}
         {[
           { title: 'Ringkasan', items: ['dashboard'] },
-          { title: 'SaaS & Billing', items: ['pricing', 'billing'], adminHidden: true },
           { title: 'Bisnis', items: ['invoices', 'customers', 'services'] },
+          { title: 'Billing', items: ['pricing', 'billing'], adminHidden: true },
           { title: 'Sistem', items: ['templates', 'users', 'logs', 'settings'] },
           { title: 'Administrasi', items: ['admin-plans', 'admin-transactions'] }
         ]

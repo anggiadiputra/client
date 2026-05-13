@@ -61,8 +61,8 @@ export interface DashboardStats {
 
 export interface MonthlyData {
   month: string;
-  total_amount: string | number;
   paid_amount: string | number;
+  unpaid_amount: string | number;
 }
 
 export interface DashboardLog {
