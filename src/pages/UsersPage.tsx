@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Shield, Search, Plus, ChevronLeft, ChevronRight, CheckSquare, Square, Edit2, Trash2, X, XCircle, CheckCircle, Loader2, User as UserIcon, Mail, Building2 } from 'lucide-react';
-import { usersAPI } from '../lib/api';
-import { toTitleCase, formatDate } from '../lib/formatter';
+import { Shield, Search, Plus, ChevronLeft, ChevronRight, CheckSquare, Square, Edit2, Trash2, X, XCircle, Loader2, Mail, Building2, Crown } from 'lucide-react';
+import { usersAPI, plansAPI } from '../lib/api';
+import { toTitleCase } from '../lib/formatter';
 import { User } from '../types';
 import { SkeletonTable } from '../components/LoadingSkeleton';
 import DropdownFilter from '../components/DropdownFilter';
@@ -18,7 +18,6 @@ export default function UsersPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
   const [error, setError] = useState('');
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [isBatchLoading, setIsBatchLoading] = useState(false);
@@ -34,6 +33,15 @@ export default function UsersPage() {
     status: 'active'
   });
 
+  // Lifetime plan state
+  const [showLifetimeModal, setShowLifetimeModal] = useState(false);
+  const [lifetimeUser, setLifetimeUser] = useState<User | null>(null);
+  const [lifetimeAction, setLifetimeAction] = useState<'grant' | 'revoke'>('grant');
+  const [plans, setPlans] = useState<any[]>([]);
+  const [selectedPlanId, setSelectedPlanId] = useState<string>('');
+  const [lifetimeLoading, setLifetimeLoading] = useState(false);
+  const [userSubscriptions, setUserSubscriptions] = useState<Record<number, any>>({});
+
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     setError('');
@@ -42,11 +50,9 @@ export default function UsersPage() {
       if (json.pagination) {
         setUsers(json.users || []);
         setTotalPages(json.pagination.totalPages);
-        setTotalItems(json.pagination.total);
       } else {
         setUsers(json.users || []);
         setTotalPages(1);
-        setTotalItems(json.users?.length || 0);
       }
     } catch (err: any) {
       console.error('Error fetching users:', err);
@@ -82,6 +88,54 @@ export default function UsersPage() {
       status: user.status || 'active'
     });
     setShowModal(true);
+  };
+
+  // Fetch plans once
+  useEffect(() => {
+    plansAPI.getAll().then((data: any[]) => {
+      // Exclude free plan from lifetime grant options
+      setPlans(data.filter((p: any) => p.slug !== 'free'));
+    }).catch(console.error);
+  }, []);
+
+  const openLifetimeModal = async (user: User) => {
+    setLifetimeUser(user);
+    setSelectedPlanId('');
+    // Fetch current subscription to determine if already lifetime
+    try {
+      const sub = await usersAPI.getSubscription(user.id);
+      setUserSubscriptions(prev => ({ ...prev, [user.id]: sub }));
+      setLifetimeAction(sub?.is_lifetime ? 'revoke' : 'grant');
+    } catch {
+      setLifetimeAction('grant');
+    }
+    setShowLifetimeModal(true);
+  };
+
+  const handleLifetimeSubmit = async () => {
+    if (!lifetimeUser) return;
+    if (lifetimeAction === 'grant' && !selectedPlanId) {
+      toast.error('Pilih paket terlebih dahulu');
+      return;
+    }
+    setLifetimeLoading(true);
+    try {
+      if (lifetimeAction === 'grant') {
+        await usersAPI.grantLifetime(lifetimeUser.id, selectedPlanId);
+        const planName = plans.find(p => String(p.id) === selectedPlanId)?.name || 'Plan';
+        toast.success(`Lifetime ${planName} berhasil diberikan ke ${lifetimeUser.email}`);
+        setUserSubscriptions(prev => ({ ...prev, [lifetimeUser.id]: { is_lifetime: true } }));
+      } else {
+        await usersAPI.revokeLifetime(lifetimeUser.id);
+        toast.success(`Lifetime plan berhasil dicabut dari ${lifetimeUser.email}`);
+        setUserSubscriptions(prev => ({ ...prev, [lifetimeUser.id]: { is_lifetime: false } }));
+      }
+      setShowLifetimeModal(false);
+    } catch (err: any) {
+      toast.error(err.message || 'Gagal memproses lifetime plan');
+    } finally {
+      setLifetimeLoading(false);
+    }
   };
 
   const handleDelete = async (user: User) => {
@@ -292,6 +346,17 @@ export default function UsersPage() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right">
                           <div className="flex items-center justify-end gap-1">
+                            <button
+                              onClick={() => openLifetimeModal(user)}
+                              className={`p-1.5 rounded-lg transition-colors ${
+                                userSubscriptions[user.id]?.is_lifetime
+                                  ? 'text-yellow-500 hover:bg-yellow-50'
+                                  : 'text-gray-400 hover:bg-gray-50'
+                              }`}
+                              title={userSubscriptions[user.id]?.is_lifetime ? 'Cabut Lifetime' : 'Grant Lifetime'}
+                            >
+                              <Crown size={16} />
+                            </button>
                             <button onClick={() => handleEdit(user)} className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Edit"><Edit2 size={16} /></button>
                             <button onClick={() => handleDelete(user)} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete"><Trash2 size={16} /></button>
                           </div>
@@ -357,6 +422,15 @@ export default function UsersPage() {
                             </span>
                           </div>
                           <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-lg">
+                            <button
+                              onClick={() => openLifetimeModal(user)}
+                              className={`p-1.5 rounded-md transition-all hover:bg-white hover:shadow-sm ${
+                                userSubscriptions[user.id]?.is_lifetime ? 'text-yellow-500' : 'text-gray-400'
+                              }`}
+                              title={userSubscriptions[user.id]?.is_lifetime ? 'Cabut Lifetime' : 'Grant Lifetime'}
+                            >
+                              <Crown size={14} />
+                            </button>
                             <button onClick={() => handleEdit(user)} className="p-1.5 text-amber-600 hover:bg-white hover:shadow-sm rounded-md transition-all" title="Edit"><Edit2 size={14} /></button>
                             <button onClick={() => handleDelete(user)} className="p-1.5 text-red-600 hover:bg-white hover:shadow-sm rounded-md transition-all" title="Delete"><Trash2 size={14} /></button>
                           </div>
@@ -403,6 +477,87 @@ export default function UsersPage() {
           </div>
         </div>
       )}
+      {/* Lifetime Plan Modal */}
+      {showLifetimeModal && lifetimeUser && (
+        <KeyboardShortcutWrapper onClose={() => setShowLifetimeModal(false)} disabled={lifetimeLoading}>
+          <div className="bg-white rounded-xl shadow-lg max-w-md w-full my-8 overflow-hidden border border-gray-200">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-yellow-100 flex items-center justify-center">
+                  <Crown size={18} className="text-yellow-500" />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-gray-900">
+                    {lifetimeAction === 'grant' ? 'Grant Lifetime Plan' : 'Cabut Lifetime Plan'}
+                  </h2>
+                  <p className="text-xs text-gray-500">{lifetimeUser.email}</p>
+                </div>
+              </div>
+              <button onClick={() => setShowLifetimeModal(false)} className="text-gray-400 hover:text-gray-600">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              {lifetimeAction === 'grant' ? (
+                <>
+                  <p className="text-sm text-gray-600">
+                    Pilih paket yang akan diberikan secara <strong>lifetime (seumur hidup)</strong> tanpa biaya berulang.
+                  </p>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Pilih Paket</label>
+                    <select
+                      value={selectedPlanId}
+                      onChange={(e) => setSelectedPlanId(e.target.value)}
+                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white"
+                    >
+                      <option value="">-- Pilih paket --</option>
+                      {plans.map((plan: any) => (
+                        <option key={plan.id} value={String(plan.id)}>
+                          {plan.name} — Rp {Number(plan.price_monthly).toLocaleString('id-ID')}/bln
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-xs text-yellow-800">
+                    ⚡ User akan mendapatkan akses paket ini tanpa batas waktu. Admin dapat mencabutnya kapan saja.
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-gray-600">
+                    User ini saat ini memiliki <strong>lifetime plan</strong>. Mencabut akses akan memberikan grace period <strong>30 hari</strong> sebelum berakhir.
+                  </p>
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700">
+                    ⚠️ Setelah dicabut, user perlu berlangganan secara reguler untuk melanjutkan akses.
+                  </div>
+                </>
+              )}
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={handleLifetimeSubmit}
+                  disabled={lifetimeLoading || (lifetimeAction === 'grant' && !selectedPlanId)}
+                  className={`flex-1 flex items-center justify-center gap-2 font-semibold py-2 rounded-lg text-sm transition-colors disabled:opacity-50 ${
+                    lifetimeAction === 'grant'
+                      ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
+                      : 'bg-red-600 hover:bg-red-700 text-white'
+                  }`}
+                >
+                  {lifetimeLoading ? <Loader2 size={16} className="animate-spin" /> : <Crown size={16} />}
+                  {lifetimeAction === 'grant' ? 'Grant Lifetime' : 'Cabut Lifetime'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowLifetimeModal(false)}
+                  className="px-5 border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold py-2 rounded-lg text-sm transition-colors"
+                >
+                  Batal
+                </button>
+              </div>
+            </div>
+          </div>
+        </KeyboardShortcutWrapper>
+      )}
+
       {/* User Edit Modal */}
       {showModal && (
         <KeyboardShortcutWrapper onClose={() => setShowModal(false)} disabled={saving}>

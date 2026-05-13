@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { 
   CheckCircle, XCircle, Loader2, ExternalLink, HardDrive, Mail, Edit, Plus, Trash2, Star, Palette,
-  Monitor, CreditCard
+  Monitor, CreditCard, Upload
 } from 'lucide-react';
 import { settingsAPI, bankAccountsAPI, whatsappAPI } from '../lib/api';
 import { useAppSettings } from '../context/AppContext';
+import { toast } from '../components/Toast';
 
 export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
@@ -21,6 +22,7 @@ export default function SettingsPage() {
   const [savingCompany, setSavingCompany] = useState(false);
   const [companyStatus, setCompanyStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [companyMessage, setCompanyMessage] = useState('');
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   // Turnstile states
   const [editingTurnstile, setEditingTurnstile] = useState(false);
@@ -520,14 +522,56 @@ export default function SettingsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">URL Logo Perusahaan</label>
-                <input
-                  type="text"
-                  value={formData.company_logo}
-                  onChange={(e) => setFormData({ ...formData, company_logo: e.target.value })}
-                  disabled={!editingCompany}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
-                  placeholder="https://example.com/logo.png"
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={formData.company_logo}
+                    onChange={(e) => setFormData({ ...formData, company_logo: e.target.value })}
+                    disabled={!editingCompany}
+                    className="flex-1 px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                    placeholder="https://example.com/logo.png"
+                  />
+                  {formData.company_logo && editingCompany && (
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, company_logo: '' })}
+                      className="flex items-center justify-center px-3 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors border border-red-100"
+                      title="Hapus Logo"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
+                  <input 
+                    type="file" 
+                    id="logo-upload"
+                    className="hidden" 
+                    accept="image/*"
+                    disabled={!editingCompany || uploadingLogo}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setUploadingLogo(true);
+                      try {
+                        const res = await settingsAPI.uploadLogo(file);
+                        setFormData({ ...formData, company_logo: res.url });
+                        toast.success('Logo berhasil diunggah');
+                      } catch (err: any) {
+                        toast.error(err.message || 'Gagal mengunggah logo');
+                      } finally {
+                        setUploadingLogo(false);
+                        // Reset input value to allow selecting the same file again
+                        e.target.value = '';
+                      }
+                    }}
+                  />
+                  <label 
+                    htmlFor="logo-upload"
+                    className={`flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors border border-gray-200 ${(!editingCompany || uploadingLogo) ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}
+                  >
+                    {uploadingLogo ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                    <span className="hidden sm:inline">Upload</span>
+                  </label>
+                </div>
               </div>
 
               {/* Bank Accounts Section */}

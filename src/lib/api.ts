@@ -61,15 +61,15 @@ const handleResponse = async (response: Response, defaultErrorMessage: string) =
  */
 const requestJSON = async (
   path: string,
-  options: { method?: string; body?: object } = {}
+  options: RequestInit = {},
+  errorMessage?: string
 ) => {
   const baseOptions = await getOptions();
   const response = await fetch(`${API_URL}${path}`, {
     ...baseOptions,
-    method: options.method || 'GET',
-    ...(options.body ? { body: JSON.stringify(options.body) } : {}),
+    ...options,
   });
-  return handleResponse(response, `Request to ${path} failed`);
+  return handleResponse(response, errorMessage || `Request to ${path} failed`);
 };
 
 
@@ -123,7 +123,11 @@ export const customersAPI = {
       ...(await getOptions()),
       body: JSON.stringify({ ids }),
     });
-    if (!response.ok) throw new Error('Failed to batch delete customers');
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      // In dev mode, server returns `error: <object>`, `message: <string>` — always use message
+      throw new Error(errorData.message || (typeof errorData.error === 'string' ? errorData.error : null) || 'Failed to batch delete customers');
+    }
     return response.json();
   },
 };
@@ -299,6 +303,23 @@ export const settingsAPI = {
       body: JSON.stringify(data),
     });
     return handleResponse(response, 'Failed to update settings');
+  },
+
+  uploadLogo: async (file: File) => {
+    const formData = new FormData();
+    formData.append('logo', file);
+
+    const options = await getOptions();
+    const headers = options.headers as any;
+    delete headers['Content-Type']; // Let browser set Content-Type with boundary
+
+    const response = await fetch(`${API_URL}/settings/upload-logo`, {
+      method: 'POST',
+      headers,
+      credentials: options.credentials,
+      body: formData,
+    });
+    return handleResponse(response, 'Failed to upload logo');
   },
 
   testS3: async (data: any) => {
@@ -768,6 +789,17 @@ export const usersAPI = {
     return response.json();
   },
 
+  getSubscription: async (id: number | string) => {
+    const response = await fetch(`${API_URL}/users/${id}/subscription`, {
+      ...(await getOptions()),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to fetch subscription');
+    }
+    return response.json();
+  },
+
   delete: async (id: number | string) => {
     const response = await fetch(`${API_URL}/users/${id}`, {
       method: 'DELETE',
@@ -789,6 +821,31 @@ export const usersAPI = {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.error || 'Failed to batch delete users');
+    }
+    return response.json();
+  },
+
+  grantLifetime: async (userId: number | string, planId: number | string) => {
+    const response = await fetch(`${API_URL}/users/${userId}/grant-lifetime`, {
+      method: 'POST',
+      ...(await getOptions()),
+      body: JSON.stringify({ plan_id: planId }),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to grant lifetime plan');
+    }
+    return response.json();
+  },
+
+  revokeLifetime: async (userId: number | string) => {
+    const response = await fetch(`${API_URL}/users/${userId}/revoke-lifetime`, {
+      method: 'POST',
+      ...(await getOptions()),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to revoke lifetime plan');
     }
     return response.json();
   },

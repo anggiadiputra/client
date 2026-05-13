@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Mail, Clock, CheckCircle, XCircle, User, FileText, Send } from 'lucide-react';
+import { ChevronLeft, Mail, Clock, CheckCircle, User, FileText } from 'lucide-react';
 import { emailsAPI } from '../lib/api';
 import { SkeletonBlock } from '../components/LoadingSkeleton';
 

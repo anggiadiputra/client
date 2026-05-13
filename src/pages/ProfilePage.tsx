@@ -3,7 +3,7 @@ import { User, ShieldCheck, Mail, Globe, MapPin, Phone, Smartphone, CheckCircle,
 import { useUser } from '../lib/stackAuth';
 import { settingsAPI } from '../lib/api';
 import RegionSelect from '../components/RegionSelect';
-import { SkeletonBlock, SkeletonCard, SkeletonForm } from '../components/LoadingSkeleton';
+import { SkeletonBlock, SkeletonCard } from '../components/LoadingSkeleton';
 
 export default function ProfilePage() {
   const user = useUser();
