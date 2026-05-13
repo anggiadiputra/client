@@ -32,23 +32,6 @@ export default function PublicInvoicePage() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  const [scale, setScale] = useState(1);
-
-  useEffect(() => {
-    const handleResize = () => {
-      const hPadding = window.innerWidth < 640 ? 32 : 64;
-      const availableWidth = window.innerWidth - hPadding;
-      if (window.innerWidth < 800 + hPadding) {
-        setScale(availableWidth / 800);
-      } else {
-        setScale(1);
-      }
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   useEffect(() => {
     fetchData();
   }, [id]);
