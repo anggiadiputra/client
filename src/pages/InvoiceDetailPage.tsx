@@ -80,22 +80,21 @@ export default function InvoiceDetailPage() {
     return date.toISOString().split('T')[0];
   };
 
-  const numberToWords = (num: number): string => {
-    const ones = ['', 'Satu', 'Dua', 'Tiga', 'Empat', 'Lima', 'Enam', 'Tujuh', 'Delapan', 'Sembilan'];
-    const teens = ['Sepuluh', 'Sebelas', 'Dua Belas', 'Tiga Belas', 'Empat Belas', 'Lima Belas', 
-                   'Enam Belas', 'Tujuh Belas', 'Delapan Belas', 'Sembilan Belas'];
-    const tens = ['', 'Sepuluh', 'Dua Puluh', 'Tiga Puluh', 'Empat Puluh', 'Lima Puluh', 
-                   'Enam Puluh', 'Tujuh Puluh', 'Delapan Puluh', 'Sembilan Puluh'];
-
-    if (num === 0) return 'Nol';
-    if (num < 10) return ones[num];
-    if (num < 20) return teens[num - 10];
-    if (num < 100) return tens[Math.floor(num / 10)] + (num % 10 ? ' ' + ones[num % 10] : '');
-    if (num < 1000) return ones[Math.floor(num / 100)] + ' Ratus' + (num % 100 ? ' ' + numberToWords(num % 100) : '');
-    if (num < 1000000) return numberToWords(Math.floor(num / 1000)) + ' Ribu' + (num % 1000 ? ' ' + numberToWords(num % 1000) : '');
-    if (num < 1000000000) return numberToWords(Math.floor(num / 1000000)) + ' Juta' + (num % 1000000 ? ' ' + numberToWords(num % 1000000) : '');
-    if (num < 1000000000000) return numberToWords(Math.floor(num / 1000000000)) + ' Miliar' + (num % 1000000000 ? ' ' + numberToWords(num % 1000000000) : '');
-    return numberToWords(Math.floor(num / 1000000000000)) + ' Triliun' + (num % 1000000000000 ? ' ' + numberToWords(num % 1000000000000) : '');
+  const numberToWords = (n: number): string => {
+    if (n === 0) return "Nol";
+    const read = (num: number): string => {
+      if (num < 12) return ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"][num];
+      if (num < 20) return read(num - 10) + " Belas";
+      if (num < 100) return (Math.floor(num / 10) === 1 ? "Sepuluh" : read(Math.floor(num / 10)) + " Puluh") + (num % 10 ? " " + read(num % 10) : "");
+      if (num < 200) return "Seratus" + (num % 100 ? " " + read(num % 100) : "");
+      if (num < 1000) return read(Math.floor(num / 100)) + " Ratus" + (num % 100 ? " " + read(num % 100) : "");
+      if (num < 2000) return "Seribu" + (num % 1000 ? " " + read(num % 1000) : "");
+      if (num < 1000000) return read(Math.floor(num / 1000)) + " Ribu" + (num % 1000 ? " " + read(num % 1000) : "");
+      if (num < 1000000000) return read(Math.floor(num / 1000000)) + " Juta" + (num % 1000000 ? " " + read(num % 1000000) : "");
+      if (num < 1000000000000) return read(Math.floor(num / 1000000000)) + " Miliar" + (num % 1000000000 ? " " + read(num % 1000000000) : "");
+      return read(Math.floor(num / 1000000000000)) + " Triliun" + (num % 1000000000000 ? " " + read(num % 1000000000000) : "");
+    };
+    return read(n).trim();
   };
 
   const handleWhatsApp = () => {
@@ -266,6 +265,18 @@ export default function InvoiceDetailPage() {
   const showDiscount = invoice.show_discount === true;
   const showTax = invoice.show_tax === true;
 
+  const capitalizeWords = (str: string) => {
+    return str.replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+    }).format(amount).replace('IDR', 'Rp');
+  };
+
   const subtotal = invoice.items?.reduce((sum: number, item: any) => {
     const qty = parseFloat(item.quantity) || 0;
     const price = parseFloat(item.unit_price) || 0;
@@ -290,77 +301,101 @@ export default function InvoiceDetailPage() {
   const grandTotal = subtotal + totalTax;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+    <div className="max-w-5xl mx-auto px-4 py-8">
       {/* Back Button */}
       <button
-        onClick={() => navigate('/invoices')}
-        className="flex items-center gap-2 text-gray-500 hover:text-gray-900 mb-6 transition-colors group"
+        onClick={() => navigate('/billing')}
+        className="group flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-all mb-8"
       >
-        <ArrowLeft size={18} className="transition-transform group-hover:-translate-x-1" />
+        <div className="p-1.5 rounded-lg group-hover:bg-gray-100 transition-colors">
+          <ArrowLeft size={18} />
+        </div>
         <span className="text-sm font-medium">Kembali ke Daftar</span>
       </button>
 
       {/* Invoice Card */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
         {/* Invoice Content - Ref for PDF */}
-        <div ref={invoiceRef} className="p-6 md:p-10 relative">
+        <div ref={invoiceRef} className="p-8 md:p-12 relative bg-white">
           {/* Invoice Header */}
-          <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-10">
+          <div className="flex justify-between items-start mb-12">
             {companySettings?.company_logo && !invoice.is_system ? (
               <div className="flex-shrink-0">
                 <img 
                   src={companySettings.company_logo} 
                   alt="Logo" 
-                  className="max-h-20 max-w-[200px] object-contain"
+                  className="max-h-24 max-w-[240px] object-contain"
                   crossOrigin="anonymous"
                 />
               </div>
             ) : (
-              <div className="text-2xl font-black text-blue-600 tracking-tighter uppercase">
-                {invoice.is_system ? 'Kwitansi Pembayaran' : (companySettings?.company_name || 'INVOICE')}
+              <div className="text-3xl font-black text-blue-600 tracking-tighter uppercase">
+                {invoice.is_system ? 'Kwitansi' : (companySettings?.company_name || 'INVOICE')}
               </div>
             )}
-            <div className="text-left md:text-right">
-              <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-4 uppercase">
+            <div className="text-right">
+              <h1 className="text-5xl font-black text-gray-900 uppercase tracking-tighter mb-6">
                 {invoice.is_system 
                   ? (invoice.system_type === 'refund' ? 'Refund' : 'Receipt')
                   : 'Invoice'
                 }
               </h1>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center md:justify-end gap-2 text-gray-500">
-                  <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-mono text-[10px] uppercase">No. Ref</span>
-                  <span className="font-bold text-gray-900">{invoice.invoice_number}</span>
+              <div className="inline-block text-left space-y-2 text-gray-700" style={{ fontSize: '14px' }}>
+                <div className="flex border-b border-gray-100 pb-1.5">
+                  <span className="w-28 font-medium text-gray-500 uppercase tracking-wider text-[10px]">No. Ref</span>
+                  <span className="font-bold text-gray-900">: {invoice.invoice_number}</span>
                 </div>
-                <p className="text-gray-500">Tanggal: <span className="font-semibold text-gray-900">{formatDate(invoice.issue_date)}</span></p>
+                <div className="flex border-b border-gray-100 pb-1.5">
+                  <span className="w-28 font-medium text-gray-500 uppercase tracking-wider text-[10px]">Tanggal</span>
+                  <span className="font-bold text-gray-900">: {formatDate(invoice.issue_date)}</span>
+                </div>
                 {!invoice.is_system && (
-                  <p className="text-gray-500">Jatuh Tempo: <span className="font-semibold text-gray-900">{formatDate(invoice.due_date)}</span></p>
+                  <div className="flex border-b border-gray-100 pb-1.5">
+                    <span className="w-28 font-medium text-gray-500 uppercase tracking-wider text-[10px]">Jatuh Tempo</span>
+                    <span className="font-bold text-gray-900">: {formatDate(invoice.due_date)}</span>
+                  </div>
                 )}
                 {invoice.status === 'paid' && (
-                  <p className="text-gray-500">Status: <span className="font-bold text-emerald-600">PAID</span></p>
+                  <div className="flex">
+                    <span className="w-28 font-medium text-gray-500 uppercase tracking-wider text-[10px]">Status</span>
+                    <span className="font-black text-emerald-600">: LUNAS</span>
+                  </div>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Contact Details */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
+          {/* Company & Client Info */}
+          <div className="grid grid-cols-2 gap-12 mb-12">
             <div>
-              <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-3">Diterbitkan Oleh</p>
-              <div className="text-sm space-y-1.5">
+              <h3 className="font-bold text-gray-800 mb-3 pb-2 border-b-2 border-gray-300 uppercase tracking-wider text-[11px]">
+                Diterbitkan Oleh
+              </h3>
+              <div className="text-sm text-gray-700 space-y-1.5">
                 <p className="font-bold text-gray-900 text-base">
                   {invoice.is_system ? 'Sistem Billing' : (companySettings?.company_name || '-')}
                 </p>
-                <p className="text-gray-600 leading-relaxed max-w-xs">
-                  {invoice.is_system ? 'Platform Management' : formatAddress(companySettings)}
+                <p className="leading-relaxed max-w-xs text-gray-600">
+                  {invoice.is_system ? 'Platform Management' : formatAddress({
+                    street: companySettings?.company_address,
+                    village: companySettings?.village_name,
+                    district: companySettings?.district_name,
+                    regency: companySettings?.regency_name,
+                    province: companySettings?.province_name,
+                    postalCode: companySettings?.company_postal_code,
+                  })}
                 </p>
-                {!invoice.is_system && companySettings?.company_phone && <p className="text-gray-600">Telp: {companySettings.company_phone}</p>}
+                {!invoice.is_system && companySettings?.company_phone && <p className="text-gray-600">Ph: {companySettings.company_phone}</p>}
                 {!invoice.is_system && companySettings?.company_email && <p className="text-gray-600">Email: {companySettings.company_email}</p>}
               </div>
             </div>
-            <div className="md:text-left">
-              <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-3">Ditujukan Kepada</p>
-              <div className="text-sm space-y-1.5">
+
+            {/* Client Info (The Receiver) */}
+            <div>
+              <h3 className="font-bold text-gray-800 mb-3 pb-2 border-b-2 border-gray-300 uppercase tracking-wider text-[11px]">
+                Ditujukan Kepada
+              </h3>
+              <div className="text-sm text-gray-700 space-y-1.5">
                 <p className="font-bold text-gray-900 text-base">
                   {invoice.is_system 
                     ? (companySettings?.company_name || 'User') 
@@ -368,7 +403,7 @@ export default function InvoiceDetailPage() {
                   }
                 </p>
                 {invoice.is_system ? (
-                   <p className="text-gray-600 leading-relaxed max-w-xs">{formatAddress({
+                   <p className="leading-relaxed max-w-xs text-gray-600">{formatAddress({
                      street: companySettings?.company_address,
                      village: companySettings?.village_name,
                      district: companySettings?.district_name,
@@ -377,46 +412,60 @@ export default function InvoiceDetailPage() {
                      postalCode: companySettings?.company_postal_code,
                    })}</p>
                 ) : (
-                  <>
-                    <p className="text-gray-600 leading-relaxed max-w-xs">{formatAddress(invoice.customer)}</p>
-                  </>
+                  <p className="leading-relaxed max-w-xs text-gray-600">{formatAddress(invoice.customer)}</p>
                 )}
-                <p className="text-gray-600">Telp: {invoice.is_system ? companySettings?.company_phone : invoice.customer?.phone || '-'}</p>
-                <p className="text-gray-600">Email: {invoice.is_system ? companySettings?.company_email : invoice.customer?.email || '-'}</p>
+                <p className="text-gray-600">Ph: {invoice.is_system ? companySettings?.company_phone : (invoice.customer?.phone || '-')}</p>
+                <p className="text-gray-600">Email: {invoice.is_system ? companySettings?.company_email : (invoice.customer?.email || '-')}</p>
               </div>
             </div>
           </div>
 
-          {/* Table */}
-          <div className="mb-10 overflow-x-auto">
-            <table className="w-full text-sm">
+          <div className="mb-10 overflow-hidden rounded-lg border border-gray-200">
+            <table className="w-full text-sm border-collapse">
               <thead>
-                <tr className="border-b-2 border-gray-900">
-                  <th className="py-3 text-left font-bold text-gray-900">Deskripsi Layanan</th>
-                  <th className="py-3 text-center font-bold text-gray-900 px-4">Qty</th>
-                  <th className="py-3 text-right font-bold text-gray-900">Harga Unit</th>
-                  {showDiscount && <th className="py-3 text-right font-bold text-gray-900 px-4">Diskon</th>}
-                  <th className="py-3 text-right font-bold text-gray-900">Total</th>
+                <tr className="bg-slate-800 text-white font-bold uppercase tracking-tighter text-[11px]">
+                  <th className="px-4 py-3 text-left first:rounded-tl-lg">Layanan / Produk</th>
+                  <th className="px-4 py-3 text-left">Deskripsi</th>
+                  <th className="px-4 py-3 text-center w-20">Jumlah</th>
+                  <th className="px-4 py-3 text-right w-32">Harga</th>
+                  {showDiscount && <th className="px-4 py-3 text-right w-24">Disc</th>}
+                  <th className="px-5 py-4 text-right last:rounded-tr-lg w-36">Total</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-200">
                 {invoice.items?.map((item: any, index: number) => {
-                  const qty = parseFloat(item.quantity) || 0;
-                  const price = parseFloat(item.unit_price) || 0;
-                  const discountPercent = parseFloat(item.discount) || 0;
+                  const isSystem = invoice.is_system;
+                  const qty = isSystem ? 1 : (parseFloat(item.quantity) || 0);
+                  const price = isSystem ? (parseFloat(item.amount) || 0) : (parseFloat(item.unit_price) || 0);
+                  const discountPercent = isSystem ? 0 : (parseFloat(item.discount) || 0);
                   const itemTotal = (qty * price) * (1 - (showDiscount ? discountPercent / 100 : 0));
-                  const service = services.find((s: any) => s.id === item.service_id);
+
+                  let productName = '-';
+                  if (isSystem) {
+                    productName = (invoice.system_type || 'System').toUpperCase();
+                  } else {
+                    const service = services.find((s: any) => s.id === item.service_id);
+                    productName = service ? service.name : '-';
+                  }
 
                   return (
-                    <tr key={index}>
-                      <td className="py-4">
-                        <p className="font-bold text-gray-900">{service?.name || 'Layanan'}</p>
-                        <p className="text-gray-500 text-xs mt-1 whitespace-pre-line leading-relaxed">{item.description || '-'}</p>
+                    <tr key={index} className="align-top hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3 font-semibold text-gray-900">
+                        {productName}
                       </td>
-                      <td className="py-4 text-center px-4 text-gray-600">{qty}</td>
-                      <td className="py-4 text-right text-gray-600">Rp {new Intl.NumberFormat('id-ID').format(price)}</td>
-                      {showDiscount && <td className="py-4 text-right px-4 text-gray-500">{discountPercent > 0 ? `${discountPercent}%` : '-'}</td>}
-                      <td className="py-4 text-right font-bold text-gray-900">Rp {new Intl.NumberFormat('id-ID').format(itemTotal)}</td>
+                      <td className="px-4 py-3 text-gray-600 text-sm whitespace-pre-line leading-relaxed break-words min-w-[200px]">
+                        {item.description || '-'}
+                      </td>
+                      <td className="px-4 py-3 text-center text-gray-600">{qty}</td>
+                      <td className="px-4 py-3 text-right whitespace-nowrap text-gray-600">{formatCurrency(price)}</td>
+                      {showDiscount && (
+                        <td className="px-4 py-3 text-right whitespace-nowrap text-gray-500">
+                          {discountPercent > 0 ? `${discountPercent}%` : '-'}
+                        </td>
+                      )}
+                      <td className="px-5 py-5 text-right whitespace-nowrap font-bold text-gray-900">
+                        {formatCurrency(itemTotal)}
+                      </td>
                     </tr>
                   );
                 })}
@@ -424,60 +473,69 @@ export default function InvoiceDetailPage() {
             </table>
           </div>
 
-          {/* Summary */}
-          <div className="flex flex-col md:flex-row justify-between gap-10">
+          {/* Summary & Terbilang Block */}
+          <div className="flex flex-col md:flex-row justify-between gap-12 mb-8">
             <div className="flex-1">
-              {invoice.status !== 'paid' && (
-                <div className="bg-gray-50 rounded-lg p-5">
-                  <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Metode Pembayaran</p>
-                  <div className="text-sm space-y-1">
-                    {bankAccounts.length > 0 ? (
-                      <>
-                        {bankAccounts.map((acc, i) => (
-                          <p key={i} className="font-semibold text-gray-800">{acc.bank_name} - {acc.account_number}</p>
-                        ))}
-                        <p className="text-gray-500 text-xs">A/N: {bankAccounts[0].account_name}</p>
-                      </>
-                    ) : (
-                      <p className="text-gray-500">Hubungi kami untuk detail pembayaran.</p>
-                    )}
-                  </div>
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-1">Terbilang</p>
-                    <p className="text-xs font-medium italic text-gray-600 leading-relaxed">{numberToWords(Math.round(grandTotal))} Rupiah</p>
-                  </div>
+              {/* Terbilang Box */}
+              <div className="mb-8 p-6 bg-gray-50 rounded-2xl border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative overflow-hidden">
+                <div className="relative z-10">
+                  <h4 className="text-[10px] uppercase tracking-widest font-black text-gray-400 mb-2">Terbilang</h4>
+                  <p className="text-sm italic text-gray-800 font-bold leading-relaxed">
+                    {capitalizeWords(numberToWords(Math.round(grandTotal)))} Rupiah
+                  </p>
                 </div>
-              )}
-              {invoice.status === 'paid' && (
-                <div className="bg-green-50 rounded-lg p-5 border border-green-100">
-                  <p className="text-[10px] uppercase tracking-widest font-bold text-green-600 mb-2">Status Pembayaran</p>
-                  <p className="text-sm font-bold text-green-800">LUNAS / PAID</p>
-                  <p className="text-xs text-green-600 mt-1">Terima kasih atas pembayaran Anda.</p>
-                  <div className="mt-4 pt-4 border-t border-green-200">
-                    <p className="text-[10px] uppercase tracking-widest font-bold text-green-400 mb-1">Terbilang</p>
-                    <p className="text-xs font-medium italic text-green-600 leading-relaxed">{numberToWords(Math.round(grandTotal))} Rupiah</p>
+                {invoice.status === 'paid' && (
+                  <div className="relative z-10 bg-green-100 text-green-700 px-6 py-2.5 rounded-xl font-black text-2xl border-2 border-green-200 rotate-[-3deg] shadow-sm whitespace-nowrap">
+                    PAID / LUNAS
+                  </div>
+                )}
+              </div>
+
+              {/* Payment Instructions */}
+              {invoice.status !== 'paid' && bankAccounts.length > 0 && (
+                <div className="p-6 bg-blue-50/50 rounded-2xl border border-blue-100/50">
+                  <h4 className="text-[10px] uppercase tracking-widest font-black text-blue-400 mb-3">Instruksi Pembayaran</h4>
+                  <div className="text-sm space-y-2 text-gray-700">
+                    {bankAccounts.map((acc, i) => (
+                      <div key={i} className="flex items-center gap-3">
+                        <span className="font-black text-blue-600">{acc.bank_name}</span>
+                        <span className="font-mono font-bold">{acc.account_number}</span>
+                      </div>
+                    ))}
+                    <div className="pt-2 border-t border-blue-100 mt-2">
+                      <p className="text-xs text-blue-600 font-medium">A/N: <span className="font-bold">{bankAccounts[0].account_name}</span></p>
+                    </div>
                   </div>
                 </div>
               )}
             </div>
-            <div className="w-full md:w-72">
-              <div className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500 font-medium">Subtotal</span>
-                  <span className="text-gray-900 font-semibold">Rp {new Intl.NumberFormat('id-ID').format(subtotal)}</span>
+
+            {/* Totals Summary */}
+            <div className="w-full md:w-80">
+              <div className="space-y-4">
+                <div className="flex justify-between items-center text-sm px-2">
+                  <span className="text-gray-500 font-bold uppercase tracking-wider text-[10px]">Subtotal</span>
+                  <span className="text-gray-900 font-bold">{formatCurrency(subtotal)}</span>
                 </div>
                 {showTax && totalTax > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500 font-medium">Pajak (PPN)</span>
-                    <span className="text-gray-900 font-semibold">+ Rp {new Intl.NumberFormat('id-ID').format(totalTax)}</span>
+                  <div className="flex justify-between items-center text-sm px-2">
+                    <span className="text-gray-500 font-bold uppercase tracking-wider text-[10px]">Pajak (PPN)</span>
+                    <span className="text-gray-900 font-bold">+ {formatCurrency(totalTax)}</span>
                   </div>
                 )}
-                <div className="pt-3 border-t-2 border-gray-900 flex justify-between">
-                  <span className="text-base font-black text-gray-900 uppercase">Total Akhir</span>
-                  <span className="text-lg font-black text-blue-600">Rp {new Intl.NumberFormat('id-ID').format(grandTotal)}</span>
+                <div className="pt-4 mt-2 border-t-4 border-gray-900 flex justify-between items-center px-2">
+                  <span className="text-base font-black text-gray-900 uppercase tracking-tighter">Total Akhir</span>
+                  <span className="text-2xl font-black text-blue-600">{formatCurrency(grandTotal)}</span>
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Footer Note */}
+          <div className="mt-12 pt-8 border-t border-gray-100 text-center">
+            <p className="text-xs text-gray-400 font-medium italic">
+              Terima kasih atas kepercayaan Anda menggunakan layanan kami.
+            </p>
           </div>
         </div>
 

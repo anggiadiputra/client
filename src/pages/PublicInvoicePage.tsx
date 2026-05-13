@@ -65,22 +65,21 @@ export default function PublicInvoicePage() {
     }).format(amount);
   };
 
-  const numberToWords = (num: number): string => {
-    const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
-    const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen',
-                   'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
-    const tens = ['', 'Ten', 'Twenty', 'Thirty', 'Forty', 'Fifty',
-                  'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-
-    if (num === 0) return 'Zero';
-    if (num < 10) return ones[num];
-    if (num < 20) return teens[num - 10];
-    if (num < 100) return tens[Math.floor(num / 10)] + (num % 10 ? ' ' + ones[num % 10] : '');
-    if (num < 1000) return ones[Math.floor(num / 100)] + ' Hundred' + (num % 100 ? ' and ' + numberToWords(num % 100) : '');
-    if (num < 1000000) return numberToWords(Math.floor(num / 1000)) + ' Thousand' + (num % 1000 ? ' ' + numberToWords(num % 1000) : '');
-    if (num < 1000000000) return numberToWords(Math.floor(num / 1000000)) + ' Million' + (num % 1000000 ? ' ' + numberToWords(num % 1000000) : '');
-    if (num < 1000000000000) return numberToWords(Math.floor(num / 1000000000)) + ' Billion' + (num % 1000000000 ? ' ' + numberToWords(num % 1000000000) : '');
-    return numberToWords(Math.floor(num / 1000000000000)) + ' Trillion' + (num % 1000000000000 ? ' ' + numberToWords(num % 1000000000000) : '');
+  const numberToWords = (n: number): string => {
+    if (n === 0) return "Nol";
+    const read = (num: number): string => {
+      if (num < 12) return ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"][num];
+      if (num < 20) return read(num - 10) + " Belas";
+      if (num < 100) return (Math.floor(num / 10) === 1 ? "Sepuluh" : read(Math.floor(num / 10)) + " Puluh") + (num % 10 ? " " + read(num % 10) : "");
+      if (num < 200) return "Seratus" + (num % 100 ? " " + read(num % 100) : "");
+      if (num < 1000) return read(Math.floor(num / 100)) + " Ratus" + (num % 100 ? " " + read(num % 100) : "");
+      if (num < 2000) return "Seribu" + (num % 1000 ? " " + read(num % 1000) : "");
+      if (num < 1000000) return read(Math.floor(num / 1000)) + " Ribu" + (num % 1000 ? " " + read(num % 1000) : "");
+      if (num < 1000000000) return read(Math.floor(num / 1000000)) + " Juta" + (num % 1000000 ? " " + read(num % 1000000) : "");
+      if (num < 1000000000000) return read(Math.floor(num / 1000000000)) + " Miliar" + (num % 1000000000 ? " " + read(num % 1000000000) : "");
+      return read(Math.floor(num / 1000000000000)) + " Triliun" + (num % 1000000000000 ? " " + read(num % 1000000000000) : "");
+    };
+    return read(n).trim();
   };
 
   const capitalizeWords = (str: string) => {
@@ -371,10 +370,10 @@ export default function PublicInvoicePage() {
                   <tr className="bg-slate-800 text-white font-bold uppercase tracking-tighter text-[11px]">
                     <th className="px-4 py-3 text-left first:rounded-tl-lg">Layanan / Produk</th>
                     <th className="px-4 py-3 text-left">Deskripsi</th>
-                    <th className="px-4 py-3 text-center">Jumlah</th>
-                    <th className="px-4 py-3 text-right">Harga</th>
-                    {showDiscount && <th className="px-4 py-3 text-right">Disc</th>}
-                    <th className="px-4 py-3 text-right last:rounded-tr-lg">Total</th>
+                    <th className="px-4 py-3 text-center w-20">Jumlah</th>
+                    <th className="px-4 py-3 text-right w-32">Harga</th>
+                    {showDiscount && <th className="px-4 py-3 text-right w-24">Disc</th>}
+                    <th className="px-4 py-3 text-right last:rounded-tr-lg w-32">Total</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-300">
@@ -398,12 +397,14 @@ export default function PublicInvoicePage() {
 
                     return (
                       <tr key={index} className="align-top">
-                        <td className="px-4 py-3">{productName}</td>
-                        <td className="px-4 py-3 text-gray-600 whitespace-pre-line">{item.description || '-'}</td>
-                        <td className="px-4 py-3 text-center">{qty}</td>
-                        <td className="px-4 py-3 text-right whitespace-nowrap">{formatCurrency(price)}</td>
-                        {showDiscount && <td className="px-4 py-3 text-right whitespace-nowrap">{discountPercent > 0 ? `${discountPercent}%` : '-'}</td>}
-                        <td className="px-4 py-3 text-right whitespace-nowrap font-medium">{formatCurrency(itemTotal)}</td>
+                        <td className="px-4 py-3 font-semibold text-gray-900">{productName}</td>
+                        <td className="px-4 py-3 text-gray-600 text-sm whitespace-pre-line leading-relaxed break-words min-w-[200px]">
+                          {item.description || '-'}
+                        </td>
+                        <td className="px-4 py-3 text-center text-gray-600">{qty}</td>
+                        <td className="px-4 py-3 text-right whitespace-nowrap text-gray-600">{formatCurrency(price)}</td>
+                        {showDiscount && <td className="px-4 py-3 text-right whitespace-nowrap text-gray-500">{discountPercent > 0 ? `${discountPercent}%` : '-'}</td>}
+                        <td className="px-4 py-3 text-right whitespace-nowrap font-bold text-gray-900">{formatCurrency(itemTotal)}</td>
                       </tr>
                     );
                   })}
@@ -434,9 +435,9 @@ export default function PublicInvoicePage() {
             {/* Terbilang */}
             <div className="mb-8 p-4 bg-gray-50 rounded-lg border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <h4 className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-1">Amount in Words</h4>
+                <h4 className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-1">Terbilang</h4>
                 <p className="text-sm italic text-gray-800 font-medium">
-                  {capitalizeWords(numberToWords(Math.round(grandTotal)))} Rupiah Only
+                  {capitalizeWords(numberToWords(Math.round(grandTotal)))} Rupiah
                 </p>
               </div>
               {invoice.status === 'paid' && (
@@ -449,7 +450,7 @@ export default function PublicInvoicePage() {
             {/* Payment Info - Only show if NOT paid */}
             {invoice.status !== 'paid' && bankAccounts && bankAccounts.length > 0 && (
               <div className="mb-6">
-                <h4 className="font-semibold text-gray-800 mb-2">Payment Instructions</h4>
+                <h4 className="font-semibold text-gray-800 mb-2">Instruksi Pembayaran</h4>
                 <div className="text-sm text-gray-700 space-y-1">
                   {bankAccounts.map((account: any, index: number) => (
                     <p key={index}>
