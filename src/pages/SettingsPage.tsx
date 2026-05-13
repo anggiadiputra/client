@@ -109,6 +109,8 @@ export default function SettingsPage() {
     regency_name: '',
     district_name: '',
     village_name: '',
+    company_postal_code: '',
+    company_website: '',
   });
 
   useEffect(() => {
@@ -157,6 +159,8 @@ export default function SettingsPage() {
         regency_name: data.regency_name || '',
         district_name: data.district_name || '',
         village_name: data.village_name || '',
+        company_postal_code: data.company_postal_code || '',
+        company_website: data.company_website || '',
       });
     } catch (error) {
       console.error('Error fetching settings:', error);
@@ -600,6 +604,31 @@ export default function SettingsPage() {
                 </div>
               )}
 
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Kode Pos</label>
+                  <input
+                    type="text"
+                    value={formData.company_postal_code}
+                    onChange={(e) => setFormData({ ...formData, company_postal_code: e.target.value })}
+                    disabled={!editingCompany}
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                    placeholder="12345"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Website</label>
+                  <input
+                    type="url"
+                    value={formData.company_website}
+                    onChange={(e) => setFormData({ ...formData, company_website: e.target.value })}
+                    disabled={!editingCompany}
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                    placeholder="https://www.perusahaan.com"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">URL Logo Perusahaan</label>
                 <div className="flex gap-2">
@@ -836,6 +865,8 @@ export default function SettingsPage() {
                           regency_name: formData.regency_name,
                           district_name: formData.district_name,
                           village_name: formData.village_name,
+                          company_postal_code: formData.company_postal_code,
+                          company_website: formData.company_website,
                         });
                         setEditingCompany(false);
                         setCompanyStatus('success');
