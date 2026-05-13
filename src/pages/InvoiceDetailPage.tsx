@@ -22,12 +22,10 @@ export default function InvoiceDetailPage() {
   const [copied, setCopied] = useState(false);
   const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
   const [scale, setScale] = useState(1);
-  const [padding, setPadding] = useState(32);
 
   useEffect(() => {
     const handleResize = () => {
       const hPadding = window.innerWidth < 640 ? 32 : 64;
-      setPadding(hPadding);
       const availableWidth = window.innerWidth - hPadding;
       if (window.innerWidth < 800 + hPadding) {
         setScale(availableWidth / 800);

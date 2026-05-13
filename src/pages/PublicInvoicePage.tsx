@@ -261,12 +261,10 @@ export default function PublicInvoicePage() {
   const isPublicRoute = window.location.pathname.startsWith('/public/');
 
   const [scale, setScale] = useState(1);
-  const [padding, setPadding] = useState(32);
 
   useEffect(() => {
     const handleResize = () => {
       const hPadding = window.innerWidth < 640 ? 32 : 64;
-      setPadding(hPadding);
       const availableWidth = window.innerWidth - hPadding;
       if (window.innerWidth < 800 + hPadding) {
         setScale(availableWidth / 800);
