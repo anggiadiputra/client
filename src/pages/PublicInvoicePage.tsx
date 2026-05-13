@@ -16,6 +16,38 @@ export default function PublicInvoicePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isDownloading, setIsDownloading] = useState(false);
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const hPadding = window.innerWidth < 640 ? 32 : 64;
+      const availableWidth = window.innerWidth - hPadding;
+      if (window.innerWidth < 800 + hPadding) {
+        setScale(availableWidth / 800);
+      } else {
+        setScale(1);
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const hPadding = window.innerWidth < 640 ? 32 : 64;
+      const availableWidth = window.innerWidth - hPadding;
+      if (window.innerWidth < 800 + hPadding) {
+        setScale(availableWidth / 800);
+      } else {
+        setScale(1);
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -259,23 +291,6 @@ export default function PublicInvoicePage() {
   const grandTotal = subtotal + totalTax;
 
   const isPublicRoute = window.location.pathname.startsWith('/public/');
-
-  const [scale, setScale] = useState(1);
-
-  useEffect(() => {
-    const handleResize = () => {
-      const hPadding = window.innerWidth < 640 ? 32 : 64;
-      const availableWidth = window.innerWidth - hPadding;
-      if (window.innerWidth < 800 + hPadding) {
-        setScale(availableWidth / 800);
-      } else {
-        setScale(1);
-      }
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   return (
     <div className={`min-h-screen ${isPublicRoute ? 'bg-gray-50' : 'bg-transparent p-0'}`}>
