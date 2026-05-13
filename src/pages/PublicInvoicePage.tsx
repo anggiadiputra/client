@@ -101,6 +101,17 @@ export default function PublicInvoicePage() {
         letterRendering: true,
         scrollY: 0,
         onclone: (clonedDoc: Document) => {
+          // Force desktop width for PDF capture so it always uses the table layout
+          const clonedElement = clonedDoc.getElementById('invoice-content');
+          if (clonedElement) {
+            clonedElement.style.width = '1024px';
+            // Ensure any mobile-only cards are hidden and table is visible in PDF
+            const cards = clonedElement.querySelectorAll('.mobile-item-card');
+            cards.forEach(c => (c as HTMLElement).style.display = 'none');
+            const table = clonedElement.querySelector('.desktop-item-table');
+            if (table) (table as HTMLElement).style.display = 'table';
+          }
+
           // Exhaustive fix for oklch colors which crash html2canvas
           const elements = clonedDoc.getElementsByTagName('*');
           for (let i = 0; i < elements.length; i++) {
@@ -277,10 +288,10 @@ export default function PublicInvoicePage() {
               <X size={24} />
             </button>
           )}
-          {/* Invoice Content */}
-          <div ref={invoiceRef} className="p-8 relative">
-            {/* Invoice Header */}
-            <div className="flex justify-between items-start mb-10">
+          {/* Invoice Content Area - Ref for PDF generation */}
+          <div ref={invoiceRef} id="invoice-content" className="p-8 md:p-12 relative bg-white">
+            {/* Header Section */}
+            <div className="flex flex-col sm:flex-row justify-between items-start gap-8 mb-12">
               {invoice.sender?.logo ? (
                 <div className="flex-shrink-0">
                   <img 
@@ -363,53 +374,108 @@ export default function PublicInvoicePage() {
               </div>
             </div>
 
-            {/* Items Table */}
-            <div className="mb-8">
-              <table className="w-full text-sm border-collapse">
-                <thead>
-                  <tr className="bg-slate-800 text-white font-bold uppercase tracking-tighter text-[11px]">
-                    <th className="px-4 py-3 text-left first:rounded-tl-lg">Layanan / Produk</th>
-                    <th className="px-4 py-3 text-left">Deskripsi</th>
-                    <th className="px-4 py-3 text-center w-20">Jumlah</th>
-                    <th className="px-4 py-3 text-right w-32">Harga</th>
-                    {showDiscount && <th className="px-4 py-3 text-right w-24">Disc</th>}
-                    <th className="px-4 py-3 text-right last:rounded-tr-lg w-32">Total</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-300">
-                  {invoice.items?.map((item: any, index: number) => {
-                    const isSystem = invoice.is_system;
-                    const qty = isSystem ? 1 : (parseFloat(item.quantity) || 0);
-                    const price = isSystem ? (parseFloat(item.amount) || 0) : (parseFloat(item.unit_price) || 0);
-                    const discountPercent = isSystem ? 0 : (parseFloat(item.discount) || 0);
-                    
-                    const lineTotal = qty * price;
-                    const discountAmount = lineTotal * (discountPercent / 100);
-                    const itemTotal = lineTotal - discountAmount;
+            {/* Items Section - Responsive Table/Cards */}
+            <div className="mb-10">
+              {/* Desktop Table - Hidden on small screens */}
+              <div className="hidden md:block overflow-hidden rounded-lg border border-gray-200 desktop-item-table">
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="bg-slate-800 text-white font-bold uppercase tracking-tighter text-[11px]">
+                      <th className="px-4 py-3 text-left first:rounded-tl-lg">Layanan / Produk</th>
+                      <th className="px-4 py-3 text-left">Deskripsi</th>
+                      <th className="px-4 py-3 text-center w-20">Jumlah</th>
+                      <th className="px-4 py-3 text-right w-32">Harga</th>
+                      {showDiscount && <th className="px-4 py-3 text-right w-24">Disc</th>}
+                      <th className="px-4 py-3 text-right last:rounded-tr-lg w-32">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {invoice.items?.map((item: any, index: number) => {
+                      const isSystem = invoice.is_system;
+                      const qty = isSystem ? 1 : (parseFloat(item.quantity) || 0);
+                      const price = isSystem ? (parseFloat(item.amount) || 0) : (parseFloat(item.unit_price) || 0);
+                      const discountPercent = isSystem ? 0 : (parseFloat(item.discount) || 0);
+                      
+                      const lineTotal = qty * price;
+                      const discountAmount = lineTotal * (discountPercent / 100);
+                      const itemTotal = lineTotal - discountAmount;
 
-                    let productName = '-';
-                    if (isSystem) {
-                      productName = (invoice.system_type || 'System').toUpperCase();
-                    } else {
-                      const service = services.find((s: any) => s.id === item.service_id);
-                      productName = service ? service.name : '-';
-                    }
+                      let productName = '-';
+                      if (isSystem) {
+                        productName = (invoice.system_type || 'System').toUpperCase();
+                      } else {
+                        const service = services.find((s: any) => s.id === item.service_id);
+                        productName = service ? service.name : '-';
+                      }
 
-                    return (
-                      <tr key={index} className="align-top">
-                        <td className="px-4 py-3 font-semibold text-gray-900">{productName}</td>
-                        <td className="px-4 py-3 text-gray-600 text-sm whitespace-pre-line leading-relaxed break-words min-w-[200px]">
-                          {item.description || '-'}
-                        </td>
-                        <td className="px-4 py-3 text-center text-gray-600">{qty}</td>
-                        <td className="px-4 py-3 text-right whitespace-nowrap text-gray-600">{formatCurrency(price)}</td>
-                        {showDiscount && <td className="px-4 py-3 text-right whitespace-nowrap text-gray-500">{discountPercent > 0 ? `${discountPercent}%` : '-'}</td>}
-                        <td className="px-4 py-3 text-right whitespace-nowrap font-bold text-gray-900">{formatCurrency(itemTotal)}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                      return (
+                        <tr key={index} className="align-top hover:bg-gray-50 transition-colors">
+                          <td className="px-4 py-3 font-semibold text-gray-900">{productName}</td>
+                          <td className="px-4 py-3 text-gray-600 text-sm whitespace-pre-line leading-relaxed break-words min-w-[200px]">
+                            {item.description || '-'}
+                          </td>
+                          <td className="px-4 py-3 text-center text-gray-600">{qty}</td>
+                          <td className="px-4 py-3 text-right whitespace-nowrap text-gray-600">{formatCurrency(price)}</td>
+                          {showDiscount && <td className="px-4 py-3 text-right whitespace-nowrap text-gray-500">{discountPercent > 0 ? `${discountPercent}%` : '-'}</td>}
+                          <td className="px-4 py-3 text-right whitespace-nowrap font-bold text-gray-900">{formatCurrency(itemTotal)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Cards - Shown only on small screens */}
+              <div className="md:hidden space-y-4 mobile-item-card-container">
+                {invoice.items?.map((item: any, index: number) => {
+                  const isSystem = invoice.is_system;
+                  const qty = isSystem ? 1 : (parseFloat(item.quantity) || 0);
+                  const price = isSystem ? (parseFloat(item.amount) || 0) : (parseFloat(item.unit_price) || 0);
+                  const discountPercent = isSystem ? 0 : (parseFloat(item.discount) || 0);
+                  
+                  const lineTotal = qty * price;
+                  const discountAmount = lineTotal * (discountPercent / 100);
+                  const itemTotal = lineTotal - discountAmount;
+                  
+                  let productName = '-';
+                  if (isSystem) {
+                    productName = (invoice.system_type || 'System').toUpperCase();
+                  } else {
+                    const service = services.find((s: any) => s.id === item.service_id);
+                    productName = service ? service.name : '-';
+                  }
+
+                  return (
+                    <div key={index} className="bg-gray-50 p-5 rounded-2xl border border-gray-100 mobile-item-card">
+                      <div className="flex justify-between items-start mb-3">
+                        <div>
+                          <p className="font-black text-gray-900 text-base leading-tight">{productName}</p>
+                          {item.description && (
+                            <p className="text-xs text-gray-500 mt-1.5 whitespace-pre-line leading-relaxed">
+                              {item.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200/60">
+                        <div className="flex flex-col">
+                          <span className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-1">Jumlah & Harga</span>
+                          <p className="text-sm font-bold text-gray-700">
+                            {qty} × {formatCurrency(price)}
+                          </p>
+                        </div>
+                        <div className="flex flex-col items-end">
+                          <span className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-1">Total Item</span>
+                          <p className="text-base font-black text-blue-600">
+                            {formatCurrency(itemTotal)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
 
               {/* Totals */}
               <div className="mt-4 flex justify-end">
