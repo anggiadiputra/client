@@ -30,16 +30,6 @@ export default function InvoicesPage() {
     invoice: null as any
   });
 
-  useEffect(() => {
-    fetchInvoices();
-    fetchCompanySettings();
-  }, [page, statusFilter, searchTerm]);
-
-  // Reset to page 1 whenever search changes
-  useEffect(() => {
-    setPage(1);
-  }, [searchTerm]);
-
   const fetchCompanySettings = async () => {
     try {
       const { settingsAPI } = await import('../lib/api');
@@ -69,6 +59,20 @@ export default function InvoicesPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchInvoices();
+      fetchCompanySettings();
+    }, searchTerm ? 400 : 0);
+    return () => clearTimeout(timer);
+  }, [page, statusFilter, searchTerm]);
+
+  // Reset to page 1 whenever search or status changes
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, statusFilter]);
+
 
   const handleSendEmail = async (invoiceId: number) => {
     try {

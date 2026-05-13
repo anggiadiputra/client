@@ -63,17 +63,16 @@ export default function UsersPage() {
   }, [page, statusFilter, searchTerm]);
 
   useEffect(() => {
-    fetchUsers();
-  }, [page, statusFilter]);
-
-  // Debounce search
-  useEffect(() => {
     const timer = setTimeout(() => {
-      setPage(1);
       fetchUsers();
-    }, 400);
+    }, searchTerm ? 400 : 0);
     return () => clearTimeout(timer);
-  }, [searchTerm]);
+  }, [page, searchTerm, statusFilter, fetchUsers]);
+
+  // Reset page when search or status filter changes
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, statusFilter]);
 
   const paginated = users; // Now using server-side results directly
 

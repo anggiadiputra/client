@@ -76,19 +76,6 @@ export default function CustomersPage() {
     status: 'active',
   });
 
-  useEffect(() => {
-    fetchCustomers(page, searchTerm, statusFilter);
-  }, [page, statusFilter]);
-
-  // Debounce search: reset to page 1 and refetch when searchTerm changes
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setPage(1);
-      fetchCustomers(1, searchTerm, statusFilter);
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
-
   const fetchCustomers = useCallback(async (currentPage = page, search = searchTerm, status = statusFilter) => {
     setLoading(true);
     try {
@@ -107,7 +94,20 @@ export default function CustomersPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, searchTerm]);
+  }, [page, searchTerm, statusFilter]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchCustomers(page, searchTerm, statusFilter);
+    }, searchTerm ? 400 : 0); // Only debounce if there is a search term
+    
+    return () => clearTimeout(timer);
+  }, [page, searchTerm, statusFilter, fetchCustomers]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, statusFilter]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

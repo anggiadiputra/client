@@ -28,10 +28,6 @@ export default function InvoiceDetailPage() {
     edit: false
   });
 
-  useEffect(() => {
-    fetchData();
-  }, [id]);
-
   const fetchData = async () => {
     if (!id) return;
     setLoading(true);
@@ -74,6 +70,10 @@ export default function InvoiceDetailPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, [id]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);

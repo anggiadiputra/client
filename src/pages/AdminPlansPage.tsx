@@ -25,10 +25,6 @@ export default function AdminPlansPage() {
     features_list: ''
   });
 
-  useEffect(() => {
-    fetchPlans();
-  }, []);
-
   const fetchPlans = async () => {
     setLoading(true);
     try {
@@ -40,6 +36,10 @@ export default function AdminPlansPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchPlans();
+  }, []);
 
   const handleCreate = () => {
     setModalMode('create');

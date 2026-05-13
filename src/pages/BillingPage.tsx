@@ -37,22 +37,6 @@ export default function BillingPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCheckingStatus, setIsCheckingStatus] = useState(false);
 
-  useEffect(() => {
-    fetchHistory();
-  }, [page]);
-
-  // Handle search with debounce
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (page === 1) {
-        fetchHistory();
-      } else {
-        setPage(1);
-      }
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
-
   const fetchHistory = async () => {
     setLoading(true);
     try {
@@ -65,6 +49,18 @@ export default function BillingPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchHistory();
+    }, searchTerm ? 500 : 0);
+    return () => clearTimeout(timer);
+  }, [page, searchTerm]);
+
+  // Reset to page 1 whenever search changes
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm]);
 
   const handleStartCheckout = () => {
     const amount = parseInt(topupAmount);

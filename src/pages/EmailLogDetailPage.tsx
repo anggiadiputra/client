@@ -10,10 +10,6 @@ export default function EmailLogDetailPage() {
   const [log, setLog] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchLog();
-  }, [id]);
-
   const fetchLog = async () => {
     if (!id) return;
     try {
@@ -25,6 +21,10 @@ export default function EmailLogDetailPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchLog();
+  }, [id]);
 
   if (loading) return (
     <div className="p-8 bg-gray-50 min-h-screen">

@@ -55,17 +55,16 @@ export default function ServicesPage() {
   };
 
   useEffect(() => {
-    fetchServices();
-  }, [page, statusFilter]);
-
-  // Debounce search
-  useEffect(() => {
     const timer = setTimeout(() => {
-      setPage(1);
       fetchServices();
-    }, 400);
+    }, searchTerm ? 400 : 0);
     return () => clearTimeout(timer);
-  }, [searchTerm]);
+  }, [page, searchTerm, statusFilter]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, statusFilter]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

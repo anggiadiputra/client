@@ -59,22 +59,6 @@ export default function AdminTransactionsPage() {
     return () => clearTimeout(timer);
   }, [formData.email, showAdjustModal, formData.userId]);
 
-  useEffect(() => {
-    fetchTransactions();
-  }, [page]);
-
-  // Handle search with debounce
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (page === 1) {
-        fetchTransactions();
-      } else {
-        setPage(1); // Changing page to 1 will trigger the first useEffect
-      }
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
-
   const fetchTransactions = async () => {
     setLoading(true);
     try {
@@ -87,6 +71,18 @@ export default function AdminTransactionsPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchTransactions();
+    }, searchTerm ? 500 : 0);
+    return () => clearTimeout(timer);
+  }, [page, searchTerm]);
+
+  // Reset page when search term changes
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm]);
 
   const handleCancelTransaction = async (orderId: string) => {
     if (!window.confirm(`Batalkan transaksi ${orderId}? Saldo tidak akan ditambahkan.`)) return;

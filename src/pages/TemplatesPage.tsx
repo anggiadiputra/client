@@ -23,10 +23,6 @@ export default function TemplatesPage() {
     email_reminder_template: '',
   });
 
-  useEffect(() => {
-    fetchSettings();
-  }, []);
-
   const fetchSettings = async () => {
     try {
       const data = await settingsAPI.get();
@@ -44,6 +40,10 @@ export default function TemplatesPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();

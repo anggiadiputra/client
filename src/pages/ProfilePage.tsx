@@ -43,10 +43,6 @@ export default function ProfilePage() {
     village_name: '',
   });
 
-  useEffect(() => {
-    fetchBillingInfo();
-  }, []);
-
   const fetchBillingInfo = async () => {
     try {
       const data = await settingsAPI.get();
@@ -74,6 +70,10 @@ export default function ProfilePage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchBillingInfo();
+  }, []);
 
   const handleSaveCustomer = async () => {
     setSavingCustomer(true);

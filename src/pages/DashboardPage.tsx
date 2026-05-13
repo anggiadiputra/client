@@ -15,10 +15,6 @@ export default function DashboardPage() {
   const [recentLogs, setRecentLogs] = useState<DashboardLog[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   const fetchData = async () => {
     try {
       const [summary, monthly, logs] = await Promise.all([
@@ -35,6 +31,10 @@ export default function DashboardPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const formatIDR = (value: number | string) => {
     const val = typeof value === 'string' ? parseFloat(value) : value;

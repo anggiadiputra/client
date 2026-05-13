@@ -37,14 +37,6 @@ export default function EditInvoicePage() {
   });
   const [items, setItems] = useState<InvoiceItem[]>([]);
 
-  useEffect(() => {
-    if (id) {
-      fetchCustomers();
-      fetchServices();
-      fetchInvoice();
-    }
-  }, [id]);
-
   const fetchCustomers = async () => {
     try {
       const data = await customersAPI.getAll();
@@ -123,6 +115,14 @@ export default function EditInvoicePage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (id) {
+      fetchCustomers();
+      fetchServices();
+      fetchInvoice();
+    }
+  }, [id]);
 
   const updateItem = (itemId: number, field: keyof InvoiceItem, value: any) => {
     setItems((prevItems) =>

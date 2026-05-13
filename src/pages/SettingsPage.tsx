@@ -113,10 +113,7 @@ export default function SettingsPage() {
     company_website: '',
   });
 
-  useEffect(() => {
-    fetchSettings();
-    fetchBankAccounts();
-  }, []);
+
 
   const fetchSettings = async () => {
     try {
@@ -356,6 +353,11 @@ export default function SettingsPage() {
       console.error('Error fetching bank accounts:', error);
     }
   };
+
+  useEffect(() => {
+    fetchSettings();
+    fetchBankAccounts();
+  }, []);
 
   const handleAddBankAccount = async () => {
     if (!bankFormData.bank_name || !bankFormData.account_name || !bankFormData.account_number) {
