@@ -6,6 +6,7 @@ import {
 import { settingsAPI, bankAccountsAPI, whatsappAPI } from '../lib/api';
 import { useAppSettings } from '../context/AppContext';
 import { toast } from '../components/Toast';
+import RegionSelect from '../components/RegionSelect';
 
 export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
@@ -100,6 +101,14 @@ export default function SettingsPage() {
     pakasir_slug: '',
     pakasir_api_key: '',
     pakasir_is_sandbox: false,
+    province_id: '',
+    regency_id: '',
+    district_id: '',
+    village_id: '',
+    province_name: '',
+    regency_name: '',
+    district_name: '',
+    village_name: '',
   });
 
   useEffect(() => {
@@ -140,6 +149,14 @@ export default function SettingsPage() {
         pakasir_slug: data.pakasir_slug || '',
         pakasir_api_key: data.pakasir_api_key || '',
         pakasir_is_sandbox: data.pakasir_is_sandbox || false,
+        province_id: data.province_id || '',
+        regency_id: data.regency_id || '',
+        district_id: data.district_id || '',
+        village_id: data.village_id || '',
+        province_name: data.province_name || '',
+        regency_name: data.regency_name || '',
+        district_name: data.district_name || '',
+        village_name: data.village_name || '',
       });
     } catch (error) {
       console.error('Error fetching settings:', error);
@@ -509,16 +526,79 @@ export default function SettingsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Alamat Perusahaan</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Alamat Perusahaan (Jalan/Nomor)</label>
                 <textarea
                   value={formData.company_address}
                   onChange={(e) => setFormData({ ...formData, company_address: e.target.value })}
                   disabled={!editingCompany}
                   className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
-                  rows={3}
-                  placeholder="Jl. Contoh No. 123, Jakarta"
+                  rows={2}
+                  placeholder="Jl. Contoh No. 123"
                 />
               </div>
+
+              {editingCompany ? (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Wilayah</label>
+                  <RegionSelect
+                    provinceId={formData.province_id}
+                    regencyId={formData.regency_id}
+                    districtId={formData.district_id}
+                    villageId={formData.village_id}
+                    onProvinceChange={(id, name) =>
+                      setFormData({ ...formData, province_id: id, province_name: name, regency_id: '', regency_name: '', district_id: '', district_name: '', village_id: '', village_name: '' })
+                    }
+                    onRegencyChange={(id, name) =>
+                      setFormData({ ...formData, regency_id: id, regency_name: name, district_id: '', district_name: '', village_id: '', village_name: '' })
+                    }
+                    onDistrictChange={(id, name) =>
+                      setFormData({ ...formData, district_id: id, district_name: name, village_id: '', village_name: '' })
+                    }
+                    onVillageChange={(id, name) =>
+                      setFormData({ ...formData, village_id: id, village_name: name })
+                    }
+                  />
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Provinsi</label>
+                    <input
+                      type="text"
+                      value={formData.province_name}
+                      disabled
+                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-500 bg-gray-50 cursor-not-allowed"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Kabupaten / Kota</label>
+                    <input
+                      type="text"
+                      value={formData.regency_name}
+                      disabled
+                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-500 bg-gray-50 cursor-not-allowed"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Kecamatan</label>
+                    <input
+                      type="text"
+                      value={formData.district_name}
+                      disabled
+                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-500 bg-gray-50 cursor-not-allowed"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Kelurahan / Desa</label>
+                    <input
+                      type="text"
+                      value={formData.village_name}
+                      disabled
+                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-500 bg-gray-50 cursor-not-allowed"
+                    />
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">URL Logo Perusahaan</label>
@@ -748,6 +828,14 @@ export default function SettingsPage() {
                           company_phone: formData.company_phone,
                           company_address: formData.company_address,
                           company_logo: formData.company_logo,
+                          province_id: formData.province_id,
+                          regency_id: formData.regency_id,
+                          district_id: formData.district_id,
+                          village_id: formData.village_id,
+                          province_name: formData.province_name,
+                          regency_name: formData.regency_name,
+                          district_name: formData.district_name,
+                          village_name: formData.village_name,
                         });
                         setEditingCompany(false);
                         setCompanyStatus('success');

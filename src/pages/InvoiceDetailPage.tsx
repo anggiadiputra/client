@@ -6,7 +6,7 @@ import SendWhatsAppModal from '../components/SendWhatsAppModal';
 import { servicesAPI, invoicesAPI, customersAPI, settingsAPI, bankAccountsAPI, emailsAPI } from '../lib/api';
 import html2pdf from 'html2pdf.js';
 import { toast } from '../components/Toast';
-import { toTitleCase } from '../lib/formatter';
+import { toTitleCase, formatAddress } from '../lib/formatter';
 import { SkeletonBlock, SkeletonTable } from '../components/LoadingSkeleton';
 
 export default function InvoiceDetailPage() {
@@ -352,7 +352,14 @@ export default function InvoiceDetailPage() {
                   {invoice.is_system ? 'Sistem Billing' : (companySettings?.company_name || '-')}
                 </p>
                 <p className="text-gray-600 leading-relaxed max-w-xs">
-                  {invoice.is_system ? 'Platform Management' : toTitleCase(companySettings?.company_address || '-')}
+                  {invoice.is_system ? 'Platform Management' : formatAddress({
+                    street: companySettings?.company_address,
+                    village: companySettings?.village_name,
+                    district: companySettings?.district_name,
+                    regency: companySettings?.regency_name,
+                    province: companySettings?.province_name,
+                    postalCode: companySettings?.company_postal_code,
+                  })}
                 </p>
                 {!invoice.is_system && companySettings?.company_phone && <p className="text-gray-600">Telp: {companySettings.company_phone}</p>}
                 {!invoice.is_system && companySettings?.company_email && <p className="text-gray-600">Email: {companySettings.company_email}</p>}
@@ -368,13 +375,24 @@ export default function InvoiceDetailPage() {
                   }
                 </p>
                 {invoice.is_system ? (
-                   <p className="text-gray-600 leading-relaxed max-w-xs">{toTitleCase(companySettings?.company_address || '-')}</p>
+                   <p className="text-gray-600 leading-relaxed max-w-xs">{formatAddress({
+                     street: companySettings?.company_address,
+                     village: companySettings?.village_name,
+                     district: companySettings?.district_name,
+                     regency: companySettings?.regency_name,
+                     province: companySettings?.province_name,
+                     postalCode: companySettings?.company_postal_code,
+                   })}</p>
                 ) : (
                   <>
-                    {invoice.customer?.address && <p className="text-gray-600 leading-relaxed max-w-xs">{toTitleCase(invoice.customer.address)}</p>}
-                    {(invoice.customer?.city || invoice.customer?.province_name) && (
-                      <p className="text-gray-600">{toTitleCase([invoice.customer?.city, invoice.customer?.province_name].filter(Boolean).join(', '))}</p>
-                    )}
+                    <p className="text-gray-600 leading-relaxed max-w-xs">{formatAddress({
+                      street: invoice.customer?.address,
+                      village: invoice.customer?.village_name,
+                      district: invoice.customer?.district_name,
+                      regency: invoice.customer?.regency_name || invoice.customer?.city,
+                      province: invoice.customer?.province_name,
+                      postalCode: invoice.customer?.postal_code,
+                    })}</p>
                   </>
                 )}
                 <p className="text-gray-600">Telp: {invoice.is_system ? companySettings?.company_phone : invoice.customer?.phone || '-'}</p>

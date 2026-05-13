@@ -23,3 +23,42 @@ export function formatDate(date: string | Date | undefined | null, options: Intl
   
   return d.toLocaleDateString('id-ID', defaultOptions);
 }
+
+export function formatAddress(params: {
+  street?: string | null;
+  village?: string | null;
+  district?: string | null;
+  regency?: string | null;
+  province?: string | null;
+  postalCode?: string | null;
+}): string {
+  const parts: string[] = [];
+  
+  if (params.street) {
+    parts.push(params.street.trim());
+  }
+  
+  if (params.village) {
+    parts.push(`Kel. ${params.village}`);
+  }
+  
+  if (params.district) {
+    parts.push(`Kec. ${params.district}`);
+  }
+  
+  if (params.regency) {
+    parts.push(params.regency);
+  }
+  
+  if (params.province) {
+    parts.push(params.province);
+  }
+  
+  let result = parts.map(toTitleCase).join(', ');
+  
+  if (params.postalCode) {
+    result += ` ${params.postalCode}`;
+  }
+  
+  return result;
+}

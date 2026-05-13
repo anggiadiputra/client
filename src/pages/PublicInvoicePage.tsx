@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Download, X } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
-import { toTitleCase } from '../lib/formatter';
+import { toTitleCase, formatAddress } from '../lib/formatter';
 import { publicAPI } from '../lib/api';
 import { SkeletonBlock, SkeletonTable } from '../components/LoadingSkeleton';
 
@@ -340,7 +340,14 @@ export default function PublicInvoicePage() {
                 </h3>
                 <div className="text-sm text-gray-700 space-y-1">
                   <p className="font-semibold">{invoice.sender?.name || '-'}</p>
-                  <p className="whitespace-pre-line">{toTitleCase(invoice.sender?.address || '-')}</p>
+                  <p className="whitespace-pre-line">{formatAddress({
+                    street: invoice.sender?.address,
+                    village: invoice.sender?.village_name,
+                    district: invoice.sender?.district_name,
+                    regency: invoice.sender?.regency_name,
+                    province: invoice.sender?.province_name,
+                    postalCode: invoice.sender?.postal_code,
+                  }) || '-'}</p>
                   {invoice.sender?.phone && (
                     <p>Ph: {invoice.sender.phone}</p>
                   )}
@@ -357,11 +364,14 @@ export default function PublicInvoicePage() {
                 </h3>
                 <div className="text-sm text-gray-700 space-y-1">
                   <p className="font-semibold">{invoice.customer?.name || '-'}</p>
-                  {invoice.customer?.address && <p className="whitespace-pre-line">{toTitleCase(invoice.customer.address)}</p>}
-                  {invoice.customer?.city && invoice.customer?.province_name && (
-                    <p>{toTitleCase(invoice.customer.city)}, {toTitleCase(invoice.customer.province_name)}</p>
-                  )}
-                  {invoice.customer?.postal_code && <p>Postal Code: {invoice.customer.postal_code}</p>}
+                  <p className="whitespace-pre-line">{formatAddress({
+                    street: invoice.customer?.address,
+                    village: invoice.customer?.village_name,
+                    district: invoice.customer?.district_name,
+                    regency: invoice.customer?.regency_name || invoice.customer?.city,
+                    province: invoice.customer?.province_name,
+                    postalCode: invoice.customer?.postal_code,
+                  })}</p>
                   {invoice.customer?.phone && <p>Ph: {invoice.customer.phone}</p>}
                   {invoice.customer?.email && <p>Email: {invoice.customer.email}</p>}
                 </div>
