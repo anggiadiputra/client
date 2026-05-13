@@ -352,14 +352,7 @@ export default function InvoiceDetailPage() {
                   {invoice.is_system ? 'Sistem Billing' : (companySettings?.company_name || '-')}
                 </p>
                 <p className="text-gray-600 leading-relaxed max-w-xs">
-                  {invoice.is_system ? 'Platform Management' : formatAddress({
-                    street: companySettings?.company_address,
-                    village: companySettings?.village_name,
-                    district: companySettings?.district_name,
-                    regency: companySettings?.regency_name,
-                    province: companySettings?.province_name,
-                    postalCode: companySettings?.company_postal_code,
-                  })}
+                  {invoice.is_system ? 'Platform Management' : formatAddress(companySettings)}
                 </p>
                 {!invoice.is_system && companySettings?.company_phone && <p className="text-gray-600">Telp: {companySettings.company_phone}</p>}
                 {!invoice.is_system && companySettings?.company_email && <p className="text-gray-600">Email: {companySettings.company_email}</p>}
@@ -385,14 +378,7 @@ export default function InvoiceDetailPage() {
                    })}</p>
                 ) : (
                   <>
-                    <p className="text-gray-600 leading-relaxed max-w-xs">{formatAddress({
-                      street: invoice.customer?.address,
-                      village: invoice.customer?.village_name,
-                      district: invoice.customer?.district_name,
-                      regency: invoice.customer?.regency_name || invoice.customer?.city,
-                      province: invoice.customer?.province_name,
-                      postalCode: invoice.customer?.postal_code,
-                    })}</p>
+                    <p className="text-gray-600 leading-relaxed max-w-xs">{formatAddress(invoice.customer)}</p>
                   </>
                 )}
                 <p className="text-gray-600">Telp: {invoice.is_system ? companySettings?.company_phone : invoice.customer?.phone || '-'}</p>

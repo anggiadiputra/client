@@ -340,14 +340,7 @@ export default function PublicInvoicePage() {
                 </h3>
                 <div className="text-sm text-gray-700 space-y-1">
                   <p className="font-semibold">{invoice.sender?.name || '-'}</p>
-                  <p className="whitespace-pre-line">{formatAddress({
-                    street: invoice.sender?.address,
-                    village: invoice.sender?.village_name,
-                    district: invoice.sender?.district_name,
-                    regency: invoice.sender?.regency_name,
-                    province: invoice.sender?.province_name,
-                    postalCode: invoice.sender?.postal_code,
-                  }) || '-'}</p>
+                  <p className="whitespace-pre-line">{formatAddress(invoice.sender) || '-'}</p>
                   {invoice.sender?.phone && (
                     <p>Ph: {invoice.sender.phone}</p>
                   )}
@@ -364,14 +357,7 @@ export default function PublicInvoicePage() {
                 </h3>
                 <div className="text-sm text-gray-700 space-y-1">
                   <p className="font-semibold">{invoice.customer?.name || '-'}</p>
-                  <p className="whitespace-pre-line">{formatAddress({
-                    street: invoice.customer?.address,
-                    village: invoice.customer?.village_name,
-                    district: invoice.customer?.district_name,
-                    regency: invoice.customer?.regency_name || invoice.customer?.city,
-                    province: invoice.customer?.province_name,
-                    postalCode: invoice.customer?.postal_code,
-                  })}</p>
+                  <p className="whitespace-pre-line">{formatAddress(invoice.customer)}</p>
                   {invoice.customer?.phone && <p>Ph: {invoice.customer.phone}</p>}
                   {invoice.customer?.email && <p>Email: {invoice.customer.email}</p>}
                 </div>

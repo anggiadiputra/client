@@ -479,6 +479,15 @@ export const authAPI = {
     return handleResponse(response, 'Failed to fetch user profile');
   },
 
+  updateProfile: async (firstName: string, lastName: string) => {
+    const response = await fetch(`${API_URL}/auth/profile`, {
+      method: 'PUT',
+      ...(await getOptions()),
+      body: JSON.stringify({ firstName, lastName }),
+    });
+    return handleResponse(response, 'Failed to update profile');
+  },
+
   syncNeon: async (token?: string) => {
     const options = await getOptions();
     if (token) {

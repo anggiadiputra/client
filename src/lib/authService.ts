@@ -152,6 +152,15 @@ class AuthService {
     }
     return data;
   }
+
+  async updateProfile(firstName: string, lastName: string) {
+    const { authAPI } = await import('./api');
+    const data = await authAPI.updateProfile(firstName, lastName);
+    if (data.user) {
+      this.persistAuth(data.user);
+    }
+    return data;
+  }
 }
 
 export default new AuthService();

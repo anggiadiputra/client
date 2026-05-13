@@ -24,41 +24,30 @@ export function formatDate(date: string | Date | undefined | null, options: Intl
   return d.toLocaleDateString('id-ID', defaultOptions);
 }
 
-export function formatAddress(params: {
-  street?: string | null;
-  village?: string | null;
-  district?: string | null;
-  regency?: string | null;
-  province?: string | null;
-  postalCode?: string | null;
-}): string {
+export function formatAddress(params: any): string {
+  if (!params) return '';
+  
+  // Extract values supporting both backend names and UI descriptive names
+  const street = params.street || params.address || '';
+  const village = params.village || params.village_name || '';
+  const district = params.district || params.district_name || '';
+  const regency = params.regency || params.regency_name || '';
+  const province = params.province || params.province_name || '';
+  const postal = params.postalCode || params.postal_code || '';
+
   const parts: string[] = [];
   
-  if (params.street) {
-    parts.push(params.street.trim());
-  }
-  
-  if (params.village) {
-    parts.push(`Kel. ${params.village}`);
-  }
-  
-  if (params.district) {
-    parts.push(`Kec. ${params.district}`);
-  }
-  
-  if (params.regency) {
-    parts.push(params.regency);
-  }
-  
-  if (params.province) {
-    parts.push(params.province);
-  }
+  if (street) parts.push(street.trim());
+  if (village) parts.push(`Kel. ${village}`);
+  if (district) parts.push(`Kec. ${district}`);
+  if (regency) parts.push(regency);
+  if (province) parts.push(province);
   
   let result = parts.map(toTitleCase).join(', ');
   
-  if (params.postalCode) {
-    result += ` ${params.postalCode}`;
+  if (postal) {
+    result += ` ${postal}`;
   }
   
-  return result;
+  return result || '-';
 }

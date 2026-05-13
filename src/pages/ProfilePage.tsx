@@ -4,6 +4,8 @@ import { useUser } from '../lib/stackAuth';
 import { settingsAPI } from '../lib/api';
 import RegionSelect from '../components/RegionSelect';
 import { SkeletonBlock, SkeletonCard } from '../components/LoadingSkeleton';
+import authService from '../lib/authService';
+import { toast } from '../components/Toast';
 
 export default function ProfilePage() {
   const user = useUser();
@@ -78,8 +80,10 @@ export default function ProfilePage() {
     try {
       await settingsAPI.update(billingInfo);
       setEditingCustomer(false);
-    } catch (err) {
+      toast.success('Billing information updated successfully');
+    } catch (err: any) {
       console.error('Failed to save billing info:', err);
+      toast.error(err.message || 'Failed to update billing information');
     } finally {
       setSavingCustomer(false);
     }
@@ -92,12 +96,22 @@ export default function ProfilePage() {
   }, [user?.displayName]);
 
   const handleSaveName = async () => {
+    if (!profileName.trim()) return;
     setSavingName(true);
     try {
-      await new Promise(res => setTimeout(res, 800));
+      const parts = profileName.trim().split(' ');
+      const firstName = parts[0];
+      const lastName = parts.slice(1).join(' ') || '-';
+      
+      await authService.updateProfile(firstName, lastName);
       setEditingName(false);
-    } catch (err) {
+      toast.success('Nama profil berhasil diperbarui');
+      
+      // Update local storage sync
+      localStorage.setItem('auth_sync', Date.now().toString());
+    } catch (err: any) {
       console.error('Failed to save name:', err);
+      toast.error(err.message || 'Gagal memperbarui nama profil');
     } finally {
       setSavingName(false);
     }
