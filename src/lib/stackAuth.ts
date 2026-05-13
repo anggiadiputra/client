@@ -1,8 +1,4 @@
-/**
- * stackAuth.ts (Neon Auth)
- * 
- * Integrasi menggunakan @neondatabase/auth.
- */
+import { useState, useEffect } from 'react';
 import { createInternalNeonAuth } from '@neondatabase/auth';
 import { BetterAuthReactAdapter, authLocalization } from '@neondatabase/auth/react';
 import authService from './authService';
@@ -26,40 +22,51 @@ export { authLocalization };
  * useUser hook wrapper agar kompatibel dengan kode yang sudah ada.
  */
 export function useUser() {
-  // useSession adalah hook dari BetterAuthReactAdapter
   const session = authClient.useSession();
-  const localUser = authService.getUser();
+  const [localUserData, setLocalUserData] = useState(authService.getUser());
+  
+  // Synchronize with local storage changes (e.g. from Profile update)
+  useEffect(() => {
+    const handleSync = () => {
+      setLocalUserData(authService.getUser());
+    };
+    window.addEventListener('storage', handleSync);
+    // Also listen for local changes in the same tab via a custom event if needed,
+    // but authService already sets 'auth_sync' in localStorage which triggers this.
+    return () => window.removeEventListener('storage', handleSync);
+  }, []);
+
   const localToken = sessionStorage.getItem('token') || localStorage.getItem('token');
-  const hasLocalAuth = !!(localUser && localToken);
+  const hasLocalAuth = !!(localUserData && localToken);
   
   if (session.isPending) {
     if (hasLocalAuth) {
       return {
-        id: localUser.id,
-        email: localUser.email,
-        displayName: localUser.firstName ? `${localUser.firstName} ${localUser.lastName}` : localUser.email,
-        role: localUser.role || 'member',
+        id: localUserData.id,
+        email: localUserData.email,
+        displayName: localUserData.firstName ? `${localUserData.firstName} ${localUserData.lastName}` : localUserData.email,
+        role: localUserData.role || 'member',
       };
     }
     return undefined;
   }
   
+  // Prioritize Local User Data if available (it may contain updated names/roles)
+  if (hasLocalAuth) {
+    return {
+      id: localUserData.id,
+      email: localUserData.email,
+      displayName: localUserData.firstName ? `${localUserData.firstName} ${localUserData.lastName}` : localUserData.email,
+      role: localUserData.role || 'member',
+    };
+  }
+
   if (session.data?.user) {
-    // For Neon Auth (SSO) users, role comes from localUser if available
     return {
       id: session.data.user.id,
       email: session.data.user.email,
       displayName: session.data.user.name || session.data.user.email,
-      role: localUser?.role || 'member',
-    };
-  }
-
-  if (hasLocalAuth) {
-    return {
-      id: localUser.id,
-      email: localUser.email,
-      displayName: localUser.firstName ? `${localUser.firstName} ${localUser.lastName}` : localUser.email,
-      role: localUser.role || 'member',
+      role: 'member',
     };
   }
   

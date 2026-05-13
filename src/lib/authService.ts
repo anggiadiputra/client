@@ -33,6 +33,7 @@ class AuthService {
     // Only signal other tabs if there was an actual change
     if (hasChanged) {
       localStorage.setItem('auth_sync', Date.now().toString());
+      window.dispatchEvent(new Event('storage')); // Force trigger for same tab
     }
   }
 
