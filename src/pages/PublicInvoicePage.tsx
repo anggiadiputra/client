@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Download, X } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
-import { toTitleCase, formatAddress } from '../lib/formatter';
+import { formatAddress } from '../lib/formatter';
 import { publicAPI } from '../lib/api';
 import { SkeletonBlock, SkeletonTable } from '../components/LoadingSkeleton';
 
@@ -260,6 +260,22 @@ export default function PublicInvoicePage() {
 
   const isPublicRoute = window.location.pathname.startsWith('/public/');
 
+  const [scale, setScale] = useState(1);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 800) {
+        setScale(window.innerWidth / 800);
+      } else {
+        setScale(1);
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <div className={`min-h-screen ${isPublicRoute ? 'bg-gray-50' : 'bg-transparent p-0'}`}>
       {/* Back Button - Only show on public route */}
@@ -275,9 +291,17 @@ export default function PublicInvoicePage() {
         </div>
       )}
 
-      {/* Invoice Card */}
-      <div className="max-w-4xl mx-auto px-4 py-4">
-        <div className="bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden relative">
+      {/* Invoice Card Container */}
+      <div className="max-w-5xl mx-auto px-4 py-4 overflow-hidden">
+        <div 
+          className="bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden relative"
+          style={{ 
+            transform: scale < 1 ? `scale(${scale})` : 'none',
+            transformOrigin: 'top left',
+            width: scale < 1 ? '800px' : 'auto',
+            height: scale < 1 ? 'auto' : 'auto'
+          }}
+        >
           {/* Close Button - Only show inside dashboard */}
           {!isPublicRoute && (
             <button
@@ -374,107 +398,53 @@ export default function PublicInvoicePage() {
               </div>
             </div>
 
-            {/* Items Section - Responsive Table/Cards */}
-            <div className="mb-10">
-              {/* Desktop Table - Hidden on small screens */}
-              <div className="hidden md:block overflow-hidden rounded-lg border border-gray-200 desktop-item-table">
-                <table className="w-full text-sm border-collapse">
-                  <thead>
-                    <tr className="bg-slate-800 text-white font-bold uppercase tracking-tighter text-[11px]">
-                      <th className="px-4 py-3 text-left first:rounded-tl-lg">Layanan / Produk</th>
-                      <th className="px-4 py-3 text-left">Deskripsi</th>
-                      <th className="px-4 py-3 text-center w-20">Jumlah</th>
-                      <th className="px-4 py-3 text-right w-32">Harga</th>
-                      {showDiscount && <th className="px-4 py-3 text-right w-24">Disc</th>}
-                      <th className="px-4 py-3 text-right last:rounded-tr-lg w-32">Total</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {invoice.items?.map((item: any, index: number) => {
-                      const isSystem = invoice.is_system;
-                      const qty = isSystem ? 1 : (parseFloat(item.quantity) || 0);
-                      const price = isSystem ? (parseFloat(item.amount) || 0) : (parseFloat(item.unit_price) || 0);
-                      const discountPercent = isSystem ? 0 : (parseFloat(item.discount) || 0);
-                      
-                      const lineTotal = qty * price;
-                      const discountAmount = lineTotal * (discountPercent / 100);
-                      const itemTotal = lineTotal - discountAmount;
+            {/* Items Table - Always Desktop Layout */}
+            <div className="mb-10 overflow-hidden rounded-lg border border-gray-200 desktop-item-table">
+              <table className="w-full text-sm border-collapse">
+                <thead>
+                  <tr className="bg-slate-800 text-white font-bold uppercase tracking-tighter text-[11px]">
+                    <th className="px-4 py-3 text-left first:rounded-tl-lg">Layanan / Produk</th>
+                    <th className="px-4 py-3 text-left">Deskripsi</th>
+                    <th className="px-4 py-3 text-center w-20">Jumlah</th>
+                    <th className="px-4 py-3 text-right w-32">Harga</th>
+                    {showDiscount && <th className="px-4 py-3 text-right w-24">Disc</th>}
+                    <th className="px-4 py-3 text-right last:rounded-tr-lg w-32">Total</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {invoice.items?.map((item: any, index: number) => {
+                    const isSystem = invoice.is_system;
+                    const qty = isSystem ? 1 : (parseFloat(item.quantity) || 0);
+                    const price = isSystem ? (parseFloat(item.amount) || 0) : (parseFloat(item.unit_price) || 0);
+                    const discountPercent = isSystem ? 0 : (parseFloat(item.discount) || 0);
+                    
+                    const lineTotal = qty * price;
+                    const discountAmount = lineTotal * (discountPercent / 100);
+                    const itemTotal = lineTotal - discountAmount;
 
-                      let productName = '-';
-                      if (isSystem) {
-                        productName = (invoice.system_type || 'System').toUpperCase();
-                      } else {
-                        const service = services.find((s: any) => s.id === item.service_id);
-                        productName = service ? service.name : '-';
-                      }
+                    let productName = '-';
+                    if (isSystem) {
+                      productName = (invoice.system_type || 'System').toUpperCase();
+                    } else {
+                      const service = services.find((s: any) => s.id === item.service_id);
+                      productName = service ? service.name : '-';
+                    }
 
-                      return (
-                        <tr key={index} className="align-top hover:bg-gray-50 transition-colors">
-                          <td className="px-4 py-3 font-semibold text-gray-900">{productName}</td>
-                          <td className="px-4 py-3 text-gray-600 text-sm whitespace-pre-line leading-relaxed break-words min-w-[200px]">
-                            {item.description || '-'}
-                          </td>
-                          <td className="px-4 py-3 text-center text-gray-600">{qty}</td>
-                          <td className="px-4 py-3 text-right whitespace-nowrap text-gray-600">{formatCurrency(price)}</td>
-                          {showDiscount && <td className="px-4 py-3 text-right whitespace-nowrap text-gray-500">{discountPercent > 0 ? `${discountPercent}%` : '-'}</td>}
-                          <td className="px-4 py-3 text-right whitespace-nowrap font-bold text-gray-900">{formatCurrency(itemTotal)}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Mobile Cards - Shown only on small screens */}
-              <div className="md:hidden space-y-4 mobile-item-card-container">
-                {invoice.items?.map((item: any, index: number) => {
-                  const isSystem = invoice.is_system;
-                  const qty = isSystem ? 1 : (parseFloat(item.quantity) || 0);
-                  const price = isSystem ? (parseFloat(item.amount) || 0) : (parseFloat(item.unit_price) || 0);
-                  const discountPercent = isSystem ? 0 : (parseFloat(item.discount) || 0);
-                  
-                  const lineTotal = qty * price;
-                  const discountAmount = lineTotal * (discountPercent / 100);
-                  const itemTotal = lineTotal - discountAmount;
-                  
-                  let productName = '-';
-                  if (isSystem) {
-                    productName = (invoice.system_type || 'System').toUpperCase();
-                  } else {
-                    const service = services.find((s: any) => s.id === item.service_id);
-                    productName = service ? service.name : '-';
-                  }
-
-                  return (
-                    <div key={index} className="bg-gray-50 p-5 rounded-2xl border border-gray-100 mobile-item-card">
-                      <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <p className="font-black text-gray-900 text-base leading-tight">{productName}</p>
-                          {item.description && (
-                            <p className="text-xs text-gray-500 mt-1.5 whitespace-pre-line leading-relaxed">
-                              {item.description}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200/60">
-                        <div className="flex flex-col">
-                          <span className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-1">Jumlah & Harga</span>
-                          <p className="text-sm font-bold text-gray-700">
-                            {qty} × {formatCurrency(price)}
-                          </p>
-                        </div>
-                        <div className="flex flex-col items-end">
-                          <span className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-1">Total Item</span>
-                          <p className="text-base font-black text-blue-600">
-                            {formatCurrency(itemTotal)}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    return (
+                      <tr key={index} className="align-top hover:bg-gray-50 transition-colors">
+                        <td className="px-4 py-3 font-semibold text-gray-900">{productName}</td>
+                        <td className="px-4 py-3 text-gray-600 text-sm whitespace-pre-line leading-relaxed break-words min-w-[200px]">
+                          {item.description || '-'}
+                        </td>
+                        <td className="px-4 py-3 text-center text-gray-600">{qty}</td>
+                        <td className="px-4 py-3 text-right whitespace-nowrap text-gray-600">{formatCurrency(price)}</td>
+                        {showDiscount && <td className="px-4 py-3 text-right whitespace-nowrap text-gray-500">{discountPercent > 0 ? `${discountPercent}%` : '-'}</td>}
+                        <td className="px-4 py-3 text-right whitespace-nowrap font-bold text-gray-900">{formatCurrency(itemTotal)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
 
               {/* Totals */}
@@ -496,7 +466,6 @@ export default function PublicInvoicePage() {
                   </div>
                 </div>
               </div>
-            </div>
 
             {/* Terbilang */}
             <div className="mb-8 p-4 bg-gray-50 rounded-lg border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
