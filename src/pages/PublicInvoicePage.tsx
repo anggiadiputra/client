@@ -261,12 +261,14 @@ export default function PublicInvoicePage() {
   const isPublicRoute = window.location.pathname.startsWith('/public/');
 
   const [scale, setScale] = useState(1);
+  const [padding, setPadding] = useState(32);
 
   useEffect(() => {
     const handleResize = () => {
-      const horizontalPadding = window.innerWidth < 640 ? 32 : 64;
-      const availableWidth = window.innerWidth - horizontalPadding;
-      if (window.innerWidth < 800 + horizontalPadding) {
+      const hPadding = window.innerWidth < 640 ? 32 : 64;
+      setPadding(hPadding);
+      const availableWidth = window.innerWidth - hPadding;
+      if (window.innerWidth < 800 + hPadding) {
         setScale(availableWidth / 800);
       } else {
         setScale(1);
@@ -298,10 +300,9 @@ export default function PublicInvoicePage() {
           className="bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden relative"
           style={{ 
             transform: scale < 1 ? `scale(${scale})` : 'none',
-            transformOrigin: 'top center',
+            transformOrigin: 'top left',
             width: scale < 1 ? '800px' : 'auto',
             height: scale < 1 ? 'auto' : 'auto',
-            margin: scale < 1 ? '0 auto' : '0'
           }}
         >
           {/* Close Button - Only show inside dashboard */}
@@ -317,7 +318,7 @@ export default function PublicInvoicePage() {
           {/* Invoice Content Area - Ref for PDF generation */}
           <div ref={invoiceRef} id="invoice-content" className="p-8 md:p-12 relative bg-white">
             {/* Header Section */}
-            <div className="flex flex-col sm:flex-row justify-between items-start gap-8 mb-12">
+            <div className="flex justify-between items-start gap-8 mb-12">
               {invoice.sender?.logo ? (
                 <div className="flex-shrink-0">
                   <img 
@@ -449,57 +450,64 @@ export default function PublicInvoicePage() {
               </table>
             </div>
 
-              {/* Totals */}
-              <div className="mt-4 flex justify-end">
-                <div className="w-64">
-                  <div className="flex justify-between py-2 text-sm border-b border-gray-300">
-                    <span className="font-semibold text-gray-700">Subtotal</span>
-                    <span className="font-semibold whitespace-nowrap">{formatCurrency(subtotal)}</span>
+            <div className="flex justify-between gap-12 mb-8">
+              <div className="flex-1">
+                {/* Terbilang */}
+                <div className="mb-8 p-6 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-between gap-6 relative overflow-hidden">
+                  <div className="relative z-10">
+                    <h4 className="text-[10px] uppercase tracking-widest font-black text-gray-400 mb-1">Terbilang</h4>
+                    <p className="text-sm italic text-gray-800 font-medium">
+                      {capitalizeWords(numberToWords(Math.round(grandTotal)))} Rupiah
+                    </p>
                   </div>
-                  {showTax && totalTax > 0 && (
-                    <div className="flex justify-between py-2 text-sm border-b border-gray-300">
-                      <span className="font-semibold text-gray-700">Pajak (PPN)</span>
-                      <span className="font-semibold whitespace-nowrap">+ {formatCurrency(totalTax)}</span>
+                  {invoice.status === 'paid' && (
+                    <div className="relative z-10 bg-green-100 text-green-700 px-6 py-2.5 rounded-xl font-black text-2xl border-2 border-green-200 rotate-[-3deg] shadow-sm whitespace-nowrap">
+                      PAID / LUNAS
                     </div>
                   )}
-                  <div className="flex justify-between py-2 text-sm">
-                    <span className="font-bold text-gray-900 uppercase">Total Akhir</span>
-                    <span className="font-bold whitespace-nowrap text-blue-600">{formatCurrency(grandTotal)}</span>
+                </div>
+
+                {/* Payment Info - Only show if NOT paid */}
+                {invoice.status !== 'paid' && bankAccounts && bankAccounts.length > 0 && (
+                  <div className="p-6 bg-blue-50/50 rounded-2xl border border-blue-100/50">
+                    <h4 className="text-[10px] uppercase tracking-widest font-black text-blue-400 mb-3">Instruksi Pembayaran</h4>
+                    <div className="text-sm text-gray-700 space-y-2">
+                      {bankAccounts.map((account: any, index: number) => (
+                        <div key={index} className="flex items-center gap-3">
+                          <span className="font-black text-blue-600">{account.bank_name}</span>
+                          <span className="font-mono font-bold">{account.account_number}</span>
+                        </div>
+                      ))}
+                      {bankAccounts[0]?.account_name && (
+                        <div className="pt-2 border-t border-blue-100 mt-2">
+                          <p className="text-xs text-blue-600 font-medium">A/N: <span className="font-bold">{bankAccounts[0].account_name}</span></p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Totals */}
+              <div className="w-80">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center text-sm px-2">
+                    <span className="text-gray-500 font-bold uppercase tracking-wider text-[10px]">Subtotal</span>
+                    <span className="text-gray-900 font-bold">{formatCurrency(subtotal)}</span>
+                  </div>
+                  {showTax && totalTax > 0 && (
+                    <div className="flex justify-between items-center text-sm px-2">
+                      <span className="text-gray-500 font-bold uppercase tracking-wider text-[10px]">Pajak (PPN)</span>
+                      <span className="text-gray-900 font-bold">+ {formatCurrency(totalTax)}</span>
+                    </div>
+                  )}
+                  <div className="pt-4 mt-2 border-t-4 border-gray-900 flex justify-between items-center px-2">
+                    <span className="text-base font-black text-gray-900 uppercase tracking-tighter">Total Akhir</span>
+                    <span className="text-xl font-black text-blue-600 tracking-tighter">{formatCurrency(grandTotal)}</span>
                   </div>
                 </div>
               </div>
-
-            {/* Terbilang */}
-            <div className="mb-8 p-4 bg-gray-50 rounded-lg border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h4 className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-1">Terbilang</h4>
-                <p className="text-sm italic text-gray-800 font-medium">
-                  {capitalizeWords(numberToWords(Math.round(grandTotal)))} Rupiah
-                </p>
-              </div>
-              {invoice.status === 'paid' && (
-                <div className="bg-green-100 text-green-700 px-4 py-2 rounded-lg font-black text-xl border-2 border-green-200 rotate-[-2deg]">
-                  PAID / LUNAS
-                </div>
-              )}
             </div>
-
-            {/* Payment Info - Only show if NOT paid */}
-            {invoice.status !== 'paid' && bankAccounts && bankAccounts.length > 0 && (
-              <div className="mb-6">
-                <h4 className="font-semibold text-gray-800 mb-2">Instruksi Pembayaran</h4>
-                <div className="text-sm text-gray-700 space-y-1">
-                  {bankAccounts.map((account: any, index: number) => (
-                    <p key={index}>
-                      {account.bank_name} {account.account_number}
-                    </p>
-                  ))}
-                  {bankAccounts[0]?.account_name && (
-                    <p className="mt-1">a.n {bankAccounts[0].account_name}</p>
-                  )}
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Download Button Area */}

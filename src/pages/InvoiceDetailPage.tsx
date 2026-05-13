@@ -22,12 +22,14 @@ export default function InvoiceDetailPage() {
   const [copied, setCopied] = useState(false);
   const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
   const [scale, setScale] = useState(1);
+  const [padding, setPadding] = useState(32);
 
   useEffect(() => {
     const handleResize = () => {
-      const horizontalPadding = window.innerWidth < 640 ? 32 : 64;
-      const availableWidth = window.innerWidth - horizontalPadding;
-      if (window.innerWidth < 800 + horizontalPadding) {
+      const hPadding = window.innerWidth < 640 ? 32 : 64;
+      setPadding(hPadding);
+      const availableWidth = window.innerWidth - hPadding;
+      if (window.innerWidth < 800 + hPadding) {
         setScale(availableWidth / 800);
       } else {
         setScale(1);
@@ -326,9 +328,8 @@ export default function InvoiceDetailPage() {
           className="bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden"
           style={{ 
             transform: scale < 1 ? `scale(${scale})` : 'none',
-            transformOrigin: 'top center',
+            transformOrigin: 'top left',
             width: scale < 1 ? '800px' : 'auto',
-            margin: scale < 1 ? '0 auto' : '0',
           }}
         >
           <div 
@@ -336,7 +337,7 @@ export default function InvoiceDetailPage() {
             id="invoice-content" 
             className="p-8 md:p-12 relative bg-white"
           >
-          <div className="flex flex-col sm:flex-row justify-between items-start gap-8 mb-12">
+          <div className="flex justify-between items-start gap-8 mb-12">
             {companySettings?.company_logo && !invoice.is_system ? (
               <div className="flex-shrink-0">
                 <img 
@@ -489,9 +490,9 @@ export default function InvoiceDetailPage() {
             </table>
           </div>
 
-          <div className="flex flex-col md:flex-row justify-between gap-12 mb-8">
+          <div className="flex justify-between gap-12 mb-8">
             <div className="flex-1">
-              <div className="mb-8 p-6 bg-gray-50 rounded-2xl border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative overflow-hidden">
+              <div className="mb-8 p-6 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-between gap-6 relative overflow-hidden">
                 <div className="relative z-10">
                   <h4 className="text-[10px] uppercase tracking-widest font-black text-gray-400 mb-2">Terbilang</h4>
                   <p className="text-sm italic text-gray-800 font-bold leading-relaxed">
