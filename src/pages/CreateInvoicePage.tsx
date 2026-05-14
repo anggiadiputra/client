@@ -31,6 +31,7 @@ export default function CreateInvoicePage() {
     issue_date: new Date().toISOString().split('T')[0],
     due_date: '',
     notes: '',
+    template_id: 'classic',
   });
   const [items, setItems] = useState<InvoiceItem[]>([
     { id: 1, service_id: null, description: '', quantity: 1, unit: '', unit_price: 0, discount: 0, tax_rate: 0 },
@@ -147,10 +148,8 @@ export default function CreateInvoicePage() {
         invoice_number,
         issue_date: formData.issue_date,
         due_date: formData.due_date,
-        notes: formData.notes,
-        show_discount: showDiscount,
-        show_unit: showUnit,
         show_tax: showTax,
+        template_id: formData.template_id,
         items: items.map((item) => ({
           service_id: item.service_id,
           description: item.description,
@@ -630,8 +629,96 @@ export default function CreateInvoicePage() {
             </div>
           </div>
 
+          {/* Template Selection */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+            <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 text-sm">3</span>
+              Pilih Desain Invoice
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Classic Template Option */}
+              <div 
+                onClick={() => setFormData({ ...formData, template_id: 'classic' })}
+                className={`relative cursor-pointer rounded-2xl border-2 transition-all overflow-hidden group ${
+                  formData.template_id === 'classic' 
+                    ? 'border-blue-600 bg-blue-50/30' 
+                    : 'border-gray-100 hover:border-gray-200 bg-white'
+                }`}
+              >
+                <div className="aspect-[4/3] bg-gray-100 p-4 overflow-hidden relative">
+                   {/* Mini Mockup for Classic */}
+                   <div className="bg-white h-full w-full shadow-sm rounded-sm p-4 space-y-2">
+                     <div className="h-4 w-12 bg-blue-600 rounded-full mb-4"></div>
+                     <div className="flex justify-between items-start">
+                       <div className="space-y-1">
+                         <div className="h-1.5 w-16 bg-gray-200 rounded"></div>
+                         <div className="h-1.5 w-20 bg-gray-200 rounded"></div>
+                       </div>
+                       <div className="h-6 w-16 bg-gray-100 rounded"></div>
+                     </div>
+                     <div className="pt-4 border-t border-gray-100 mt-4 space-y-2">
+                       <div className="h-2 w-full bg-gray-50 rounded"></div>
+                       <div className="h-2 w-full bg-gray-50 rounded"></div>
+                     </div>
+                   </div>
+                </div>
+                <div className="p-4 flex items-center justify-between">
+                  <div>
+                    <p className="font-bold text-gray-900">Classic Professional</p>
+                    <p className="text-xs text-gray-500">Desain standar yang bersih dan teratur.</p>
+                  </div>
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                    formData.template_id === 'classic' ? 'bg-blue-600 text-white' : 'border-2 border-gray-200'
+                  }`}>
+                    {formData.template_id === 'classic' && <Check size={14} />}
+                  </div>
+                </div>
+              </div>
+
+              {/* Modern Template Option */}
+              <div 
+                onClick={() => setFormData({ ...formData, template_id: 'modern' })}
+                className={`relative cursor-pointer rounded-2xl border-2 transition-all overflow-hidden group ${
+                  formData.template_id === 'modern' 
+                    ? 'border-blue-600 bg-blue-50/30' 
+                    : 'border-gray-100 hover:border-gray-200 bg-white'
+                }`}
+              >
+                <div className="aspect-[4/3] bg-slate-900 p-4 overflow-hidden relative">
+                   {/* Mini Mockup for Modern */}
+                   <div className="bg-white h-full w-full shadow-sm rounded-sm overflow-hidden flex flex-col">
+                     <div className="h-1/3 bg-slate-800 p-3 flex justify-between">
+                        <div className="h-3 w-8 bg-blue-400 rounded-full"></div>
+                        <div className="h-4 w-12 bg-white/20 rounded"></div>
+                     </div>
+                     <div className="p-3 space-y-2 flex-1">
+                       <div className="h-1.5 w-24 bg-gray-100 rounded"></div>
+                       <div className="h-1.5 w-20 bg-gray-100 rounded"></div>
+                       <div className="pt-2 mt-2 border-t border-gray-50 space-y-1">
+                         <div className="h-2 w-full bg-gray-50 rounded"></div>
+                         <div className="h-2 w-full bg-gray-50 rounded"></div>
+                       </div>
+                     </div>
+                   </div>
+                </div>
+                <div className="p-4 flex items-center justify-between">
+                  <div>
+                    <p className="font-bold text-gray-900">Modern Premium</p>
+                    <p className="text-xs text-gray-500">Tampilan elegan dengan kontras tinggi.</p>
+                  </div>
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                    formData.template_id === 'modern' ? 'bg-blue-600 text-white' : 'border-2 border-gray-200'
+                  }`}>
+                    {formData.template_id === 'modern' && <Check size={14} />}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Bottom Buttons */}
-          <div className="flex items-center gap-3 pb-6">
+          <div className="flex items-center gap-3 pb-6 mt-8">
             <button
               type="submit"
               disabled={loading}

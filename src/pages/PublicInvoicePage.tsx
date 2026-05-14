@@ -5,6 +5,9 @@ import html2pdf from 'html2pdf.js';
 import { formatAddress } from '../lib/formatter';
 import { publicAPI } from '../lib/api';
 import { SkeletonBlock, SkeletonTable } from '../components/LoadingSkeleton';
+import ClassicTemplate from '../components/invoice-templates/ClassicTemplate';
+import ModernTemplate from '../components/invoice-templates/ModernTemplate';
+import { Layout } from 'lucide-react';
 
 export default function PublicInvoicePage() {
   const navigate = useNavigate();
@@ -17,6 +20,7 @@ export default function PublicInvoicePage() {
   const [error, setError] = useState('');
   const [isDownloading, setIsDownloading] = useState(false);
   const [scale, setScale] = useState(1);
+  const [selectedTemplate, setSelectedTemplate] = useState<'classic' | 'modern'>('classic');
 
   useEffect(() => {
     const handleResize = () => {
@@ -48,6 +52,10 @@ export default function PublicInvoicePage() {
       // Use inlined data from invoiceData
       if (invoiceData.bank_accounts) setBankAccounts(invoiceData.bank_accounts);
       if (invoiceData.services) setServices(invoiceData.services);
+
+      if (invoiceData.template_id) {
+        setSelectedTemplate(invoiceData.template_id);
+      }
 
       // If the current URL has a numeric ID, replace it with the invoice number for SEO-friendly URLs
       if (id && !isNaN(Number(id)) && invoiceData.invoice_number) {
@@ -293,221 +301,81 @@ export default function PublicInvoicePage() {
       {/* Invoice Card Container */}
       <div className="max-w-5xl mx-auto px-4 py-4 overflow-hidden">
         <div 
-          className="bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden relative"
+          className="transition-all duration-500 ease-in-out"
           style={{ 
             transform: scale < 1 ? `scale(${scale})` : 'none',
             transformOrigin: 'top left',
             width: scale < 1 ? '800px' : 'auto',
-            height: scale < 1 ? 'auto' : 'auto',
           }}
         >
-          {/* Close Button - Only show inside dashboard */}
-          {!isPublicRoute && (
-            <button
-              onClick={() => navigate('/billing')}
-              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all z-10"
-              title="Close"
-            >
-              <X size={24} />
-            </button>
+          {selectedTemplate === 'classic' ? (
+            <ClassicTemplate 
+              invoice={invoice}
+              companySettings={{
+                company_logo: invoice.sender?.logo,
+                company_name: invoice.sender?.name,
+                company_address: invoice.sender?.address,
+                company_phone: invoice.sender?.phone,
+                company_email: invoice.sender?.email,
+                village_name: invoice.sender?.village_name,
+                district_name: invoice.sender?.district_name,
+                regency_name: invoice.sender?.regency_name,
+                province_name: invoice.sender?.province_name,
+                company_postal_code: invoice.sender?.postal_code,
+              }}
+              bankAccounts={bankAccounts}
+              services={services}
+              formatDate={formatDate}
+              formatCurrency={formatCurrency}
+              numberToWords={numberToWords}
+              capitalizeWords={capitalizeWords}
+              showDiscount={showDiscount}
+              showTax={showTax}
+              subtotal={subtotal}
+              totalTax={totalTax}
+              grandTotal={grandTotal}
+              invoiceRef={invoiceRef}
+            />
+          ) : (
+            <ModernTemplate 
+              invoice={invoice}
+              companySettings={{
+                company_logo: invoice.sender?.logo,
+                company_name: invoice.sender?.name,
+                company_address: invoice.sender?.address,
+                company_phone: invoice.sender?.phone,
+                company_email: invoice.sender?.email,
+                village_name: invoice.sender?.village_name,
+                district_name: invoice.sender?.district_name,
+                regency_name: invoice.sender?.regency_name,
+                province_name: invoice.sender?.province_name,
+                company_postal_code: invoice.sender?.postal_code,
+              }}
+              bankAccounts={bankAccounts}
+              services={services}
+              formatDate={formatDate}
+              formatCurrency={formatCurrency}
+              numberToWords={numberToWords}
+              capitalizeWords={capitalizeWords}
+              showDiscount={showDiscount}
+              showTax={showTax}
+              subtotal={subtotal}
+              totalTax={totalTax}
+              grandTotal={grandTotal}
+              invoiceRef={invoiceRef}
+            />
           )}
-          {/* Invoice Content Area - Ref for PDF generation */}
-          <div ref={invoiceRef} id="invoice-content" className="p-8 md:p-12 relative bg-white">
-            {/* Header Section */}
-            <div className="flex justify-between items-start gap-8 mb-12">
-              {invoice.sender?.logo ? (
-                <div className="flex-shrink-0">
-                  <img 
-                    src={invoice.sender.logo} 
-                    alt="Logo" 
-                    className="max-h-20 max-w-[200px] object-contain"
-                    crossOrigin="anonymous"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
-                  />
-                </div>
-              ) : (
-                <div className="text-2xl font-black text-blue-600 tracking-tighter uppercase">
-                  {invoice.sender?.name || 'INVOICE'}
-                </div>
-              )}
-              <div className="text-right">
-                <h1 className="text-4xl font-black text-gray-900 uppercase tracking-tighter mb-4">
-                  {invoice.is_system 
-                    ? (invoice.system_type === 'refund' ? 'Refund' : 'Kwitansi')
-                    : 'Invoice'
-                  }
-                </h1>
-                <div className="inline-block text-left space-y-1.5 text-gray-700" style={{ fontSize: '13px' }}>
-                  <div className="flex border-b border-gray-100 pb-1">
-                    <span className="w-24 font-medium text-gray-500">No. Ref</span>
-                    <span className="font-bold text-gray-900">: {invoice.invoice_number}</span>
-                  </div>
-                  <div className="flex border-b border-gray-100 pb-1">
-                    <span className="w-24 font-medium text-gray-500">Tanggal</span>
-                    <span className="font-bold text-gray-900">: {formatDate(invoice.issue_date)}</span>
-                  </div>
-                  {!invoice.is_system && (
-                    <div className="flex border-b border-gray-100 pb-1">
-                      <span className="w-24 font-medium text-gray-500">Jatuh Tempo</span>
-                      <span className="font-bold text-gray-900">: {formatDate(invoice.due_date)}</span>
-                    </div>
-                  )}
-                  {invoice.status === 'paid' && (
-                    <div className="flex">
-                      <span className="w-24 font-medium text-gray-500">Status</span>
-                      <span className="font-black text-emerald-600">: LUNAS</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
 
-            {/* Company & Client Info */}
-            <div className="grid grid-cols-2 gap-8 mb-8">
-              {/* Company Info (The Sender) */}
-              <div>
-                <h3 className="font-bold text-gray-800 mb-2 pb-2 border-b-2 border-gray-300 uppercase tracking-wider text-[10px]">
-                  Diterbitkan Oleh
-                </h3>
-                <div className="text-sm text-gray-700 space-y-1">
-                  <p className="font-semibold">{invoice.sender?.name || '-'}</p>
-                  <p className="whitespace-pre-line">{formatAddress(invoice.sender) || '-'}</p>
-                  {invoice.sender?.phone && (
-                    <p>Ph: {invoice.sender.phone}</p>
-                  )}
-                  {invoice.sender?.email && (
-                    <p>Email: {invoice.sender.email}</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Client Info (The Receiver) */}
-              <div>
-                <h3 className="font-bold text-gray-800 mb-2 pb-2 border-b-2 border-gray-300 uppercase tracking-wider text-[10px]">
-                  Ditujukan Kepada
-                </h3>
-                <div className="text-sm text-gray-700 space-y-1">
-                  <p className="font-semibold">{invoice.customer?.name || '-'}</p>
-                  <p className="whitespace-pre-line">{formatAddress(invoice.customer)}</p>
-                  {invoice.customer?.phone && <p>Ph: {invoice.customer.phone}</p>}
-                  {invoice.customer?.email && <p>Email: {invoice.customer.email}</p>}
-                </div>
-              </div>
-            </div>
-
-            {/* Items Table - Always Desktop Layout */}
-            <div className="mb-10 overflow-hidden rounded-lg border border-gray-200 desktop-item-table">
-              <table className="w-full text-sm border-collapse">
-                <thead>
-                  <tr className="bg-slate-800 text-white font-bold uppercase tracking-tighter text-[11px]">
-                    <th className="px-4 py-3 text-left first:rounded-tl-lg">Layanan / Produk</th>
-                    <th className="px-4 py-3 text-left">Deskripsi</th>
-                    <th className="px-4 py-3 text-center w-20">Jumlah</th>
-                    <th className="px-4 py-3 text-right w-32">Harga</th>
-                    {showDiscount && <th className="px-4 py-3 text-right w-24">Disc</th>}
-                    <th className="px-4 py-3 text-right last:rounded-tr-lg w-32">Total</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {invoice.items?.map((item: any, index: number) => {
-                    const isSystem = invoice.is_system;
-                    const qty = isSystem ? 1 : (parseFloat(item.quantity) || 0);
-                    const price = isSystem ? (parseFloat(item.amount) || 0) : (parseFloat(item.unit_price) || 0);
-                    const discountPercent = isSystem ? 0 : (parseFloat(item.discount) || 0);
-                    
-                    const lineTotal = qty * price;
-                    const discountAmount = lineTotal * (discountPercent / 100);
-                    const itemTotal = lineTotal - discountAmount;
-
-                    let productName = '-';
-                    if (isSystem) {
-                      productName = (invoice.system_type || 'System').toUpperCase();
-                    } else {
-                      const service = services.find((s: any) => s.id === item.service_id);
-                      productName = service ? service.name : '-';
-                    }
-
-                    return (
-                      <tr key={index} className="align-top hover:bg-gray-50 transition-colors">
-                        <td className="px-4 py-3 font-semibold text-gray-900">{productName}</td>
-                        <td className="px-4 py-3 text-gray-600 text-sm whitespace-pre-line leading-relaxed break-words min-w-[200px]">
-                          {item.description || '-'}
-                        </td>
-                        <td className="px-4 py-3 text-center text-gray-600">{qty}</td>
-                        <td className="px-4 py-3 text-right whitespace-nowrap text-gray-600">{formatCurrency(price)}</td>
-                        {showDiscount && <td className="px-4 py-3 text-right whitespace-nowrap text-gray-500">{discountPercent > 0 ? `${discountPercent}%` : '-'}</td>}
-                        <td className="px-4 py-3 text-right whitespace-nowrap font-bold text-gray-900">{formatCurrency(itemTotal)}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="flex justify-between gap-12 mb-8">
-              <div className="flex-1">
-                {/* Terbilang */}
-                <div className="mb-8 p-6 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-between gap-6 relative overflow-hidden">
-                  <div className="relative z-10">
-                    <h4 className="text-[10px] uppercase tracking-widest font-black text-gray-400 mb-1">Terbilang</h4>
-                    <p className="text-sm italic text-gray-800 font-medium">
-                      {capitalizeWords(numberToWords(Math.round(grandTotal)))} Rupiah
-                    </p>
-                  </div>
-                  {invoice.status === 'paid' && (
-                    <div className="relative z-10 bg-green-100 text-green-700 px-6 py-2.5 rounded-xl font-black text-2xl border-2 border-green-200 rotate-[-3deg] shadow-sm whitespace-nowrap">
-                      PAID / LUNAS
-                    </div>
-                  )}
-                </div>
-
-                {/* Payment Info - Only show if NOT paid */}
-                {invoice.status !== 'paid' && bankAccounts && bankAccounts.length > 0 && (
-                  <div className="p-6 bg-blue-50/50 rounded-2xl border border-blue-100/50">
-                    <h4 className="text-[10px] uppercase tracking-widest font-black text-blue-400 mb-3">Instruksi Pembayaran</h4>
-                    <div className="text-sm text-gray-700 space-y-2">
-                      {bankAccounts.map((account: any, index: number) => (
-                        <div key={index} className="flex items-center gap-3">
-                          <span className="font-black text-blue-600">{account.bank_name}</span>
-                          <span className="font-mono font-bold">{account.account_number}</span>
-                        </div>
-                      ))}
-                      {bankAccounts[0]?.account_name && (
-                        <div className="pt-2 border-t border-blue-100 mt-2">
-                          <p className="text-xs text-blue-600 font-medium">A/N: <span className="font-bold">{bankAccounts[0].account_name}</span></p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Totals */}
-              <div className="w-80">
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center text-sm px-2">
-                    <span className="text-gray-500 font-bold uppercase tracking-wider text-[10px]">Subtotal</span>
-                    <span className="text-gray-900 font-bold">{formatCurrency(subtotal)}</span>
-                  </div>
-                  {showTax && totalTax > 0 && (
-                    <div className="flex justify-between items-center text-sm px-2">
-                      <span className="text-gray-500 font-bold uppercase tracking-wider text-[10px]">Pajak (PPN)</span>
-                      <span className="text-gray-900 font-bold">+ {formatCurrency(totalTax)}</span>
-                    </div>
-                  )}
-                  <div className="pt-4 mt-2 border-t-4 border-gray-900 flex justify-between items-center px-2">
-                    <span className="text-base font-black text-gray-900 uppercase tracking-tighter">Total Akhir</span>
-                    <span className="text-xl font-black text-blue-600 tracking-tighter">{formatCurrency(grandTotal)}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
 
           {/* Download Button Area */}
-          <div className="bg-gray-50 border-t border-gray-100 p-6 flex justify-end items-center">
+          <div className="bg-gray-50 border-t border-gray-100 p-6 flex justify-end items-center gap-3">
+            <button
+              onClick={() => setSelectedTemplate(selectedTemplate === 'classic' ? 'modern' : 'classic')}
+              className="flex items-center gap-2 bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 px-4 rounded-lg transition-all text-sm shadow-sm"
+              title="Ganti Desain"
+            >
+              <Layout size={16} /> <span>Ganti Desain</span>
+            </button>
             <button
               onClick={handleDownloadPDF}
               disabled={isDownloading}
