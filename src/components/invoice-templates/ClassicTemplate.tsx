@@ -202,11 +202,6 @@ export default function ClassicTemplate({
                 {capitalizeWords(numberToWords(Math.round(grandTotal)))} Rupiah
               </p>
             </div>
-            {invoice.status === 'paid' && (
-              <div className="relative z-10 bg-green-100 text-green-700 px-6 py-2.5 rounded-xl font-black text-2xl border-2 border-green-200 rotate-[-3deg] shadow-sm whitespace-nowrap">
-                PAID / LUNAS
-              </div>
-            )}
           </div>
 
           {invoice.status !== 'paid' && bankAccounts.length > 0 && (

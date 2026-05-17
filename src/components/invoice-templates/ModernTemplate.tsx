@@ -229,14 +229,6 @@ export default function ModernTemplate({
               <span className="text-base font-black text-slate-900 uppercase tracking-tighter">Total Amount</span>
               <span className="text-3xl font-black text-slate-900 tracking-tighter">{formatCurrency(grandTotal)}</span>
             </div>
-            
-            {invoice.status === 'paid' && (
-              <div className="mt-12 flex justify-center">
-                <div className="px-8 py-4 bg-emerald-50 text-emerald-600 border-2 border-emerald-200 rounded-2xl font-black text-3xl uppercase tracking-tighter rotate-[-5deg] shadow-lg shadow-emerald-100">
-                  PAID
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
