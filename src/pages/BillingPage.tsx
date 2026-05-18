@@ -223,49 +223,49 @@ export default function BillingPage() {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Billing & Wallet</h1>
-          <p className="text-sm text-gray-500">Kelola saldo, riwayat transaksi, dan langganan Anda</p>
+          <h1 className="text-2xl font-bold text-tx-main mb-1">Billing & Wallet</h1>
+          <p className="text-sm text-tx-muted">Kelola saldo, riwayat transaksi, dan langganan Anda</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* LEFT: Wallet Card & Top-up */}
         <div className="lg:col-span-1 space-y-4">
-          <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
-            <div className="flex items-center gap-2 text-gray-500 mb-2">
+          <div className="bg-surface rounded-lg p-6 border border-separator shadow-sm">
+            <div className="flex items-center gap-2 text-tx-muted mb-2">
               <Wallet size={16} />
               <span className="text-xs font-semibold uppercase tracking-wider">Saldo Saat Ini</span>
             </div>
-            <div className="text-3xl font-bold text-gray-900 mb-1">
+            <div className="text-3xl font-bold text-tx-main mb-1">
               Rp {parseFloat(wallet?.balance || '0').toLocaleString('id-ID')}
             </div>
-            <div className="text-gray-400 text-xs mt-1">
+            <div className="text-tx-subtle text-xs mt-1">
               Dompet Digital Invoizes
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
-            <h3 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <div className="bg-surface rounded-lg p-6 border border-separator shadow-sm">
+            <h3 className="text-sm font-semibold text-tx-main mb-4 flex items-center gap-2">
               <CheckCircle2 size={16} className="text-green-500" />
               Status Langganan
             </h3>
             <div className="space-y-3">
-              <div className="flex justify-between items-center pb-2 border-b border-gray-50">
-                <span className="text-xs text-gray-500 font-medium">Paket Aktif</span>
-                <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase tracking-wide">
+              <div className="flex justify-between items-center pb-2 border-b border-separator">
+                <span className="text-xs text-tx-muted font-medium">Paket Aktif</span>
+                <span className="text-xs font-bold text-blue-600 bg-blue-500/10 px-2 py-0.5 rounded uppercase tracking-wide">
                   {subscription?.plan?.name || 'Free'}
                 </span>
               </div>
-              <div className="flex justify-between items-center pb-2 border-b border-gray-50">
-                <span className="text-xs text-gray-500 font-medium">Berlaku Sampai</span>
-                <span className="text-xs font-bold text-gray-900">
+              <div className="flex justify-between items-center pb-2 border-b border-separator">
+                <span className="text-xs text-tx-muted font-medium">Berlaku Sampai</span>
+                <span className="text-xs font-bold text-tx-main">
                   {subscription?.expires_at ? formatDate(subscription.expires_at) : 'Selamanya'}
                 </span>
               </div>
               <div className="pt-2">
                 <button 
                   onClick={() => navigate('/pricing')}
-                  className="w-full py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-2 bg-surface border border-separator hover:bg-surface-2 text-tx-muted text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
                 >
                   Ubah Paket
                   <ExternalLink size={12} />
@@ -274,11 +274,11 @@ export default function BillingPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">Isi Saldo (Top-up)</h3>
+          <div className="bg-surface rounded-lg p-6 border border-separator shadow-sm">
+            <h3 className="text-sm font-semibold text-tx-main mb-4">Isi Saldo (Top-up)</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-[11px] font-semibold text-gray-500 mb-2 uppercase tracking-wide">Nominal (Rp)</label>
+                <label className="block text-[11px] font-semibold text-tx-muted mb-2 uppercase tracking-wide">Nominal (Rp)</label>
                 <div className="grid grid-cols-2 gap-2 mb-3">
                   {['50000', '100000', '250000', '500000'].map((amt) => (
                     <button
@@ -286,8 +286,8 @@ export default function BillingPage() {
                       onClick={() => setTopupAmount(amt)}
                       className={`py-1.5 px-3 text-xs font-semibold rounded-md border transition-colors ${
                         topupAmount === amt 
-                          ? 'border-blue-500 bg-blue-50 text-blue-700' 
-                          : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
+                          ? 'border-blue-500 bg-blue-500/10 text-blue-700' 
+                          : 'border-separator bg-surface text-tx-muted hover:bg-surface-2'
                       }`}
                     >
                       {parseInt(amt).toLocaleString('id-ID')}
@@ -295,12 +295,12 @@ export default function BillingPage() {
                   ))}
                 </div>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-sm">Rp</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-tx-subtle font-medium text-sm">Rp</span>
                   <input
                     type="number"
                     value={topupAmount}
                     onChange={(e) => setTopupAmount(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-gray-400"
+                    className="w-full pl-9 pr-3 py-2 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-tx-subtle"
                     placeholder="0"
                   />
                 </div>
@@ -318,21 +318,21 @@ export default function BillingPage() {
 
         {/* RIGHT: Transaction History */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden flex flex-col h-full">
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-3">
+          <div className="bg-surface rounded-lg border border-separator shadow-sm overflow-hidden flex flex-col h-full">
+            <div className="px-6 py-4 border-b border-separator flex items-center justify-between gap-3">
               <div className="relative flex-1 max-w-xs">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-tx-subtle" size={14} />
                 <input
                   type="text"
                   placeholder="Cari riwayat..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-8 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
+                  className="w-full pl-8 pr-3 py-1.5 bg-surface-2 border border-separator rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
                 />
               </div>
               <button 
                 onClick={fetchHistory}
-                className="p-1.5 hover:bg-gray-200 rounded text-gray-400 hover:text-gray-600 transition-colors"
+                className="p-1.5 hover:bg-surface-2 rounded text-tx-subtle hover:text-tx-muted transition-colors"
                 title="Refresh"
               >
                 <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
@@ -343,97 +343,211 @@ export default function BillingPage() {
               {loading ? (
                 <SkeletonTable rows={5} columns={4} className="border-none shadow-none" />
               ) : history.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 text-gray-400 space-y-2">
+                <div className="flex flex-col items-center justify-center py-20 text-tx-subtle space-y-2">
                   <Clock size={32} className="opacity-20" />
                   <p className="text-xs font-medium">Belum ada riwayat transaksi</p>
                 </div>
               ) : (
-                <table className="w-full text-left border-collapse">
-                  <thead className="bg-gray-50 border-b border-gray-200 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                    <tr>
-                      <th className="px-4 py-2">Transaksi</th>
-                      <th className="px-4 py-2">ID Ref</th>
-                      <th className="px-4 py-2">Waktu</th>
-                      <th className="px-4 py-2 text-right">Nominal</th>
-                      <th className="px-4 py-2 text-center">Status</th>
-                      <th className="px-4 py-2 text-right">Aksi</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
+                <>
+                  <div className="overflow-x-auto hidden md:block">
+                    <table className="w-full text-left border-collapse">
+                      <thead className="bg-surface-2 border-b border-separator text-[10px] font-bold text-tx-muted uppercase tracking-widest">
+                        <tr>
+                          <th className="px-4 py-2">Transaksi</th>
+                          <th className="px-4 py-2">ID Ref</th>
+                          <th className="px-4 py-2">Waktu</th>
+                          <th className="px-4 py-2 text-right">Nominal</th>
+                          <th className="px-4 py-2 text-center">Status</th>
+                          <th className="px-4 py-2 text-right">Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-separator">
+                        {history.map((tx) => (
+                          <tr key={tx.id} className="hover:bg-surface-2 transition-colors">
+                            <td className="px-4 py-2">
+                              <div className="flex items-center gap-2">
+                                <div className={`flex items-center justify-center w-5 h-5 rounded ${
+                                  tx.type === 'deposit' ? 'bg-green-500/10 text-green-600' : 'bg-red-500/10 text-red-600'
+                                }`}>
+                                  {tx.type === 'deposit' ? <ArrowDownLeft size={10} /> : <ArrowUpRight size={10} />}
+                                </div>
+                                <span 
+                                  className={`text-[12px] font-semibold ${
+                                    tx.status === 'pending' && tx.pakasir_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date())
+                                      ? 'text-blue-600 cursor-pointer hover:underline' 
+                                      : 'text-tx-main'
+                                  }`}
+                                  onClick={() => {
+                                    if (tx.status === 'pending' && tx.pakasir_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date())) {
+                                      setCheckoutData({
+                                        order_id: tx.pakasir_order_id,
+                                        amount: tx.amount,
+                                        payment_url: tx.payment_url,
+                                        payment_method: tx.payment_method,
+                                        payment_number: tx.payment_number,
+                                        expired_at: tx.expired_at,
+                                        created_at: tx.created_at
+                                      });
+                                      setShowCheckoutModal(true);
+                                    }
+                                  }}
+                                >
+                                  {tx.description}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="px-4 py-2">
+                              <span className="text-[10px] font-mono text-tx-subtle">{tx.pakasir_order_id || '-'}</span>
+                            </td>
+                            <td className="px-4 py-2">
+                              <span className="text-[10px] text-tx-muted">{formatDate(tx.created_at)}</span>
+                            </td>
+                            <td className="px-4 py-2 text-right">
+                              <p className={`font-bold text-[12px] ${
+                                tx.status === 'failed' || (tx.status === 'pending' && tx.expired_at && new Date(tx.expired_at) < new Date())
+                                  ? 'text-tx-subtle' 
+                                  : tx.type === 'deposit' ? 'text-green-600' : 'text-red-600'
+                              }`}>
+                                Rp {tx.type === 'deposit' ? (tx.status === 'completed' || (tx.status === 'pending' && (!tx.expired_at || new Date(tx.expired_at) > new Date())) ? '+' : '') : '-'} {Math.abs(parseFloat(tx.amount)).toLocaleString('id-ID')}
+                              </p>
+                            </td>
+                            <td className="px-4 py-2 text-center">
+                              <div className="flex justify-center">
+                                {tx.status === 'pending' && (
+                                  <span className={`px-1.5 py-0.5 rounded-[4px] text-[9px] font-black uppercase tracking-tighter border ${
+                                    tx.expired_at && new Date(tx.expired_at) < new Date() 
+                                      ? 'bg-red-500/10 text-red-600 border-red-500/20' 
+                                      : 'bg-amber-500/10 text-amber-600 border-amber-500/20'
+                                  }`}>
+                                    {tx.expired_at && new Date(tx.expired_at) < new Date() ? 'Gagal' : 'Pending'}
+                                  </span>
+                                )}
+                                {tx.status === 'completed' && (
+                                  <span className="px-1.5 py-0.5 rounded-[4px] text-[9px] font-black uppercase tracking-tighter bg-green-500/10 text-green-700 border border-green-500/20">
+                                    Berhasil
+                                  </span>
+                                )}
+                                {tx.status === 'failed' && (
+                                  <span className="px-1.5 py-0.5 rounded-[4px] text-[9px] font-black uppercase tracking-tighter bg-red-500/10 text-red-700 border border-red-500/20">
+                                    Gagal
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-4 py-2 text-right">
+                              <div className="flex items-center justify-end gap-1">
+                                {tx.status === 'pending' && tx.pakasir_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date()) && (
+                                  <button
+                                    onClick={async (e) => {
+                                      e.stopPropagation();
+                                      const btn = e.currentTarget;
+                                      btn.disabled = true;
+                                      try {
+                                        const res = await walletAPI.checkStatus(tx.pakasir_order_id, tx.amount);
+                                        if (res.status === 'completed') {
+                                          toast.success('Berhasil!');
+                                          refreshSaaSData();
+                                          fetchHistory();
+                                        }
+                                      } catch (err) {
+                                        toast.error('Gagal');
+                                      } finally {
+                                        btn.disabled = false;
+                                      }
+                                    }}
+                                    className="p-1 text-amber-600 hover:bg-amber-500/10 rounded border border-amber-500/20 transition-colors"
+                                    title="Cek Status"
+                                  >
+                                    <RefreshCw size={12} />
+                                  </button>
+                                )}
+                                 {(tx.system_invoice_id || tx.invoice_id) && (
+                                   <button
+                                     onClick={() => navigate(`/invoices/${tx.invoice_number || tx.system_invoice_id || tx.invoice_id}/view`)}
+                                     className="p-1 text-blue-600 hover:bg-blue-500/10 rounded border border-blue-500/20 transition-colors"
+                                     title="Lihat Kwitansi"
+                                   >
+                                     <ExternalLink size={12} />
+                                   </button>
+                                 )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Mobile View */}
+                  <div className="md:hidden divide-y divide-separator pt-2">
                     {history.map((tx) => (
-                      <tr key={tx.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-4 py-2">
-                          <div className="flex items-center gap-2">
-                            <div className={`flex items-center justify-center w-5 h-5 rounded ${
-                              tx.type === 'deposit' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+                      <div key={tx.id} className="p-3.5 bg-surface hover:bg-surface-2 transition-colors">
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="flex items-start gap-2.5">
+                            <div className={`flex items-center justify-center w-6 h-6 rounded shrink-0 mt-0.5 ${
+                              tx.type === 'deposit' ? 'bg-green-500/10 text-green-600' : 'bg-red-500/10 text-red-600'
                             }`}>
-                              {tx.type === 'deposit' ? <ArrowDownLeft size={10} /> : <ArrowUpRight size={10} />}
+                              {tx.type === 'deposit' ? <ArrowDownLeft size={14} /> : <ArrowUpRight size={14} />}
                             </div>
-                            <span 
-                              className={`text-[12px] font-semibold ${
-                                tx.status === 'pending' && tx.pakasir_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date())
-                                  ? 'text-blue-600 cursor-pointer hover:underline' 
-                                  : 'text-gray-800'
-                              }`}
-                              onClick={() => {
-                                if (tx.status === 'pending' && tx.pakasir_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date())) {
-                                  setCheckoutData({
-                                    order_id: tx.pakasir_order_id,
-                                    amount: tx.amount,
-                                    payment_url: tx.payment_url,
-                                    payment_method: tx.payment_method,
-                                    payment_number: tx.payment_number,
-                                    expired_at: tx.expired_at,
-                                    created_at: tx.created_at
-                                  });
-                                  setShowCheckoutModal(true);
-                                }
-                              }}
-                            >
-                              {tx.description}
-                            </span>
+                            <div className="min-w-0">
+                              <p 
+                                className={`text-sm font-bold truncate leading-tight ${
+                                  tx.status === 'pending' && tx.pakasir_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date())
+                                    ? 'text-blue-600 cursor-pointer hover:underline' 
+                                    : 'text-tx-main'
+                                }`}
+                                onClick={() => {
+                                  if (tx.status === 'pending' && tx.pakasir_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date())) {
+                                    setCheckoutData({
+                                      order_id: tx.pakasir_order_id,
+                                      amount: tx.amount,
+                                      payment_url: tx.payment_url,
+                                      payment_method: tx.payment_method,
+                                      payment_number: tx.payment_number,
+                                      expired_at: tx.expired_at,
+                                      created_at: tx.created_at
+                                    });
+                                    setShowCheckoutModal(true);
+                                  }
+                                }}
+                              >
+                                {tx.description}
+                              </p>
+                              <div className="text-[10px] text-tx-subtle font-mono mt-0.5">{tx.pakasir_order_id || '-'}</div>
+                            </div>
                           </div>
-                        </td>
-                        <td className="px-4 py-2">
-                          <span className="text-[10px] font-mono text-gray-400">{tx.pakasir_order_id || '-'}</span>
-                        </td>
-                        <td className="px-4 py-2">
-                          <span className="text-[10px] text-gray-500">{formatDate(tx.created_at)}</span>
-                        </td>
-                        <td className="px-4 py-2 text-right">
-                          <p className={`font-bold text-[12px] ${
+                          <p className={`font-black text-sm tabular-nums shrink-0 ${
                             tx.status === 'failed' || (tx.status === 'pending' && tx.expired_at && new Date(tx.expired_at) < new Date())
-                              ? 'text-gray-400' 
+                              ? 'text-tx-subtle' 
                               : tx.type === 'deposit' ? 'text-green-600' : 'text-red-600'
                           }`}>
-                            Rp {tx.type === 'deposit' ? (tx.status === 'completed' || (tx.status === 'pending' && (!tx.expired_at || new Date(tx.expired_at) > new Date())) ? '+' : '') : '-'} {Math.abs(parseFloat(tx.amount)).toLocaleString('id-ID')}
+                            {tx.type === 'deposit' ? (tx.status === 'completed' || (tx.status === 'pending' && (!tx.expired_at || new Date(tx.expired_at) > new Date())) ? '+' : '') : '-'} Rp {Math.abs(parseFloat(tx.amount)).toLocaleString('id-ID')}
                           </p>
-                        </td>
-                        <td className="px-4 py-2 text-center">
-                          <div className="flex justify-center">
+                        </div>
+
+                        <div className="flex items-center justify-between pt-2.5 mt-2 border-t border-separator text-xs">
+                          <span className="text-tx-muted text-[11px]">{formatDate(tx.created_at)}</span>
+                          <div className="flex items-center gap-1.5">
                             {tx.status === 'pending' && (
-                              <span className={`px-1.5 py-0.5 rounded-[4px] text-[9px] font-black uppercase tracking-tighter border ${
+                              <span className={`px-2 py-0.5 rounded-[4px] text-[10px] font-black uppercase tracking-tighter border ${
                                 tx.expired_at && new Date(tx.expired_at) < new Date() 
-                                  ? 'bg-red-50 text-red-600 border-red-100' 
-                                  : 'bg-amber-50 text-amber-600 border-amber-100'
+                                  ? 'bg-red-500/10 text-red-600 border-red-500/20' 
+                                  : 'bg-amber-500/10 text-amber-600 border-amber-500/20'
                               }`}>
                                 {tx.expired_at && new Date(tx.expired_at) < new Date() ? 'Gagal' : 'Pending'}
                               </span>
                             )}
                             {tx.status === 'completed' && (
-                              <span className="px-1.5 py-0.5 rounded-[4px] text-[9px] font-black uppercase tracking-tighter bg-green-50 text-green-700 border border-green-100">
+                              <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-black uppercase tracking-tighter bg-green-500/10 text-green-700 border border-green-500/20">
                                 Berhasil
                               </span>
                             )}
                             {tx.status === 'failed' && (
-                              <span className="px-1.5 py-0.5 rounded-[4px] text-[9px] font-black uppercase tracking-tighter bg-red-50 text-red-700 border border-red-100">
+                              <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-black uppercase tracking-tighter bg-red-500/10 text-red-700 border border-red-500/20">
                                 Gagal
                               </span>
                             )}
-                          </div>
-                        </td>
-                        <td className="px-4 py-2 text-right">
-                          <div className="flex items-center justify-end gap-1">
+
                             {tx.status === 'pending' && tx.pakasir_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date()) && (
                               <button
                                 onClick={async (e) => {
@@ -453,48 +567,48 @@ export default function BillingPage() {
                                     btn.disabled = false;
                                   }
                                 }}
-                                className="p-1 text-amber-600 hover:bg-amber-50 rounded border border-amber-100 transition-colors"
+                                className="p-1 text-amber-600 hover:bg-amber-500/10 rounded border border-amber-500/20 transition-colors"
                                 title="Cek Status"
                               >
                                 <RefreshCw size={12} />
                               </button>
                             )}
-                             {(tx.system_invoice_id || tx.invoice_id) && (
-                               <button
-                                 onClick={() => navigate(`/invoices/${tx.invoice_number || tx.system_invoice_id || tx.invoice_id}/view`)}
-                                 className="p-1 text-blue-600 hover:bg-blue-50 rounded border border-blue-100 transition-colors"
-                                 title="Lihat Kwitansi"
-                               >
-                                 <ExternalLink size={12} />
-                               </button>
-                             )}
+                            {(tx.system_invoice_id || tx.invoice_id) && (
+                              <button
+                                onClick={() => navigate(`/invoices/${tx.invoice_number || tx.system_invoice_id || tx.invoice_id}/view`)}
+                                className="p-1 text-blue-600 hover:bg-blue-500/10 rounded border border-blue-500/20 transition-colors"
+                                title="Lihat Kwitansi"
+                              >
+                                <ExternalLink size={12} />
+                              </button>
+                            )}
                           </div>
-                        </td>
-                      </tr>
+                        </div>
+                      </div>
                     ))}
-                  </tbody>
-                </table>
+                  </div>
+                </>
               )}
             </div>
 
             {/* Pagination */}
             {total > limit && (
-              <div className="px-4 py-3 border-t border-gray-100 flex items-center justify-between bg-white">
-                <div className="text-[11px] text-gray-500 font-medium">
+              <div className="px-4 py-3 border-t border-separator flex items-center justify-between bg-surface">
+                <div className="text-[11px] text-tx-muted font-medium">
                   {Math.min(page * limit, total)} dari {total}
                 </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setPage(p => Math.max(1, p - 1))}
                     disabled={page === 1 || loading}
-                    className="p-1 border border-gray-200 rounded hover:bg-gray-50 disabled:opacity-40 transition-colors"
+                    className="p-1 border border-separator rounded hover:bg-surface-2 disabled:opacity-40 transition-colors"
                   >
                     <ChevronLeft size={14} />
                   </button>
                   <button
                     onClick={() => setPage(p => p + 1)}
                     disabled={page * limit >= total || loading}
-                    className="p-1 border border-gray-200 rounded hover:bg-gray-50 disabled:opacity-40 transition-colors"
+                    className="p-1 border border-separator rounded hover:bg-surface-2 disabled:opacity-40 transition-colors"
                   >
                     <ChevronRight size={14} />
                   </button>
@@ -508,14 +622,14 @@ export default function BillingPage() {
       {/* TOPUP MODAL CHECKOUT */}
       {showCheckoutModal && (
         <KeyboardShortcutWrapper onClose={() => !isProcessing && setShowCheckoutModal(false)} disabled={isProcessing}>
-          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full my-8 overflow-hidden border border-gray-200 animate-in zoom-in slide-in-from-bottom-4 duration-300">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">
-              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+          <div className="bg-surface rounded-xl shadow-2xl max-w-lg w-full my-8 overflow-hidden border border-separator animate-in zoom-in slide-in-from-bottom-4 duration-300">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-separator bg-surface-2/50">
+              <h2 className="text-lg font-bold text-tx-main flex items-center gap-2">
                 <CreditCard className="text-blue-600" size={20} />
                 Checkout Top-up
               </h2>
               {!isProcessing && (
-                <button onClick={() => setShowCheckoutModal(false)} className="p-1.5 hover:bg-gray-200 rounded-full text-gray-400 transition-colors">
+                <button onClick={() => setShowCheckoutModal(false)} className="p-1.5 hover:bg-surface-2 rounded-full text-tx-subtle transition-colors">
                   <X size={20} />
                 </button>
               )}
@@ -525,7 +639,7 @@ export default function BillingPage() {
               {!checkoutData ? (
                 /* Step 1: Select Method */
                 <div className="space-y-6">
-                  <div className="p-4 bg-blue-50/50 border border-blue-100 rounded-xl flex items-center justify-between">
+                  <div className="p-4 bg-blue-500/10/50 border border-blue-500/20 rounded-xl flex items-center justify-between">
                     <div>
                       <p className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-1">Total Tagihan</p>
                       <p className="text-2xl font-black text-blue-900">Rp {parseInt(topupAmount).toLocaleString('id-ID')}</p>
@@ -536,7 +650,7 @@ export default function BillingPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Pilih Metode Pembayaran</label>
+                    <label className="block text-xs font-bold text-tx-muted uppercase tracking-wider mb-3">Pilih Metode Pembayaran</label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {paymentMethods.map((method) => (
                         <button
@@ -544,14 +658,14 @@ export default function BillingPage() {
                           onClick={() => setSelectedMethod(method.id)}
                           className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${
                             selectedMethod === method.id 
-                              ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500 shadow-sm' 
-                              : 'border-gray-100 hover:border-gray-300 bg-white'
+                              ? 'border-blue-500 bg-blue-500/10 ring-1 ring-blue-500 shadow-sm' 
+                              : 'border-separator hover:border-gray-300 bg-surface'
                           }`}
                         >
-                          <div className={`p-2 rounded-lg ${selectedMethod === method.id ? 'bg-blue-600 text-white' : 'bg-gray-50 text-gray-400'}`}>
+                          <div className={`p-2 rounded-lg ${selectedMethod === method.id ? 'bg-blue-600 text-white' : 'bg-surface-2 text-tx-subtle'}`}>
                             <method.icon size={18} />
                           </div>
-                          <span className={`text-[13px] font-bold ${selectedMethod === method.id ? 'text-blue-900' : 'text-gray-600'}`}>{method.name}</span>
+                          <span className={`text-[13px] font-bold ${selectedMethod === method.id ? 'text-blue-900' : 'text-tx-muted'}`}>{method.name}</span>
                         </button>
                       ))}
                     </div>
@@ -570,15 +684,15 @@ export default function BillingPage() {
                 /* Step 2: Payment Instructions */
                 <div className="space-y-6">
                   <div className="text-center pb-1">
-                    <div className="inline-flex items-center justify-center p-2 bg-green-50 text-green-600 rounded-full mb-2">
+                    <div className="inline-flex items-center justify-center p-2 bg-green-500/10 text-green-600 rounded-full mb-2">
                       <Info size={20} />
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900">Instruksi Bayar</h3>
-                    <p className="text-[11px] text-gray-500 mt-0.5">Selesaikan pengisian saldo melalui detail di bawah.</p>
+                    <h3 className="text-lg font-bold text-tx-main">Instruksi Bayar</h3>
+                    <p className="text-[11px] text-tx-muted mt-0.5">Selesaikan pengisian saldo melalui detail di bawah.</p>
                   </div>
 
                   {/* Payment Breakdown */}
-                  <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-4 space-y-2.5">
+                  <div className="bg-blue-500/10/50 border border-blue-500/20 rounded-xl p-4 space-y-2.5">
                     <div className="flex justify-between items-center text-xs">
                       <span className="text-blue-600 font-medium">Nominal Top-up</span>
                       <span className="font-bold text-blue-900">
@@ -595,21 +709,21 @@ export default function BillingPage() {
                         Rp {parseInt(String(checkoutData.fee_amount || 0)).toLocaleString('id-ID')}
                       </span>
                     </div>
-                    <div className="pt-2 border-t border-blue-100 flex justify-between items-center">
+                    <div className="pt-2 border-t border-blue-500/20 flex justify-between items-center">
                       <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Total Bayar</span>
                       <span className="text-lg font-black text-blue-900">Rp {parseInt(String(checkoutData.amount || 0)).toLocaleString('id-ID')}</span>
                     </div>
                   </div>
 
-                  <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 space-y-2">
+                  <div className="bg-surface-2 border border-separator rounded-xl p-4 space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Order ID</span>
-                      <span className="text-xs font-mono font-bold text-gray-900">{checkoutData.order_id}</span>
+                      <span className="text-[10px] font-bold text-tx-muted uppercase tracking-widest">Order ID</span>
+                      <span className="text-xs font-mono font-bold text-tx-main">{checkoutData.order_id}</span>
                     </div>
                     {checkoutData.created_at && (
                       <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Waktu Dibuat</span>
-                        <span className="text-xs font-semibold text-gray-700">
+                        <span className="text-[10px] font-bold text-tx-muted uppercase tracking-widest">Waktu Dibuat</span>
+                        <span className="text-xs font-semibold text-tx-muted">
                           {new Date(checkoutData.created_at).toLocaleString('id-ID', {
                             day: 'numeric', month: 'short', year: 'numeric',
                             hour: '2-digit', minute: '2-digit'
@@ -619,7 +733,7 @@ export default function BillingPage() {
                     )}
                     {checkoutData.expired_at && (
                       <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Batas Waktu</span>
+                        <span className="text-[10px] font-bold text-tx-muted uppercase tracking-widest">Batas Waktu</span>
                         <span className="text-xs font-bold text-red-600 flex items-center gap-1">
                           <Clock size={12} />
                           {new Date(checkoutData.expired_at).toLocaleString('id-ID', {
@@ -633,30 +747,30 @@ export default function BillingPage() {
 
                   {checkoutData.payment_url && checkoutData.payment_method === 'qris' ? (
                     <div className="flex flex-col items-center">
-                      <div className="p-4 bg-white border-2 border-dashed border-gray-100 rounded-2xl mb-4">
+                      <div className="p-4 bg-surface border-2 border-dashed border-separator rounded-2xl mb-4">
                         <img 
                           src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(checkoutData.payment_url)}`} 
                           alt="QRIS Code"
                           className="w-48 h-48 border border-white"
                         />
                       </div>
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                      <p className="text-[10px] font-bold text-tx-subtle uppercase tracking-widest mb-4 flex items-center gap-2">
                         <QrCode size={12} /> Scan QRIS melalui aplikasi e-wallet Anda
                       </p>
                     </div>
                   ) : checkoutData.payment_number ? (
-                    <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
+                    <div className="bg-surface-2 rounded-xl p-5 border border-separator">
                       <div className="flex justify-between items-center mb-3">
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Nomor Virtual Account</span>
-                        <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase tracking-wider">{checkoutData.payment_method}</span>
+                        <span className="text-[10px] font-bold text-tx-subtle uppercase tracking-widest">Nomor Virtual Account</span>
+                        <span className="text-[10px] font-bold text-blue-600 bg-blue-500/10 px-2 py-0.5 rounded uppercase tracking-wider">{checkoutData.payment_method}</span>
                       </div>
                       <div className="flex items-center justify-between gap-4">
-                        <code className="text-2xl font-mono font-black text-gray-900 tracking-wider">
+                        <code className="text-2xl font-mono font-black text-tx-main tracking-wider">
                           {checkoutData.payment_number}
                         </code>
                         <button 
                           onClick={() => copyToClipboard(checkoutData.payment_number)}
-                          className="p-2 bg-white border border-gray-200 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors shadow-sm"
+                          className="p-2 bg-surface border border-separator rounded-lg text-blue-600 hover:bg-blue-500/10 transition-colors shadow-sm"
                         >
                           <Copy size={18} />
                         </button>
@@ -678,7 +792,7 @@ export default function BillingPage() {
                       <button
                         onClick={handleCancelTopup}
                         disabled={isCheckingStatus}
-                        className="flex-1 bg-white hover:bg-red-50 text-red-600 font-bold py-3 rounded-xl text-[11px] border border-red-100 transition-all flex items-center justify-center gap-1.5"
+                        className="flex-1 bg-surface hover:bg-red-500/10 text-red-600 font-bold py-3 rounded-xl text-[11px] border border-red-500/20 transition-all flex items-center justify-center gap-1.5"
                       >
                         <Trash2 size={14} />
                         Batalkan Pesanan
@@ -686,14 +800,14 @@ export default function BillingPage() {
 
                       <button
                         onClick={() => setCheckoutData(null)}
-                        className="flex-1 bg-white hover:bg-gray-50 text-gray-600 font-bold py-3 rounded-xl text-[11px] border border-gray-200 transition-all flex items-center justify-center gap-1.5"
+                        className="flex-1 bg-surface hover:bg-surface-2 text-tx-muted font-bold py-3 rounded-xl text-[11px] border border-separator transition-all flex items-center justify-center gap-1.5"
                       >
                         <X size={14} />
                         Ganti Metode
                       </button>
                     </div>
 
-                    <div className="p-3 bg-amber-50 border border-amber-100 rounded-lg flex gap-3 text-amber-700">
+                    <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg flex gap-3 text-amber-700">
                       <AlertCircle size={16} className="shrink-0 mt-0.5" />
                       <p className="text-[10px] leading-relaxed">
                         Jika sudah bayar tapi saldo belum bertambah, klik <b>Cek Status</b>. Sistem akan memverifikasi pembayaran Anda secara manual.
@@ -704,14 +818,14 @@ export default function BillingPage() {
               )}
             </div>
             
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-center gap-6">
+            <div className="px-6 py-4 bg-surface-2 border-t border-separator flex items-center justify-center gap-6">
               <div className="flex items-center gap-1.5 grayscale opacity-40">
                 <div className="w-5 h-5 bg-gray-400 rounded-full text-[8px] flex items-center justify-center text-white font-black">S</div>
-                <span className="text-[9px] font-bold text-gray-500 tracking-tighter">SECURE PAYMENT</span>
+                <span className="text-[9px] font-bold text-tx-muted tracking-tighter">SECURE PAYMENT</span>
               </div>
               <div className="flex items-center gap-1.5 grayscale opacity-40">
-                 <RefreshCw size={10} className="text-gray-500" />
-                 <span className="text-[9px] font-bold text-gray-500 tracking-tighter">INSTANT TOPUP</span>
+                 <RefreshCw size={10} className="text-tx-muted" />
+                 <span className="text-[9px] font-bold text-tx-muted tracking-tighter">INSTANT TOPUP</span>
               </div>
             </div>
           </div>

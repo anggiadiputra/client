@@ -252,16 +252,16 @@ export default function EditInvoiceModal({ isOpen, onClose, invoiceId, onSuccess
 
   return (
     <KeyboardShortcutWrapper onClose={handleClose}>
-      <div className="bg-white rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-surface rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-separator">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Edit Invoice</h2>
-            {formData.invoice_number && <p className="text-sm text-gray-600 mt-1">{formData.invoice_number}</p>}
+            <h2 className="text-xl font-bold text-tx-main">Edit Invoice</h2>
+            {formData.invoice_number && <p className="text-sm text-tx-muted mt-1">{formData.invoice_number}</p>}
           </div>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-tx-subtle hover:text-tx-muted transition-colors"
           >
             <X size={24} />
           </button>
@@ -276,13 +276,13 @@ export default function EditInvoiceModal({ isOpen, onClose, invoiceId, onSuccess
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                <div className="bg-red-500/10 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
                   {error}
                 </div>
               )}
 
               {successMessage && (
-                <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center gap-2">
+                <div className="bg-green-500/10 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center gap-2">
                   <CheckCircle size={18} />
                   {successMessage}
                 </div>
@@ -291,7 +291,7 @@ export default function EditInvoiceModal({ isOpen, onClose, invoiceId, onSuccess
               {/* Invoice Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-tx-muted mb-2">
                     Customer <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -310,7 +310,7 @@ export default function EditInvoiceModal({ isOpen, onClose, invoiceId, onSuccess
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-tx-muted mb-2">
                     Status
                   </label>
                   <select
@@ -326,7 +326,7 @@ export default function EditInvoiceModal({ isOpen, onClose, invoiceId, onSuccess
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-tx-muted mb-2">
                     Tanggal Issue <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -339,7 +339,7 @@ export default function EditInvoiceModal({ isOpen, onClose, invoiceId, onSuccess
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-tx-muted mb-2">
                     Tanggal Jatuh Tempo <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -355,7 +355,7 @@ export default function EditInvoiceModal({ isOpen, onClose, invoiceId, onSuccess
               {/* Items */}
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-gray-900">Item Layanan</h3>
+                  <h3 className="text-lg font-bold text-tx-main">Item Layanan</h3>
                   <button
                     type="button"
                     onClick={addItem}
@@ -379,7 +379,7 @@ export default function EditInvoiceModal({ isOpen, onClose, invoiceId, onSuccess
                       <div className="w-32 text-sm font-semibold text-right">Subtotal</div>
                     </div>
 
-                    <div className="divide-y divide-gray-200 border-x border-gray-200">
+                    <div className="divide-y divide-separator border-x border-separator">
                       {items.map((item) => (
                         <div key={item.id} className="flex gap-3 py-4 px-4 items-start">
                           <div className="flex-1 min-w-[180px] pt-0.5">
@@ -475,7 +475,7 @@ export default function EditInvoiceModal({ isOpen, onClose, invoiceId, onSuccess
                           )}
 
                           <div className="w-32 flex items-start gap-2 pt-0.5">
-                            <div className="flex-1 bg-gray-50 px-3 py-2 rounded-lg text-right text-sm font-semibold text-gray-900 whitespace-nowrap">
+                            <div className="flex-1 bg-surface-2 px-3 py-2 rounded-lg text-right text-sm font-semibold text-tx-main whitespace-nowrap">
                               {formatCurrency(calculateItemTotal(item))}
                             </div>
                             {items.length > 1 && (
@@ -495,10 +495,10 @@ export default function EditInvoiceModal({ isOpen, onClose, invoiceId, onSuccess
                 </div>
 
                 {/* Opsi Tambahan */}
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <p className="text-sm text-gray-600 mb-3">Opsi Tambahan</p>
+                <div className="mt-4 pt-4 border-t border-separator">
+                  <p className="text-sm text-tx-muted mb-3">Opsi Tambahan</p>
                   <div className="flex flex-wrap gap-4">
-                    <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                    <label className="flex items-center gap-2 text-sm text-tx-muted cursor-pointer">
                       <input
                         type="checkbox"
                         checked={showDiscount}
@@ -507,7 +507,7 @@ export default function EditInvoiceModal({ isOpen, onClose, invoiceId, onSuccess
                       />
                       Tampilkan Diskon
                     </label>
-                    <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                    <label className="flex items-center gap-2 text-sm text-tx-muted cursor-pointer">
                       <input
                         type="checkbox"
                         checked={showUnit}
@@ -516,7 +516,7 @@ export default function EditInvoiceModal({ isOpen, onClose, invoiceId, onSuccess
                       />
                       Tampilkan Satuan
                     </label>
-                    <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                    <label className="flex items-center gap-2 text-sm text-tx-muted cursor-pointer">
                       <input
                         type="checkbox"
                         checked={showTax}
@@ -531,7 +531,7 @@ export default function EditInvoiceModal({ isOpen, onClose, invoiceId, onSuccess
 
               {/* Notes */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-tx-muted mb-2">
                   Catatan (Opsional)
                 </label>
                 <textarea
@@ -544,9 +544,9 @@ export default function EditInvoiceModal({ isOpen, onClose, invoiceId, onSuccess
               </div>
 
               {/* Total */}
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-surface-2 rounded-lg p-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-lg font-bold text-gray-900">Total Invoice:</span>
+                  <span className="text-lg font-bold text-tx-main">Total Invoice:</span>
                   <span className="text-2xl font-bold text-blue-600">
                     {formatCurrency(calculateTotal())}
                   </span>
@@ -557,11 +557,11 @@ export default function EditInvoiceModal({ isOpen, onClose, invoiceId, onSuccess
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200">
+        <div className="flex items-center justify-end gap-3 p-6 border-t border-separator">
           <button
             type="button"
             onClick={handleClose}
-            className="px-6 py-2 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-6 py-2 border border-gray-300 text-tx-muted font-semibold rounded-lg hover:bg-surface-2 transition-colors"
           >
             Batal
           </button>

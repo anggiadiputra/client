@@ -78,12 +78,12 @@ export default function EmailLogsPage() {
     switch (status) {
       case 'sent':
       case 'success':
-        return { bg: 'bg-blue-100', text: 'text-blue-700', icon: CheckCircle };
+        return { bg: 'bg-blue-500/15', text: 'text-blue-700', icon: CheckCircle };
       case 'failed':
       case 'error':
-        return { bg: 'bg-red-100', text: 'text-red-700', icon: XCircle };
+        return { bg: 'bg-red-500/15', text: 'text-red-700', icon: XCircle };
       default:
-        return { bg: 'bg-gray-100', text: 'text-gray-700', icon: AlertCircle };
+        return { bg: 'bg-surface-2', text: 'text-tx-muted', icon: AlertCircle };
     }
   };
 
@@ -107,8 +107,8 @@ export default function EmailLogsPage() {
           >
             <ChevronLeft size={15} /> Kembali ke History
           </button>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Email Logs</h1>
-          <p className="text-sm text-gray-500">Total {totalItems} riwayat pengiriman Email.</p>
+          <h1 className="text-2xl font-bold text-tx-main mb-1">Email Logs</h1>
+          <p className="text-sm text-tx-muted">Total {totalItems} riwayat pengiriman Email.</p>
         </div>
 
         <CompactBatchActions
@@ -119,16 +119,16 @@ export default function EmailLogsPage() {
         />
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-surface rounded-lg shadow-sm border border-separator overflow-hidden">
         {/* Desktop View */}
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-200">
+              <tr className="bg-surface-2 border-b border-separator">
                 <th className="w-10 px-6 py-3">
                   <button 
                     onClick={toggleSelectAll}
-                    className="text-gray-400 hover:text-blue-600 transition-colors"
+                    className="text-tx-subtle hover:text-blue-600 transition-colors"
                   >
                     {selectedIds.length > 0 && selectedIds.length === logs.length ? (
                       <CheckSquare size={18} className="text-blue-600" />
@@ -137,39 +137,39 @@ export default function EmailLogsPage() {
                     )}
                   </button>
                 </th>
-                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Penerima</th>
-                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Subjek</th>
-                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Waktu</th>
-                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Aksi</th>
+                <th className="px-6 py-3 text-xs font-semibold text-tx-muted uppercase tracking-wider">Penerima</th>
+                <th className="px-6 py-3 text-xs font-semibold text-tx-muted uppercase tracking-wider">Subjek</th>
+                <th className="px-6 py-3 text-xs font-semibold text-tx-muted uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-xs font-semibold text-tx-muted uppercase tracking-wider">Waktu</th>
+                <th className="px-6 py-3 text-xs font-semibold text-tx-muted uppercase tracking-wider text-center">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-separator">
               {loading ? (
                 Array.from({ length: 10 }).map((_, idx) => (
                   <tr key={idx} className="animate-pulse">
-                    <td className="px-6 py-4"><div className="w-5 h-5 bg-gray-100 rounded"></div></td>
+                    <td className="px-6 py-4"><div className="w-5 h-5 bg-surface-2 rounded"></div></td>
                     <td className="px-6 py-4">
-                      <div className="h-4 bg-gray-200 rounded w-28 mb-2"></div>
-                      <div className="h-3 bg-gray-100 rounded w-20"></div>
+                      <div className="h-4 bg-surface-2 rounded w-28 mb-2"></div>
+                      <div className="h-3 bg-surface-2 rounded w-20"></div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="h-4 bg-gray-200 rounded w-40"></div>
+                      <div className="h-4 bg-surface-2 rounded w-40"></div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="h-5 bg-gray-200 rounded-full w-20"></div>
+                      <div className="h-5 bg-surface-2 rounded-full w-20"></div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="h-4 bg-gray-200 rounded w-32"></div>
+                      <div className="h-4 bg-surface-2 rounded w-32"></div>
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <div className="h-5 bg-gray-100 rounded w-5 mx-auto"></div>
+                      <div className="h-5 bg-surface-2 rounded w-5 mx-auto"></div>
                     </td>
                   </tr>
                 ))
               ) : logs.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-20 text-center text-gray-400">
+                  <td colSpan={6} className="py-20 text-center text-tx-subtle">
                     Belum ada riwayat pengiriman.
                   </td>
                 </tr>
@@ -178,11 +178,11 @@ export default function EmailLogsPage() {
                   const style = getStatusStyle(log.status);
                   const Icon = style.icon;
                   return (
-                    <tr key={log.id} className={`hover:bg-gray-50 transition-colors ${selectedIds.includes(log.id) ? 'bg-blue-50/50' : ''}`}>
+                    <tr key={log.id} className={`hover:bg-surface-2 transition-colors ${selectedIds.includes(log.id) ? 'bg-blue-500/10/50' : ''}`}>
                       <td className="px-6 py-4">
                         <button 
                           onClick={() => toggleSelect(log.id)}
-                          className="text-gray-400 hover:text-blue-600 transition-colors"
+                          className="text-tx-subtle hover:text-blue-600 transition-colors"
                         >
                           {selectedIds.includes(log.id) ? (
                             <CheckSquare size={18} className="text-blue-600" />
@@ -192,7 +192,7 @@ export default function EmailLogsPage() {
                         </button>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="font-semibold text-gray-900 truncate max-w-[200px]" title={log.recipient}>
+                        <div className="font-semibold text-tx-main truncate max-w-[200px]" title={log.recipient}>
                           {log.recipient}
                         </div>
                         {log.invoice_number && (
@@ -209,7 +209,7 @@ export default function EmailLogsPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-gray-600 flex items-center gap-1.5">
+                        <div className="text-sm text-tx-muted flex items-center gap-1.5">
                           <Clock size={14} />
                           {formatDate(log.sent_at)}
                         </div>
@@ -217,7 +217,7 @@ export default function EmailLogsPage() {
                       <td className="px-6 py-4 text-center">
                         <button
                           onClick={() => navigate(`/logs/email/${log.id}`)}
-                          className="text-gray-400 hover:text-blue-600 transition-colors"
+                          className="text-tx-subtle hover:text-blue-600 transition-colors"
                         >
                           <ChevronRight size={20} />
                         </button>
@@ -232,9 +232,9 @@ export default function EmailLogsPage() {
 
         {/* Mobile View (Cards) */}
         {!loading && (
-          <div className="md:hidden divide-y divide-gray-100 border-t border-gray-200">
+          <div className="md:hidden divide-y divide-separator border-t border-separator">
             {logs.length === 0 ? (
-              <div className="py-20 text-center text-gray-400 text-sm">
+              <div className="py-20 text-center text-tx-subtle text-sm">
                 Belum ada riwayat pengiriman.
               </div>
             ) : (
@@ -242,11 +242,11 @@ export default function EmailLogsPage() {
                 const style = getStatusStyle(log.status);
                 const Icon = style.icon;
                 return (
-                  <div key={log.id} className={`p-4 hover:bg-gray-50 transition-colors ${selectedIds.includes(log.id) ? 'bg-blue-50/50' : ''}`}>
+                  <div key={log.id} className={`p-4 hover:bg-surface-2 transition-colors ${selectedIds.includes(log.id) ? 'bg-blue-500/10/50' : ''}`}>
                     <div className="flex items-start gap-3">
                       <button 
                         onClick={() => toggleSelect(log.id)}
-                        className="mt-1 text-gray-400 transition-colors"
+                        className="mt-1 text-tx-subtle transition-colors"
                       >
                         {selectedIds.includes(log.id) ? (
                           <CheckSquare size={18} className="text-blue-600" />
@@ -256,25 +256,25 @@ export default function EmailLogsPage() {
                       </button>
                       <div className="flex-1 min-w-0" onClick={() => navigate(`/logs/email/${log.id}`)}>
                         <div className="flex justify-between items-start mb-1">
-                          <div className="font-bold text-gray-900 truncate pr-2" title={log.recipient}>
+                          <div className="font-bold text-tx-main truncate pr-2" title={log.recipient}>
                             {log.recipient}
                           </div>
                           <span className={`${style.bg} ${style.text} px-2 py-0.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap`}>
                             {log.status}
                           </span>
                         </div>
-                        <div className="text-xs text-gray-600 truncate mb-2" title={log.subject}>
+                        <div className="text-xs text-tx-muted truncate mb-2" title={log.subject}>
                           {log.subject}
                         </div>
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1.5 text-[10px] text-gray-500">
-                            <Clock size={12} className="text-gray-400" />
+                          <div className="flex items-center gap-1.5 text-[10px] text-tx-muted">
+                            <Clock size={12} className="text-tx-subtle" />
                             {formatDate(log.sent_at)}
                           </div>
                           {log.invoice_number && (
                             <span className="text-[10px] text-blue-600 font-medium">#{log.invoice_number}</span>
                           )}
-                          <ChevronRight size={16} className="text-gray-400" />
+                          <ChevronRight size={16} className="text-tx-subtle" />
                         </div>
                       </div>
                     </div>
@@ -287,15 +287,15 @@ export default function EmailLogsPage() {
 
         {/* Mobile Loading Skeleton */}
         {loading && (
-          <div className="md:hidden divide-y divide-gray-100 border-t border-gray-200 animate-pulse">
+          <div className="md:hidden divide-y divide-separator border-t border-separator animate-pulse">
             {Array.from({ length: 5 }).map((_, idx) => (
               <div key={idx} className="p-4 space-y-3">
                 <div className="flex justify-between items-center">
-                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                  <div className="h-4 bg-gray-100 rounded w-16"></div>
+                  <div className="h-4 bg-surface-2 rounded w-1/2"></div>
+                  <div className="h-4 bg-surface-2 rounded w-16"></div>
                 </div>
-                <div className="h-3 bg-gray-100 rounded w-3/4"></div>
-                <div className="h-2 bg-gray-100 rounded w-1/4"></div>
+                <div className="h-3 bg-surface-2 rounded w-3/4"></div>
+                <div className="h-2 bg-surface-2 rounded w-1/4"></div>
               </div>
             ))}
           </div>
@@ -303,22 +303,22 @@ export default function EmailLogsPage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
-            <div className="text-sm text-gray-500">
-              Halaman <span className="font-semibold text-gray-900">{page}</span> dari <span className="font-semibold text-gray-900">{totalPages}</span>
+          <div className="px-6 py-4 bg-surface-2 border-t border-separator flex items-center justify-between">
+            <div className="text-sm text-tx-muted">
+              Halaman <span className="font-semibold text-tx-main">{page}</span> dari <span className="font-semibold text-tx-main">{totalPages}</span>
             </div>
             <div className="flex gap-2">
               <button
                 disabled={page === 1}
                 onClick={() => setPage(p => p - 1)}
-                className="px-3 py-1 border border-gray-300 rounded bg-white text-sm font-medium hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                className="px-3 py-1 border border-gray-300 rounded bg-surface text-sm font-medium hover:bg-surface-2 disabled:opacity-50 transition-colors"
               >
                 <PrevIcon size={16} />
               </button>
               <button
                 disabled={page === totalPages}
                 onClick={() => setPage(p => p + 1)}
-                className="px-3 py-1 border border-gray-300 rounded bg-white text-sm font-medium hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                className="px-3 py-1 border border-gray-300 rounded bg-surface text-sm font-medium hover:bg-surface-2 disabled:opacity-50 transition-colors"
               >
                 <NextIcon size={16} />
               </button>

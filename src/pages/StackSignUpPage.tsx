@@ -59,7 +59,7 @@ export default function StackSignUpPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f4f6f9] flex flex-col font-sans">
+    <div className="min-h-screen bg-base flex flex-col font-sans">
       <Navbar 
         onLoginClick={() => navigate('/login')} 
         onGetStartedClick={() => {}} 
@@ -76,7 +76,7 @@ export default function StackSignUpPage() {
 
             <div className="p-6 pt-0">
               {error && (
-                <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-md flex items-start gap-2 text-sm font-medium border border-red-100">
+                <div className="mb-4 p-3 bg-red-500/10 text-red-600 rounded-md flex items-start gap-2 text-sm font-medium border border-red-500/20">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                   <span>{error}</span>
                 </div>

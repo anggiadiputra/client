@@ -177,8 +177,8 @@ export default function ServicesPage() {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Layanan / Produk</h1>
-          <p className="text-sm text-gray-500">Kelola katalog layanan dan harga produk Anda</p>
+          <h1 className="text-2xl font-bold text-tx-main mb-1">Layanan / Produk</h1>
+          <p className="text-sm text-tx-muted">Kelola katalog layanan dan harga produk Anda</p>
         </div>
         <button
           onClick={openCreateModal}
@@ -193,13 +193,13 @@ export default function ServicesPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
         <div className="flex flex-1 items-center gap-3">
           <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-tx-subtle" size={16} />
             <input
               type="text"
               placeholder="Cari layanan atau deskripsi..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-gray-400"
+              className="w-full pl-9 pr-4 py-2 bg-input-bg border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-tx-subtle"
             />
           </div>
           <DropdownFilter
@@ -220,26 +220,26 @@ export default function ServicesPage() {
         />
 
         {!loading && (
-          <span className="text-xs text-gray-400 whitespace-nowrap">
+          <span className="text-xs text-tx-subtle whitespace-nowrap">
             {totalItems} service{totalItems !== 1 ? 's' : ''}
           </span>
         )}
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+      <div className="bg-surface rounded-lg border border-separator shadow-sm overflow-hidden">
         {loading ? (
           <SkeletonTable rows={5} columns={4} />
         ) : (
           <>
             <div className="overflow-x-auto hidden md:block">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-surface-2 border-b border-separator">
                   <tr>
                     <th className="w-10 px-6 py-3 text-left">
                       <button 
                         onClick={toggleSelectAll}
-                        className="text-gray-400 hover:text-blue-600 transition-colors"
+                        className="text-tx-subtle hover:text-blue-600 transition-colors"
                       >
                         {selectedIds.length > 0 && selectedIds.length === paginated.length ? (
                           <CheckSquare size={18} className="text-blue-600" />
@@ -248,27 +248,27 @@ export default function ServicesPage() {
                         )}
                       </button>
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Description</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-tx-muted uppercase tracking-wider">Name</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-tx-muted uppercase tracking-wider hidden lg:table-cell">Description</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-tx-muted uppercase tracking-wider">Price</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-tx-muted uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-right text-xs font-semibold text-tx-muted uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-separator">
                   {paginated.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                      <td colSpan={5} className="px-6 py-8 text-center text-tx-muted">
                         {searchTerm || statusFilter ? 'No services found matching your filters.' : 'No services yet.'}
                       </td>
                     </tr>
                   ) : (
                     paginated.map((service) => (
-                      <tr key={service.id} className={`hover:bg-gray-50 transition-colors ${selectedIds.includes(service.id) ? 'bg-blue-50/50' : ''}`}>
+                      <tr key={service.id} className={`hover:bg-surface-2 transition-colors ${selectedIds.includes(service.id) ? 'bg-blue-500/10/50' : ''}`}>
                         <td className="px-6 py-4">
                           <button 
                             onClick={() => toggleSelect(service.id)}
-                            className="text-gray-400 hover:text-blue-600 transition-colors"
+                            className="text-tx-subtle hover:text-blue-600 transition-colors"
                           >
                             {selectedIds.includes(service.id) ? (
                               <CheckSquare size={18} className="text-blue-600" />
@@ -278,26 +278,26 @@ export default function ServicesPage() {
                           </button>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">{service.name}</div>
+                          <div className="text-sm font-medium text-tx-main">{service.name}</div>
                         </td>
                         <td className="px-6 py-4 hidden lg:table-cell">
-                          <div className="text-sm text-gray-500 max-w-xs truncate">{service.description || '-'}</div>
+                          <div className="text-sm text-tx-muted max-w-xs truncate">{service.description || '-'}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm font-semibold text-gray-800">{formatRupiah(service.price)}</span>
+                          <span className="text-sm font-semibold text-tx-main">{formatRupiah(service.price)}</span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                            service.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                            service.status === 'active' ? 'bg-green-500/15 text-green-800' : 'bg-red-500/15 text-red-800'
                           }`}>
                             {service.status || 'active'}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-right whitespace-nowrap">
                           <div className="flex items-center justify-end gap-1">
-                            <button onClick={() => handleView(service)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View"><Eye size={18} /></button>
-                            <button onClick={() => handleEdit(service)} className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Edit"><Edit2 size={18} /></button>
-                            <button onClick={() => handleDelete(service.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete"><Trash2 size={18} /></button>
+                            <button onClick={() => handleView(service)} className="p-1.5 text-blue-600 hover:bg-blue-500/10 rounded-lg transition-colors" title="View"><Eye size={18} /></button>
+                            <button onClick={() => handleEdit(service)} className="p-1.5 text-amber-600 hover:bg-amber-500/10 rounded-lg transition-colors" title="Edit"><Edit2 size={18} /></button>
+                            <button onClick={() => handleDelete(service.id)} className="p-1.5 text-red-600 hover:bg-red-500/10 rounded-lg transition-colors" title="Delete"><Trash2 size={18} /></button>
                           </div>
                         </td>
                       </tr>
@@ -308,18 +308,18 @@ export default function ServicesPage() {
             </div>
 
             {/* Mobile View (Cards) */}
-            <div className="md:hidden divide-y divide-gray-100">
+            <div className="md:hidden divide-y divide-separator">
               {paginated.length === 0 ? (
-                <div className="px-6 py-8 text-center text-gray-500">
+                <div className="px-6 py-8 text-center text-tx-muted">
                   {searchTerm || statusFilter ? 'No services found matching your filters.' : 'No services yet.'}
                 </div>
               ) : (
                 paginated.map((service) => (
-                  <div key={service.id} className={`p-4 bg-white rounded-xl shadow-sm border border-gray-100 mb-3 mx-2 hover:shadow-md transition-all ${selectedIds.includes(service.id) ? 'bg-blue-50/50 border-blue-200 ring-1 ring-blue-100' : ''}`}>
+                  <div key={service.id} className={`p-4 bg-surface rounded-xl shadow-sm border border-separator mb-3 mx-2 hover:shadow-md transition-all ${selectedIds.includes(service.id) ? 'bg-blue-500/10/50 border-blue-200 ring-1 ring-blue-100' : ''}`}>
                     <div className="flex items-start gap-4 mb-3">
                       <button 
                         onClick={() => toggleSelect(service.id)}
-                        className="mt-1 text-gray-400 hover:text-blue-600 transition-colors"
+                        className="mt-1 text-tx-subtle hover:text-blue-600 transition-colors"
                       >
                         {selectedIds.includes(service.id) ? (
                           <CheckSquare size={20} className="text-blue-600" />
@@ -330,35 +330,35 @@ export default function ServicesPage() {
                       <div className="min-w-0 flex-1">
                         <div className="flex items-start justify-between mb-2">
                           <div>
-                            <h3 className="text-sm font-extrabold text-gray-900 tracking-tight truncate">{service.name}</h3>
+                            <h3 className="text-sm font-extrabold text-tx-main tracking-tight truncate">{service.name}</h3>
                             <div className="flex items-center gap-1.5 mt-0.5">
                               <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${
-                                service.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                service.status === 'active' ? 'bg-green-500/15 text-green-800' : 'bg-red-500/15 text-red-800'
                               }`}>
                                 {service.status || 'active'}
                               </span>
                             </div>
                           </div>
-                          <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-lg">
-                            <button onClick={() => handleView(service)} className="p-1.5 text-blue-600 hover:bg-white hover:shadow-sm rounded-md transition-all" title="View"><Eye size={14} /></button>
-                            <button onClick={() => handleEdit(service)} className="p-1.5 text-amber-600 hover:bg-white hover:shadow-sm rounded-md transition-all" title="Edit"><Edit2 size={14} /></button>
-                            <button onClick={() => handleDelete(service.id)} className="p-1.5 text-red-600 hover:bg-white hover:shadow-sm rounded-md transition-all" title="Delete"><Trash2 size={14} /></button>
+                          <div className="flex items-center gap-1 bg-surface-2 p-1 rounded-lg">
+                            <button onClick={() => handleView(service)} className="p-1.5 text-blue-600 hover:bg-surface hover:shadow-sm rounded-md transition-all" title="View"><Eye size={14} /></button>
+                            <button onClick={() => handleEdit(service)} className="p-1.5 text-amber-600 hover:bg-surface hover:shadow-sm rounded-md transition-all" title="Edit"><Edit2 size={14} /></button>
+                            <button onClick={() => handleDelete(service.id)} className="p-1.5 text-red-600 hover:bg-surface hover:shadow-sm rounded-md transition-all" title="Delete"><Trash2 size={14} /></button>
                           </div>
                         </div>
-                        <div className="flex items-start gap-2 text-xs text-gray-500">
-                          <div className="w-5 h-5 bg-gray-50 rounded flex items-center justify-center shrink-0 mt-0.5">
-                            <FileText size={10} className="text-gray-400" />
+                        <div className="flex items-start gap-2 text-xs text-tx-muted">
+                          <div className="w-5 h-5 bg-surface-2 rounded flex items-center justify-center shrink-0 mt-0.5">
+                            <FileText size={10} className="text-tx-subtle" />
                           </div>
                           <p className="line-clamp-2 leading-relaxed">{service.description || 'Tidak ada deskripsi'}</p>
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-50">
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-separator">
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-green-50 rounded-full flex items-center justify-center">
+                        <div className="w-6 h-6 bg-green-500/10 rounded-full flex items-center justify-center">
                           <Tag size={12} className="text-green-600" />
                         </div>
-                        <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Harga Layanan</span>
+                        <span className="text-[10px] uppercase font-bold text-tx-subtle tracking-wider">Harga Layanan</span>
                       </div>
                       <span className="text-sm font-extrabold text-blue-600">{formatRupiah(service.price)}</span>
                     </div>
@@ -373,12 +373,12 @@ export default function ServicesPage() {
       {/* Pagination */}
       {!loading && totalPages > 1 && (
         <div className="flex items-center justify-between mt-4">
-          <p className="text-sm text-gray-500">Page {page} of {totalPages}</p>
+          <p className="text-sm text-tx-muted">Page {page} of {totalPages}</p>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setPage(page - 1)}
               disabled={page === 1}
-              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 text-sm text-tx-muted border border-separator rounded-lg disabled:opacity-40 hover:bg-surface-2 transition-colors"
             >
               <ChevronLeft size={15} /> Prev
             </button>
@@ -387,7 +387,7 @@ export default function ServicesPage() {
               const p = start + i;
               return (
                 <button key={p} onClick={() => setPage(p)}
-                  className={`w-8 h-8 text-sm rounded-lg transition-colors ${p === page ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-50 border border-gray-200'}`}>
+                  className={`w-8 h-8 text-sm rounded-lg transition-colors ${p === page ? 'bg-blue-600 text-white' : 'text-tx-muted hover:bg-surface-2 border border-separator'}`}>
                   {p}
                 </button>
               );
@@ -395,7 +395,7 @@ export default function ServicesPage() {
             <button
               onClick={() => setPage(page + 1)}
               disabled={page === totalPages}
-              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 text-sm text-tx-muted border border-separator rounded-lg disabled:opacity-40 hover:bg-surface-2 transition-colors"
             >
               Next <ChevronRight size={15} />
             </button>
@@ -406,18 +406,18 @@ export default function ServicesPage() {
       {/* Modal */}
       {showModal && (
         <KeyboardShortcutWrapper onClose={closeModal}>
-          <div className="bg-white rounded-xl shadow-sm max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-200">
+          <div className="bg-surface rounded-xl shadow-sm max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-separator">
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-separator">
               <div>
-                <h2 className="text-lg font-bold text-gray-900">
+                <h2 className="text-lg font-bold text-tx-main">
                   {modalMode === 'create' && 'Add Service'}
                   {modalMode === 'edit' && 'Edit Service'}
                   {modalMode === 'view' && 'Service Details'}
                 </h2>
-                <p className="text-sm text-gray-500">Fill in the service information</p>
+                <p className="text-sm text-tx-muted">Fill in the service information</p>
               </div>
-              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 transition-colors">
+              <button onClick={closeModal} className="text-tx-subtle hover:text-tx-muted transition-colors">
                 <X size={20} />
               </button>
             </div>
@@ -426,46 +426,46 @@ export default function ServicesPage() {
             {modalMode === 'view' && selectedService ? (
               <div className="p-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Service Name</label>
-                  <div className="text-gray-900">{selectedService.name}</div>
+                  <label className="block text-sm font-semibold text-tx-muted mb-1">Service Name</label>
+                  <div className="text-tx-main">{selectedService.name}</div>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Description</label>
-                  <div className="text-gray-900">{selectedService.description || '-'}</div>
+                  <label className="block text-sm font-semibold text-tx-muted mb-1">Description</label>
+                  <div className="text-tx-main">{selectedService.description || '-'}</div>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Price</label>
-                  <div className="text-gray-900 font-semibold text-lg">{formatRupiah(selectedService.price)}</div>
+                  <label className="block text-sm font-semibold text-tx-muted mb-1">Price</label>
+                  <div className="text-tx-main font-semibold text-lg">{formatRupiah(selectedService.price)}</div>
                 </div>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
                 {error && (
-                  <p className="text-xs text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 py-2">{error}</p>
+                  <p className="text-xs text-red-500 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{error}</p>
                 )}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Service Name <span className="text-red-500">*</span></label>
+                  <label className="block text-sm font-medium text-tx-muted mb-1.5">Service Name <span className="text-red-500">*</span></label>
                   <input
                     type="text"
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main placeholder:text-tx-subtle focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                     placeholder="e.g. Web Development"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
+                  <label className="block text-sm font-medium text-tx-muted mb-1.5">Description</label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main placeholder:text-tx-subtle focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                     rows={3}
                     placeholder="Brief description of the service"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Price (Rp) <span className="text-red-500">*</span></label>
+                  <label className="block text-sm font-medium text-tx-muted mb-1.5">Price (Rp) <span className="text-red-500">*</span></label>
                   <input
                     type="text"
                     required
@@ -474,27 +474,27 @@ export default function ServicesPage() {
                       const value = e.target.value.replace(/[^0-9]/g, '');
                       setFormData({ ...formData, price: value });
                     }}
-                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main placeholder:text-tx-subtle focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                     placeholder="e.g. 500.000"
                   />
-                  <p className="text-xs text-gray-400 mt-1.5">Enter amount in Indonesian Rupiah</p>
+                  <p className="text-xs text-tx-subtle mt-1.5">Enter amount in Indonesian Rupiah</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Status</label>
+                  <label className="block text-sm font-medium text-tx-muted mb-1.5">Status</label>
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition appearance-none bg-white font-medium"
+                    className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition appearance-none bg-surface font-medium"
                   >
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
                   </select>
                 </div>
-                <div className="flex gap-3 pt-4 border-t border-gray-200">
+                <div className="flex gap-3 pt-4 border-t border-separator">
                   <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-lg text-sm transition-colors">
                     {modalMode === 'create' ? 'Save Service' : 'Update Service'}
                   </button>
-                  <button type="button" onClick={closeModal} className="border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold py-2.5 px-6 rounded-lg text-sm transition-colors">
+                  <button type="button" onClick={closeModal} className="border border-separator hover:bg-surface-2 text-tx-muted font-semibold py-2.5 px-6 rounded-lg text-sm transition-colors">
                     Cancel
                   </button>
                 </div>

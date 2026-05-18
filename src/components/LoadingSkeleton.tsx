@@ -16,7 +16,7 @@ export function SkeletonBlock({
 }) {
   return (
     <div
-      className={`animate-pulse bg-gray-200 ${rounded ? 'rounded' : ''} ${className}`}
+      className={`animate-pulse bg-surface-2 dark:bg-gray-700 ${rounded ? 'rounded' : ''} ${className}`}
       style={{ width, height }}
     />
   );
@@ -37,7 +37,6 @@ export function SkeletonText({
         <SkeletonBlock
           key={i}
           width={i === lines - 1 ? `${Math.random() * 30 + 50}%` : '100%'}
-          maxWidth={maxWidth}
           height="0.875rem"
         />
       ))}
@@ -47,7 +46,7 @@ export function SkeletonText({
 
 export function SkeletonCard({ className = '' }: { className?: string }) {
   return (
-    <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 ${className}`}>
+    <div className={`bg-surface rounded-lg shadow-sm border border-separator p-6 ${className}`}>
       <div className="flex items-start justify-between">
         <div className="space-y-3 flex-1">
           <SkeletonBlock width="40%" height="0.875rem" />
@@ -69,8 +68,8 @@ export function SkeletonTable({
   className?: string;
 }) {
   return (
-    <div className={`bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden ${className}`}>
-      <div className="bg-gray-50 border-b border-gray-200 px-6 py-4">
+    <div className={`bg-surface rounded-lg shadow-sm border border-separator overflow-hidden ${className}`}>
+      <div className="bg-surface-2 border-b border-separator px-6 py-4">
         <div className="flex items-center gap-4">
           {Array.from({ length: columns }).map((_, i) => (
             <SkeletonBlock
@@ -83,7 +82,7 @@ export function SkeletonTable({
         </div>
       </div>
 
-      <div className="divide-y divide-gray-200">
+      <div className="divide-y divide-separator">
         {Array.from({ length: rows }).map((_, rowIndex) => (
           <div key={rowIndex} className="px-6 py-4">
             <div className="flex items-center gap-4">
@@ -118,8 +117,8 @@ export function SkeletonForm({ fields = 4 }: { fields?: number }) {
 
 export function SkeletonModal({ className = '' }: { className?: string }) {
   return (
-    <div className={`bg-white rounded-lg shadow-xl max-w-2xl w-full ${className}`}>
-      <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+    <div className={`bg-surface rounded-lg shadow-xl max-w-2xl w-full ${className}`}>
+      <div className="p-6 border-b border-separator flex items-center justify-between">
         <SkeletonBlock width="40%" height="1.25rem" />
         <SkeletonBlock width="24px" height="24px" rounded />
       </div>
@@ -128,7 +127,7 @@ export function SkeletonModal({ className = '' }: { className?: string }) {
         <SkeletonForm fields={5} />
       </div>
 
-      <div className="p-6 border-t border-gray-200 flex gap-3 justify-end">
+      <div className="p-6 border-t border-separator flex gap-3 justify-end">
         <SkeletonBlock width="80px" height="2.25rem" rounded />
         <SkeletonBlock width="100px" height="2.25rem" rounded />
       </div>

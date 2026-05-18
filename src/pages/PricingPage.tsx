@@ -96,7 +96,7 @@ export default function PricingPage() {
 
   const getPlanIcon = (slug: string) => {
     switch (slug) {
-      case 'free': return <ShieldCheck className="text-gray-400" size={24} />;
+      case 'free': return <ShieldCheck className="text-tx-subtle" size={24} />;
       case 'starter': return <Zap className="text-blue-500" size={24} />;
       case 'pro': return <Crown className="text-amber-500" size={24} />;
       default: return <Zap className="text-blue-500" size={24} />;
@@ -135,8 +135,8 @@ export default function PricingPage() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-12">
-          <div className="h-8 bg-gray-200 animate-pulse rounded w-1/4 mb-4"></div>
-          <div className="h-4 bg-gray-200 animate-pulse rounded w-1/2"></div>
+          <div className="h-8 bg-surface-2 animate-pulse rounded w-1/4 mb-4"></div>
+          <div className="h-4 bg-surface-2 animate-pulse rounded w-1/2"></div>
         </div>
         <SkeletonStatsCards count={3} />
       </div>
@@ -146,8 +146,8 @@ export default function PricingPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Pilihan Paket Langganan</h1>
-        <p className="text-sm text-gray-500">Pilih paket yang sesuai untuk mengelola bisnis Anda dengan efisien.</p>
+        <h1 className="text-2xl font-bold text-tx-main mb-1">Pilihan Paket Langganan</h1>
+        <p className="text-sm text-tx-muted">Pilih paket yang sesuai untuk mengelola bisnis Anda dengan efisien.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -158,8 +158,8 @@ export default function PricingPage() {
           return (
             <div 
               key={plan.id}
-              className={`relative flex flex-col p-6 bg-white rounded-lg shadow-sm border ${
-                isCurrent ? 'border-blue-500 ring-1 ring-blue-500' : 'border-gray-200'
+              className={`relative flex flex-col p-6 bg-surface rounded-lg shadow-sm border ${
+                isCurrent ? 'border-blue-500 ring-1 ring-blue-500' : 'border-separator'
               }`}
             >
               {isCurrent && (
@@ -169,19 +169,19 @@ export default function PricingPage() {
               )}
 
               <div className="mb-5">
-                <div className="p-2 bg-gray-50 rounded-lg inline-block mb-3 border border-gray-100">
+                <div className="p-2 bg-surface-2 rounded-lg inline-block mb-3 border border-separator">
                   {getPlanIcon(plan.slug)}
                 </div>
-                <h3 className="text-lg font-bold text-gray-900">{plan.name}</h3>
-                <p className="text-xs text-gray-500 mt-1">{plan.description}</p>
+                <h3 className="text-lg font-bold text-tx-main">{plan.name}</h3>
+                <p className="text-xs text-tx-muted mt-1">{plan.description}</p>
               </div>
 
-              <div className="mb-6 pb-6 border-b border-gray-100">
+              <div className="mb-6 pb-6 border-b border-separator">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-2xl font-bold text-gray-900">
+                  <span className="text-2xl font-bold text-tx-main">
                     Rp {parseFloat(plan.price_monthly).toLocaleString('id-ID')}
                   </span>
-                  <span className="text-gray-500 text-xs font-medium">/ bulan</span>
+                  <span className="text-tx-muted text-xs font-medium">/ bulan</span>
                 </div>
               </div>
 
@@ -189,15 +189,15 @@ export default function PricingPage() {
                 {features.map((feature, idx) => (
                   <div key={idx} className="flex items-center gap-3">
                     {feature.included ? (
-                      <div className="flex items-center justify-center w-5 h-5 bg-green-50 rounded text-green-600">
+                      <div className="flex items-center justify-center w-5 h-5 bg-green-500/10 rounded text-green-600">
                         <Check size={12} />
                       </div>
                     ) : (
-                      <div className="flex items-center justify-center w-5 h-5 bg-gray-50 rounded text-gray-400">
+                      <div className="flex items-center justify-center w-5 h-5 bg-surface-2 rounded text-tx-subtle">
                         <X size={12} />
                       </div>
                     )}
-                    <span className={`text-sm ${feature.included ? 'text-gray-700 font-medium' : 'text-gray-400 line-through'}`}>
+                    <span className={`text-sm ${feature.included ? 'text-tx-muted font-medium' : 'text-tx-subtle line-through'}`}>
                       {feature.label}
                     </span>
                   </div>
@@ -209,10 +209,10 @@ export default function PricingPage() {
                 disabled={isCurrent || processingId !== null}
                 className={`w-full py-2.5 px-4 rounded-lg font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${
                   isCurrent 
-                    ? 'bg-gray-50 text-gray-400 border border-gray-200 cursor-not-allowed'
+                    ? 'bg-surface-2 text-tx-subtle border border-separator cursor-not-allowed'
                     : plan.slug === 'pro'
                       ? 'bg-blue-600 text-white hover:bg-blue-700'
-                      : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+                      : 'bg-surface text-tx-muted border border-separator hover:bg-surface-2'
                 }`}
               >
                 {processingId === plan.id ? (
@@ -231,12 +231,12 @@ export default function PricingPage() {
         })}
       </div>
 
-      <div className="mt-8 bg-gray-50 rounded-lg p-6 border border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="mt-8 bg-surface-2 rounded-lg p-6 border border-separator flex flex-col md:flex-row items-center justify-between gap-4">
         <div>
-          <h3 className="text-sm font-bold text-gray-900 mb-1">Butuh bantuan memilih paket?</h3>
-          <p className="text-xs text-gray-600">Tim kami siap membantu Anda menemukan solusi yang tepat untuk skala bisnis Anda.</p>
+          <h3 className="text-sm font-bold text-tx-main mb-1">Butuh bantuan memilih paket?</h3>
+          <p className="text-xs text-tx-muted">Tim kami siap membantu Anda menemukan solusi yang tepat untuk skala bisnis Anda.</p>
         </div>
-        <button className="px-6 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg font-semibold text-sm hover:bg-gray-50 transition-colors">
+        <button className="px-6 py-2 bg-surface border border-separator text-tx-muted rounded-lg font-semibold text-sm hover:bg-surface-2 transition-colors">
           Hubungi Sales
         </button>
       </div>

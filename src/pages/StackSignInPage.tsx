@@ -21,7 +21,7 @@ export default function StackSignInPage() {
   }, [user, navigate]);
 
   return (
-    <div className="min-h-screen bg-[#f4f6f9] flex flex-col">
+    <div className="min-h-screen bg-base flex flex-col">
       <Navbar 
         onLoginClick={() => {}} 
         onGetStartedClick={() => navigate('/register')}

@@ -21,12 +21,12 @@ export default function CompactBatchActions({
   if (selectedCount === 0) return null;
 
   return (
-    <div className="flex items-center gap-3 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-md animate-in fade-in slide-in-from-top-1 duration-200">
+    <div className="flex items-center gap-3 px-3 py-1.5 bg-blue-500/10 border border-blue-200 rounded-md animate-in fade-in slide-in-from-top-1 duration-200">
       <div className="flex items-center gap-2 pr-3 border-r border-blue-200">
         <span className="text-sm font-semibold text-blue-700">{selectedCount} terpilih</span>
         <button 
           onClick={onClear}
-          className="p-0.5 hover:bg-blue-100 rounded-full text-blue-500 transition-colors"
+          className="p-0.5 hover:bg-blue-500/15 rounded-full text-blue-500 transition-colors"
           title="Batal"
         >
           <X size={14} />
@@ -43,7 +43,7 @@ export default function CompactBatchActions({
                 e.target.value = ""; // Reset after selection
               }}
               disabled={isLoading}
-              className="pl-8 pr-6 py-1 text-xs font-medium bg-white border border-blue-300 rounded text-blue-700 hover:bg-blue-50 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors cursor-pointer disabled:opacity-50"
+              className="pl-8 pr-6 py-1 text-xs font-medium bg-surface border border-blue-300 rounded text-blue-700 hover:bg-blue-500/10 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors cursor-pointer disabled:opacity-50"
             >
               <option value="">Update Status</option>
               {statusOptions.map((opt) => (

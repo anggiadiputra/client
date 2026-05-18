@@ -37,10 +37,10 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: ViewInv
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      draft: 'bg-gray-100 text-gray-800',
-      sent: 'bg-blue-100 text-blue-800',
-      paid: 'bg-green-100 text-green-800',
-      overdue: 'bg-red-100 text-red-800',
+      draft: 'bg-surface-2 text-tx-main',
+      sent: 'bg-blue-500/15 text-blue-800',
+      paid: 'bg-green-500/15 text-green-800',
+      overdue: 'bg-red-500/15 text-red-800',
     };
     return colors[status] || colors.draft;
   };
@@ -53,20 +53,20 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: ViewInv
 
   return (
     <KeyboardShortcutWrapper onClose={onClose}>
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-surface rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-separator">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Detail Invoice</h2>
-            {invoice && <p className="text-sm text-gray-600 mt-1">{invoice.invoice_number}</p>}
+            <h2 className="text-xl font-bold text-tx-main">Detail Invoice</h2>
+            {invoice && <p className="text-sm text-tx-muted mt-1">{invoice.invoice_number}</p>}
           </div>
           <div className="flex items-center gap-3">
-            <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+            <button className="p-2 text-tx-muted hover:text-tx-main hover:bg-surface-2 rounded-lg transition-colors">
               <Printer size={20} />
             </button>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-tx-subtle hover:text-tx-muted transition-colors"
             >
               <X size={24} />
             </button>
@@ -84,37 +84,37 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: ViewInv
               {/* Invoice Info */}
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-700 mb-2">Informasi Invoice</h3>
+                  <h3 className="text-sm font-semibold text-tx-muted mb-2">Informasi Invoice</h3>
                   <div className="space-y-1 text-sm">
-                    <p><span className="text-gray-600">Status:</span> <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(invoice.status)}`}>{invoice.status}</span></p>
-                    <p><span className="text-gray-600">Tanggal Issue:</span> {new Date(invoice.issue_date).toLocaleDateString('id-ID')}</p>
-                    <p><span className="text-gray-600">Jatuh Tempo:</span> {new Date(invoice.due_date).toLocaleDateString('id-ID')}</p>
+                    <p><span className="text-tx-muted">Status:</span> <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(invoice.status)}`}>{invoice.status}</span></p>
+                    <p><span className="text-tx-muted">Tanggal Issue:</span> {new Date(invoice.issue_date).toLocaleDateString('id-ID')}</p>
+                    <p><span className="text-tx-muted">Jatuh Tempo:</span> {new Date(invoice.due_date).toLocaleDateString('id-ID')}</p>
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-700 mb-2">Customer</h3>
+                  <h3 className="text-sm font-semibold text-tx-muted mb-2">Customer</h3>
                   <div className="space-y-1 text-sm">
                     <p className="font-medium">{invoice.customer_name}</p>
-                    <p className="text-gray-600">{invoice.customer_email}</p>
+                    <p className="text-tx-muted">{invoice.customer_email}</p>
                   </div>
                 </div>
               </div>
 
               {/* Items */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-3">Item Layanan</h3>
-                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <h3 className="text-sm font-semibold text-tx-muted mb-3">Item Layanan</h3>
+                <div className="border border-separator rounded-lg overflow-hidden">
                   <table className="w-full text-sm">
-                    <thead className="bg-gray-50">
+                    <thead className="bg-surface-2">
                       <tr>
-                        <th className="text-left px-4 py-3 font-semibold text-gray-700">Deskripsi</th>
-                        <th className="text-right px-4 py-3 font-semibold text-gray-700">Qty</th>
-                        <th className="text-right px-4 py-3 font-semibold text-gray-700">Harga</th>
-                        {showDiscount && <th className="text-right px-4 py-3 font-semibold text-gray-700">Diskon</th>}
-                        <th className="text-right px-4 py-3 font-semibold text-gray-700">Subtotal</th>
+                        <th className="text-left px-4 py-3 font-semibold text-tx-muted">Deskripsi</th>
+                        <th className="text-right px-4 py-3 font-semibold text-tx-muted">Qty</th>
+                        <th className="text-right px-4 py-3 font-semibold text-tx-muted">Harga</th>
+                        {showDiscount && <th className="text-right px-4 py-3 font-semibold text-tx-muted">Diskon</th>}
+                        <th className="text-right px-4 py-3 font-semibold text-tx-muted">Subtotal</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200">
+                    <tbody className="divide-y divide-separator">
                       {invoice.items?.map((item: any, index: number) => {
                         const lineTotal = item.quantity * item.unit_price;
                         const discountAmount = showDiscount ? lineTotal * ((item.discount || 0) / 100) : 0;
@@ -139,16 +139,16 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: ViewInv
               <div className="flex justify-end">
                 <div className="w-64 space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Subtotal:</span>
+                    <span className="text-tx-muted">Subtotal:</span>
                     <span>{formatCurrency(invoice.total_amount)}</span>
                   </div>
                   {showTax && invoice.tax_amount > 0 && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Pajak:</span>
+                      <span className="text-tx-muted">Pajak:</span>
                       <span>{formatCurrency(invoice.tax_amount)}</span>
                     </div>
                   )}
-                  <div className="border-t border-gray-200 pt-2 flex justify-between font-bold text-lg">
+                  <div className="border-t border-separator pt-2 flex justify-between font-bold text-lg">
                     <span>Total:</span>
                     <span className="text-blue-600">{formatCurrency(invoice.total_amount + (showTax ? invoice.tax_amount : 0))}</span>
                   </div>
@@ -158,13 +158,13 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: ViewInv
               {/* Notes */}
               {invoice.notes && (
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-700 mb-2">Catatan</h3>
-                  <p className="text-sm text-gray-600 bg-gray-50 p-4 rounded-lg">{invoice.notes}</p>
+                  <h3 className="text-sm font-semibold text-tx-muted mb-2">Catatan</h3>
+                  <p className="text-sm text-tx-muted bg-surface-2 p-4 rounded-lg">{invoice.notes}</p>
                 </div>
               )}
             </div>
           ) : (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-tx-muted">
               Invoice tidak ditemukan
             </div>
           )}

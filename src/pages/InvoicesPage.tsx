@@ -131,14 +131,14 @@ export default function InvoicesPage() {
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'paid':
-        return 'bg-green-100 text-green-800 border border-green-200';
+        return 'bg-green-500/15 text-green-800 border border-green-200';
       case 'sent':
-        return 'bg-blue-100 text-blue-800 border border-blue-200';
+        return 'bg-blue-500/15 text-blue-800 border border-blue-200';
       case 'overdue':
-        return 'bg-red-100 text-red-800 border border-red-200';
+        return 'bg-red-500/15 text-red-800 border border-red-200';
       case 'draft':
       default:
-        return 'bg-gray-100 text-gray-800 border border-gray-200';
+        return 'bg-surface-2 text-tx-main border border-separator';
     }
   };
 
@@ -148,8 +148,8 @@ export default function InvoicesPage() {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Daftar Invoice</h1>
-          <p className="text-sm text-gray-500">Kelola dan lacak semua invoice pelanggan Anda</p>
+          <h1 className="text-2xl font-bold text-tx-main mb-1">Daftar Invoice</h1>
+          <p className="text-sm text-tx-muted">Kelola dan lacak semua invoice pelanggan Anda</p>
         </div>
         <button
           onClick={() => navigate('/invoices/create')}
@@ -164,13 +164,13 @@ export default function InvoicesPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
         <div className="flex flex-1 items-center gap-3">
           <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-tx-subtle" size={16} />
             <input
               type="text"
               placeholder="Cari no. invoice atau customer..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-gray-400"
+              className="w-full pl-9 pr-4 py-2 bg-input-bg border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-tx-subtle"
             />
           </div>
           <DropdownFilter
@@ -186,21 +186,21 @@ export default function InvoicesPage() {
         </div>
 
         {!loading && (
-          <span className="text-xs text-gray-400 whitespace-nowrap">
+          <span className="text-xs text-tx-subtle whitespace-nowrap">
             {totalItems} invoice{totalItems !== 1 ? 's' : ''}
           </span>
         )}
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+      <div className="bg-surface rounded-lg border border-separator shadow-sm overflow-hidden">
         {loading ? (
           <SkeletonTable rows={5} columns={6} />
         ) : (
           <>
             <div className="overflow-x-auto hidden md:block">
                 <table className="w-full text-left border-collapse">
-                  <thead className="bg-gray-50 border-b border-gray-200 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                  <thead className="bg-surface-2 border-b border-separator text-[10px] font-bold text-tx-subtle uppercase tracking-widest">
                     <tr>
                       <th className="px-4 py-2">No. Invoice</th>
                       <th className="px-4 py-2 hidden lg:table-cell">Pelanggan</th>
@@ -210,23 +210,23 @@ export default function InvoicesPage() {
                       <th className="px-4 py-2 text-right">Aksi</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-separator">
                     {invoices.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="px-4 py-12 text-center text-gray-400 text-xs italic">
+                        <td colSpan={7} className="px-4 py-12 text-center text-tx-subtle text-xs italic">
                           {searchTerm || statusFilter ? 'Tidak ada invoice yang cocok.' : 'Belum ada invoice. Klik "Create Invoice" untuk mulai.'}
                         </td>
                       </tr>
                     ) : (
                       invoices.map((invoice) => (
-                        <tr key={invoice.id} className="hover:bg-gray-50 transition-colors">
-                          <td className="px-4 py-3 text-sm font-bold text-gray-900 tabular-nums">
+                        <tr key={invoice.id} className="hover:bg-surface-2 transition-colors">
+                          <td className="px-4 py-3 text-sm font-bold text-tx-main tabular-nums">
                             {invoice.invoice_number}
                           </td>
                           <td className="px-4 py-3 hidden lg:table-cell">
-                            <span className="text-xs text-gray-700 font-medium">{invoice.customer_name}</span>
+                            <span className="text-xs text-tx-muted font-medium">{invoice.customer_name}</span>
                           </td>
-                          <td className="px-4 py-3 text-right text-sm font-black text-gray-900 tabular-nums">
+                          <td className="px-4 py-3 text-right text-sm font-black text-tx-main tabular-nums">
                             {formatRupiah(parseFloat(String(invoice.grand_total ?? invoice.total_amount ?? 0)))}
                           </td>
                           <td className="px-4 py-3 text-center">
@@ -236,16 +236,16 @@ export default function InvoicesPage() {
                               </span>
                             </div>
                           </td>
-                          <td className="px-4 py-3 hidden xl:table-cell text-xs text-gray-500">
+                          <td className="px-4 py-3 hidden xl:table-cell text-xs text-tx-muted">
                             {formatDate(invoice.due_date, { day: 'numeric', month: 'short', year: 'numeric' })}
                           </td>
                           <td className="px-4 py-3 text-right">
                             <div className="flex items-center justify-end gap-1">
-                              <button onClick={() => handleSendEmail(invoice.id)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded border border-blue-50 transition-colors" title="Email"><Mail size={16} /></button>
-                              <button onClick={() => handleOpenWhatsApp(invoice)} className="p-1.5 text-green-600 hover:bg-green-50 rounded border border-green-50 transition-colors" title="WA"><WhatsAppIcon size={16} /></button>
-                              <button onClick={() => handleViewInvoice(invoice)} className="p-1.5 text-gray-600 hover:bg-gray-50 rounded border border-gray-50 transition-colors" title="View"><Eye size={16} /></button>
-                              <button onClick={() => handleEditInvoice(invoice)} className="p-1.5 text-amber-600 hover:bg-amber-50 rounded border border-amber-50 transition-colors" title="Edit"><Edit2 size={16} /></button>
-                              <button onClick={() => handleDeleteInvoice(invoice)} disabled={deletingId === invoice.id} className="p-1.5 text-red-600 hover:bg-red-50 rounded border border-red-50 transition-colors disabled:opacity-40" title="Delete">
+                              <button onClick={() => handleSendEmail(invoice.id)} className="p-1.5 text-blue-600 hover:bg-blue-500/10 rounded border border-blue-50 transition-colors" title="Email"><Mail size={16} /></button>
+                              <button onClick={() => handleOpenWhatsApp(invoice)} className="p-1.5 text-green-600 hover:bg-green-500/10 rounded border border-green-50 transition-colors" title="WA"><WhatsAppIcon size={16} /></button>
+                              <button onClick={() => handleViewInvoice(invoice)} className="p-1.5 text-tx-muted hover:bg-surface-2 rounded border border-separator transition-colors" title="View"><Eye size={16} /></button>
+                              <button onClick={() => handleEditInvoice(invoice)} className="p-1.5 text-amber-600 hover:bg-amber-500/10 rounded border border-amber-50 transition-colors" title="Edit"><Edit2 size={16} /></button>
+                              <button onClick={() => handleDeleteInvoice(invoice)} disabled={deletingId === invoice.id} className="p-1.5 text-red-600 hover:bg-red-500/10 rounded border border-red-50 transition-colors disabled:opacity-40" title="Delete">
                                 {deletingId === invoice.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
                               </button>
                             </div>
@@ -258,21 +258,21 @@ export default function InvoicesPage() {
             </div>
 
             {/* Mobile View (Cards) */}
-            <div className="md:hidden divide-y divide-gray-100">
+            <div className="md:hidden divide-y divide-separator">
               {invoices.length === 0 ? (
-                <div className="px-6 py-8 text-center text-gray-500">
+                <div className="px-6 py-8 text-center text-tx-muted">
                   {searchTerm || statusFilter ? 'No invoices match your filters.' : 'No invoices yet.'}
                 </div>
               ) : (
                 invoices.map((invoice) => (
-                  <div key={invoice.id} className="p-4 bg-white rounded-xl shadow-sm border border-gray-100 mb-3 mx-2 hover:shadow-md transition-all">
+                  <div key={invoice.id} className="p-4 bg-surface rounded-xl shadow-sm border border-separator mb-3 mx-2 hover:shadow-md transition-all">
                     <div className="flex items-start gap-3 mb-3">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
-                            <div className="bg-gray-50 flex items-center gap-1.5 px-2 py-0.5 rounded border border-gray-100">
-                              <Hash size={10} className="text-gray-400" />
-                              <span className="text-[10px] font-extrabold text-gray-500 uppercase tracking-wider">{invoice.invoice_number}</span>
+                            <div className="bg-surface-2 flex items-center gap-1.5 px-2 py-0.5 rounded border border-separator">
+                              <Hash size={10} className="text-tx-subtle" />
+                              <span className="text-[10px] font-extrabold text-tx-muted uppercase tracking-wider">{invoice.invoice_number}</span>
                             </div>
                             <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${getStatusColor(invoice.status)}`}>
                               {invoice.status}
@@ -283,26 +283,26 @@ export default function InvoicesPage() {
                           </span>
                         </div>
                         <div className="flex items-center gap-2 mb-2">
-                          <div className="w-6 h-6 bg-blue-50 rounded-full flex items-center justify-center shrink-0">
+                          <div className="w-6 h-6 bg-blue-500/10 rounded-full flex items-center justify-center shrink-0">
                             <UserIcon size={12} className="text-blue-600" />
                           </div>
-                          <h3 className="text-sm font-extrabold text-gray-900 truncate tracking-tight">{invoice.customer_name}</h3>
+                          <h3 className="text-sm font-extrabold text-tx-main truncate tracking-tight">{invoice.customer_name}</h3>
                         </div>
-                        <div className="flex items-center gap-2 text-[11px] text-gray-500">
-                          <Calendar size={12} className="text-gray-400" />
+                        <div className="flex items-center gap-2 text-[11px] text-tx-muted">
+                          <Calendar size={12} className="text-tx-subtle" />
                           <span>Tempo: {formatDate(invoice.due_date, { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between pt-3 border-t border-gray-50">
-                      <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-lg">
-                        <button onClick={() => handleSendEmail(invoice.id)} className="p-1.5 text-blue-600 hover:bg-white hover:shadow-sm rounded-md transition-all" title="Email"><Mail size={14} /></button>
-                        <button onClick={() => handleOpenWhatsApp(invoice)} className="p-1.5 text-green-600 hover:bg-white hover:shadow-sm rounded-md transition-all" title="WA"><WhatsAppIcon size={14} /></button>
+                    <div className="flex items-center justify-between pt-3 border-t border-separator">
+                      <div className="flex items-center gap-1 bg-surface-2 p-1 rounded-lg">
+                        <button onClick={() => handleSendEmail(invoice.id)} className="p-1.5 text-blue-600 hover:bg-surface hover:shadow-sm rounded-md transition-all" title="Email"><Mail size={14} /></button>
+                        <button onClick={() => handleOpenWhatsApp(invoice)} className="p-1.5 text-green-600 hover:bg-surface hover:shadow-sm rounded-md transition-all" title="WA"><WhatsAppIcon size={14} /></button>
                       </div>
-                      <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-lg">
-                        <button onClick={() => handleViewInvoice(invoice)} className="p-1.5 text-gray-600 hover:bg-white hover:shadow-sm rounded-md transition-all" title="View"><Eye size={14} /></button>
-                        <button onClick={() => handleEditInvoice(invoice)} className="p-1.5 text-amber-600 hover:bg-white hover:shadow-sm rounded-md transition-all" title="Edit"><Edit2 size={14} /></button>
-                        <button onClick={() => handleDeleteInvoice(invoice)} disabled={deletingId === invoice.id} className="p-1.5 text-red-600 hover:bg-white hover:shadow-sm rounded-md transition-all disabled:opacity-40" title="Delete">
+                      <div className="flex items-center gap-1 bg-surface-2 p-1 rounded-lg">
+                        <button onClick={() => handleViewInvoice(invoice)} className="p-1.5 text-tx-muted hover:bg-surface hover:shadow-sm rounded-md transition-all" title="View"><Eye size={14} /></button>
+                        <button onClick={() => handleEditInvoice(invoice)} className="p-1.5 text-amber-600 hover:bg-surface hover:shadow-sm rounded-md transition-all" title="Edit"><Edit2 size={14} /></button>
+                        <button onClick={() => handleDeleteInvoice(invoice)} disabled={deletingId === invoice.id} className="p-1.5 text-red-600 hover:bg-surface hover:shadow-sm rounded-md transition-all disabled:opacity-40" title="Delete">
                           {deletingId === invoice.id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
                         </button>
                       </div>
@@ -318,12 +318,12 @@ export default function InvoicesPage() {
       {/* Pagination */}
       {!loading && totalPages > 1 && (
         <div className="flex items-center justify-between mt-4">
-          <p className="text-sm text-gray-500">Page {page} of {totalPages}</p>
+          <p className="text-sm text-tx-muted">Page {page} of {totalPages}</p>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setPage(page - 1)}
               disabled={page === 1}
-              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 text-sm text-tx-muted border border-separator rounded-lg disabled:opacity-40 hover:bg-surface-2 transition-colors"
             >
               <ChevronLeft size={15} /> Prev
             </button>
@@ -332,7 +332,7 @@ export default function InvoicesPage() {
               const p = start + i;
               return (
                 <button key={p} onClick={() => setPage(p)}
-                  className={`w-8 h-8 text-sm rounded-lg transition-colors ${p === page ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-50 border border-gray-200'}`}>
+                  className={`w-8 h-8 text-sm rounded-lg transition-colors ${p === page ? 'bg-blue-600 text-white' : 'text-tx-muted hover:bg-surface-2 border border-separator'}`}>
                   {p}
                 </button>
               );
@@ -340,7 +340,7 @@ export default function InvoicesPage() {
             <button
               onClick={() => setPage(page + 1)}
               disabled={page === totalPages}
-              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 text-sm text-tx-muted border border-separator rounded-lg disabled:opacity-40 hover:bg-surface-2 transition-colors"
             >
               Next <ChevronRight size={15} />
             </button>

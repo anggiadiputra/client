@@ -115,15 +115,15 @@ export default function StackVerifyEmailPage() {
   }, [otp]);
 
   return (
-    <div className="min-h-screen bg-[#f4f6f9] flex flex-col">
+    <div className="min-h-screen bg-base flex flex-col">
       <Navbar onLoginClick={() => navigate('/login')} onGetStartedClick={() => navigate('/register')} />
       <div className="flex-1 flex items-center justify-center px-4 py-16">
-        <div className="w-full max-w-[440px] bg-white rounded-2xl shadow-sm border border-gray-100 px-10 py-10">
+        <div className="w-full max-w-[440px] bg-surface rounded-2xl shadow-sm border border-separator px-10 py-10">
           <div className="text-center mb-7">
-            <h1 className="text-2xl font-bold text-gray-900 mb-1.5">Verify your email</h1>
-            <p className="text-sm text-gray-500">
+            <h1 className="text-2xl font-bold text-tx-main mb-1.5">Verify your email</h1>
+            <p className="text-sm text-tx-muted">
               We've sent a 6-digit code to <br />
-              <span className="font-semibold text-gray-800 break-all">{email}</span>
+              <span className="font-semibold text-tx-main break-all">{email}</span>
             </p>
           </div>
 
@@ -136,7 +136,7 @@ export default function StackVerifyEmailPage() {
                   type="text"
                   maxLength={1}
                   inputMode="numeric"
-                  className="w-12 h-14 text-center text-xl font-medium bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-800"
+                  className="w-12 h-14 text-center text-xl font-medium bg-surface border border-separator rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-tx-main"
                   value={digit}
                   onChange={(e) => handleChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
@@ -147,7 +147,7 @@ export default function StackVerifyEmailPage() {
             </div>
 
             {error && (
-              <p className="text-xs text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+              <p className="text-xs text-red-500 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
                 {error}
               </p>
             )}
@@ -176,7 +176,7 @@ export default function StackVerifyEmailPage() {
             </button>
             <Link
               to="/register"
-              className="text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors flex items-center gap-1 group"
+              className="text-sm font-medium text-tx-muted hover:text-tx-muted transition-colors flex items-center gap-1 group"
             >
               <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
               Back to Sign Up

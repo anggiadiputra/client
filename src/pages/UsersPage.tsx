@@ -194,10 +194,10 @@ export default function UsersPage() {
   };
 
   const getRoleBadge = (role: string) =>
-    role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800';
+    role === 'admin' ? 'bg-purple-500/15 text-purple-800' : 'bg-blue-500/15 text-blue-800';
 
   const getStatusBadge = (status: string) =>
-    status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+    status === 'active' ? 'bg-green-500/15 text-green-800' : 'bg-red-500/15 text-red-800';
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
@@ -205,8 +205,8 @@ export default function UsersPage() {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Users</h1>
-          <p className="text-sm text-gray-500">Manage system users and their access levels</p>
+          <h1 className="text-2xl font-bold text-tx-main mb-1">Users</h1>
+          <p className="text-sm text-tx-muted">Manage system users and their access levels</p>
         </div>
         <button
           className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg text-sm transition-colors shrink-0"
@@ -220,13 +220,13 @@ export default function UsersPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
         <div className="flex flex-1 items-center gap-3">
           <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-tx-subtle" size={16} />
             <input
               type="text"
               placeholder="Cari nama, email, atau perusahaan..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-gray-400"
+              className="w-full pl-9 pr-4 py-2 bg-surface-2 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-tx-subtle"
             />
           </div>
           <DropdownFilter
@@ -247,14 +247,14 @@ export default function UsersPage() {
         />
 
         {!loading && (
-          <span className="text-xs text-gray-400 whitespace-nowrap">
+          <span className="text-xs text-tx-subtle whitespace-nowrap">
             {users.length} user{users.length !== 1 ? 's' : ''}
           </span>
         )}
       </div>
 
       {/* Table Section */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+      <div className="bg-surface rounded-lg border border-separator shadow-sm overflow-hidden">
         {loading ? (
           <SkeletonTable rows={5} columns={5} />
         ) : error ? (
@@ -262,7 +262,7 @@ export default function UsersPage() {
             <p className="text-sm text-red-500 mb-3">{error}</p>
             <button
               onClick={fetchUsers}
-              className="text-sm px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
+              className="text-sm px-4 py-2 bg-red-500/10 text-red-600 rounded-lg hover:bg-red-500/15 transition-colors"
             >
               Retry
             </button>
@@ -271,12 +271,12 @@ export default function UsersPage() {
           <>
             <div className="overflow-x-auto hidden md:block">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-surface-2 border-b border-separator">
                   <tr>
                     <th className="w-10 px-6 py-3 text-left">
                       <button 
                         onClick={toggleSelectAll}
-                        className="text-gray-400 hover:text-blue-600 transition-colors"
+                        className="text-tx-subtle hover:text-blue-600 transition-colors"
                       >
                         {selectedIds.length > 0 && selectedIds.length === paginated.length ? (
                           <CheckSquare size={18} className="text-blue-600" />
@@ -285,27 +285,27 @@ export default function UsersPage() {
                         )}
                       </button>
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Full Name</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden lg:table-cell">Email</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Role/Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden xl:table-cell">Company</th>
-                    <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-tx-muted uppercase tracking-wider">Full Name</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-tx-muted uppercase tracking-wider hidden lg:table-cell">Email</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-tx-muted uppercase tracking-wider">Role/Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-tx-muted uppercase tracking-wider hidden xl:table-cell">Company</th>
+                    <th className="px-6 py-3 text-right text-xs font-semibold text-tx-muted uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-separator">
                   {paginated.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                      <td colSpan={6} className="px-6 py-8 text-center text-tx-muted">
                         {searchTerm || statusFilter ? 'No users found matching your filters.' : 'No users yet.'}
                       </td>
                     </tr>
                   ) : (
                     paginated.map((user) => (
-                      <tr key={user.id} className={`hover:bg-gray-50 transition-colors ${selectedIds.includes(user.id) ? 'bg-blue-50/50' : ''}`}>
+                      <tr key={user.id} className={`hover:bg-surface-2 transition-colors ${selectedIds.includes(user.id) ? 'bg-blue-500/10/50' : ''}`}>
                         <td className="px-6 py-4">
                           <button 
                             onClick={() => toggleSelect(user.id)}
-                            className="text-gray-400 hover:text-blue-600 transition-colors"
+                            className="text-tx-subtle hover:text-blue-600 transition-colors"
                           >
                             {selectedIds.includes(user.id) ? (
                               <CheckSquare size={18} className="text-blue-600" />
@@ -316,16 +316,16 @@ export default function UsersPage() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold shrink-0">
+                            <div className="w-8 h-8 rounded-full bg-blue-500/15 flex items-center justify-center text-blue-600 text-xs font-bold shrink-0">
                               {user.first_name?.[0]}{user.last_name?.[0]}
                             </div>
-                            <div className="text-sm font-medium text-gray-900">
+                            <div className="text-sm font-medium text-tx-main">
                               {toTitleCase(`${user.first_name} ${user.last_name}`)}
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap hidden lg:table-cell">
-                          <div className="text-sm text-gray-700">{user.email}</div>
+                          <div className="text-sm text-tx-muted">{user.email}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex flex-col gap-1">
@@ -339,7 +339,7 @@ export default function UsersPage() {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap hidden xl:table-cell">
-                          <div className="text-sm text-gray-700">
+                          <div className="text-sm text-tx-muted">
                             {user.company_name ? toTitleCase(user.company_name) : '-'}
                           </div>
                         </td>
@@ -350,14 +350,14 @@ export default function UsersPage() {
                               className={`p-1.5 rounded-lg transition-colors ${
                                 userSubscriptions[user.id]?.is_lifetime
                                   ? 'text-yellow-500 hover:bg-yellow-50'
-                                  : 'text-gray-400 hover:bg-gray-50'
+                                  : 'text-tx-subtle hover:bg-surface-2'
                               }`}
                               title={userSubscriptions[user.id]?.is_lifetime ? 'Cabut Lifetime' : 'Grant Lifetime'}
                             >
                               <Crown size={16} />
                             </button>
-                            <button onClick={() => handleEdit(user)} className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Edit"><Edit2 size={16} /></button>
-                            <button onClick={() => handleDelete(user)} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete"><Trash2 size={16} /></button>
+                            <button onClick={() => handleEdit(user)} className="p-1.5 text-amber-600 hover:bg-amber-500/10 rounded-lg transition-colors" title="Edit"><Edit2 size={16} /></button>
+                            <button onClick={() => handleDelete(user)} className="p-1.5 text-red-600 hover:bg-red-500/10 rounded-lg transition-colors" title="Delete"><Trash2 size={16} /></button>
                           </div>
                         </td>
                       </tr>
@@ -368,18 +368,18 @@ export default function UsersPage() {
             </div>
 
             {/* Mobile View (Cards) */}
-            <div className="md:hidden divide-y divide-gray-100">
+            <div className="md:hidden divide-y divide-separator">
               {paginated.length === 0 ? (
-                <div className="px-6 py-8 text-center text-gray-500">
+                <div className="px-6 py-8 text-center text-tx-muted">
                   {searchTerm || statusFilter ? 'No users found matching your filters.' : 'No users yet.'}
                 </div>
               ) : (
                 paginated.map((user) => (
-                  <div key={user.id} className={`p-4 bg-white rounded-xl shadow-sm border border-gray-100 mb-3 mx-2 hover:shadow-md transition-all ${selectedIds.includes(user.id) ? 'bg-blue-50/50 border-blue-200 ring-1 ring-blue-100' : ''}`}>
+                  <div key={user.id} className={`p-4 bg-surface rounded-xl shadow-sm border border-separator mb-3 mx-2 hover:shadow-md transition-all ${selectedIds.includes(user.id) ? 'bg-blue-500/10/50 border-blue-200 ring-1 ring-blue-100' : ''}`}>
                     <div className="flex items-start gap-4">
                       <button 
                         onClick={() => toggleSelect(user.id)}
-                        className="mt-1 text-gray-400 hover:text-blue-600 transition-colors"
+                        className="mt-1 text-tx-subtle hover:text-blue-600 transition-colors"
                       >
                         {selectedIds.includes(user.id) ? (
                           <CheckSquare size={20} className="text-blue-600" />
@@ -390,16 +390,16 @@ export default function UsersPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-sm font-extrabold shrink-0 border-2 border-white shadow-sm">
+                            <div className="w-10 h-10 rounded-full bg-blue-500/15 flex items-center justify-center text-blue-600 text-sm font-extrabold shrink-0 border-2 border-white shadow-sm">
                               {user.first_name?.[0]}{user.last_name?.[0]}
                             </div>
                             <div className="min-w-0">
-                              <h3 className="text-sm font-extrabold text-gray-900 tracking-tight truncate">
+                              <h3 className="text-sm font-extrabold text-tx-main tracking-tight truncate">
                                 {toTitleCase(`${user.first_name} ${user.last_name}`)}
                               </h3>
                               <div className="flex items-center gap-1 mt-0.5">
-                                <Mail size={10} className="text-gray-400" />
-                                <p className="text-[11px] text-gray-500 truncate">{user.email}</p>
+                                <Mail size={10} className="text-tx-subtle" />
+                                <p className="text-[11px] text-tx-muted truncate">{user.email}</p>
                               </div>
                             </div>
                           </div>
@@ -413,25 +413,25 @@ export default function UsersPage() {
                             </span>
                           </div>
                         </div>
-                        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-50">
-                          <div className="flex items-center gap-2 text-[11px] text-gray-500 font-medium bg-gray-50 px-2 py-1 rounded-md">
-                            <Building2 size={12} className="text-gray-400" />
+                        <div className="flex items-center justify-between mt-3 pt-3 border-t border-separator">
+                          <div className="flex items-center gap-2 text-[11px] text-tx-muted font-medium bg-surface-2 px-2 py-1 rounded-md">
+                            <Building2 size={12} className="text-tx-subtle" />
                             <span className="truncate max-w-[120px]">
                               {user.company_name ? toTitleCase(user.company_name) : 'Tanpa Perusahaan'}
                             </span>
                           </div>
-                          <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-lg">
+                          <div className="flex items-center gap-1 bg-surface-2 p-1 rounded-lg">
                             <button
                               onClick={() => openLifetimeModal(user)}
-                              className={`p-1.5 rounded-md transition-all hover:bg-white hover:shadow-sm ${
-                                userSubscriptions[user.id]?.is_lifetime ? 'text-yellow-500' : 'text-gray-400'
+                              className={`p-1.5 rounded-md transition-all hover:bg-surface hover:shadow-sm ${
+                                userSubscriptions[user.id]?.is_lifetime ? 'text-yellow-500' : 'text-tx-subtle'
                               }`}
                               title={userSubscriptions[user.id]?.is_lifetime ? 'Cabut Lifetime' : 'Grant Lifetime'}
                             >
                               <Crown size={14} />
                             </button>
-                            <button onClick={() => handleEdit(user)} className="p-1.5 text-amber-600 hover:bg-white hover:shadow-sm rounded-md transition-all" title="Edit"><Edit2 size={14} /></button>
-                            <button onClick={() => handleDelete(user)} className="p-1.5 text-red-600 hover:bg-white hover:shadow-sm rounded-md transition-all" title="Delete"><Trash2 size={14} /></button>
+                            <button onClick={() => handleEdit(user)} className="p-1.5 text-amber-600 hover:bg-surface hover:shadow-sm rounded-md transition-all" title="Edit"><Edit2 size={14} /></button>
+                            <button onClick={() => handleDelete(user)} className="p-1.5 text-red-600 hover:bg-surface hover:shadow-sm rounded-md transition-all" title="Delete"><Trash2 size={14} /></button>
                           </div>
                         </div>
                       </div>
@@ -447,12 +447,12 @@ export default function UsersPage() {
       {/* Pagination */}
       {!loading && !error && totalPages > 1 && (
         <div className="flex items-center justify-between mt-4">
-          <p className="text-sm text-gray-500">Page {page} of {totalPages}</p>
+          <p className="text-sm text-tx-muted">Page {page} of {totalPages}</p>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setPage(page - 1)}
               disabled={page === 1}
-              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 text-sm text-tx-muted border border-separator rounded-lg disabled:opacity-40 hover:bg-surface-2 transition-colors"
             >
               <ChevronLeft size={15} /> Prev
             </button>
@@ -461,7 +461,7 @@ export default function UsersPage() {
               const p = start + i;
               return (
                 <button key={p} onClick={() => setPage(p)}
-                  className={`w-8 h-8 text-sm rounded-lg transition-colors ${p === page ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-50 border border-gray-200'}`}>
+                  className={`w-8 h-8 text-sm rounded-lg transition-colors ${p === page ? 'bg-blue-600 text-white' : 'text-tx-muted hover:bg-surface-2 border border-separator'}`}>
                   {p}
                 </button>
               );
@@ -469,7 +469,7 @@ export default function UsersPage() {
             <button
               onClick={() => setPage(page + 1)}
               disabled={page === totalPages}
-              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 text-sm text-tx-muted border border-separator rounded-lg disabled:opacity-40 hover:bg-surface-2 transition-colors"
             >
               Next <ChevronRight size={15} />
             </button>
@@ -479,35 +479,35 @@ export default function UsersPage() {
       {/* Lifetime Plan Modal */}
       {showLifetimeModal && lifetimeUser && (
         <KeyboardShortcutWrapper onClose={() => setShowLifetimeModal(false)} disabled={lifetimeLoading}>
-          <div className="bg-white rounded-xl shadow-lg max-w-md w-full my-8 overflow-hidden border border-gray-200">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <div className="bg-surface rounded-xl shadow-lg max-w-md w-full my-8 overflow-hidden border border-separator">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-separator">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-yellow-100 flex items-center justify-center">
                   <Crown size={18} className="text-yellow-500" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-gray-900">
+                  <h2 className="text-base font-bold text-tx-main">
                     {lifetimeAction === 'grant' ? 'Grant Lifetime Plan' : 'Cabut Lifetime Plan'}
                   </h2>
-                  <p className="text-xs text-gray-500">{lifetimeUser.email}</p>
+                  <p className="text-xs text-tx-muted">{lifetimeUser.email}</p>
                 </div>
               </div>
-              <button onClick={() => setShowLifetimeModal(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setShowLifetimeModal(false)} className="text-tx-subtle hover:text-tx-muted">
                 <X size={20} />
               </button>
             </div>
             <div className="p-6 space-y-4">
               {lifetimeAction === 'grant' ? (
                 <>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-tx-muted">
                     Pilih paket yang akan diberikan secara <strong>lifetime (seumur hidup)</strong> tanpa biaya berulang.
                   </p>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Pilih Paket</label>
+                    <label className="block text-sm font-medium text-tx-muted mb-1.5">Pilih Paket</label>
                     <select
                       value={selectedPlanId}
                       onChange={(e) => setSelectedPlanId(e.target.value)}
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white"
+                      className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-surface"
                     >
                       <option value="">-- Pilih paket --</option>
                       {plans.map((plan: any) => (
@@ -523,10 +523,10 @@ export default function UsersPage() {
                 </>
               ) : (
                 <>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-tx-muted">
                     User ini saat ini memiliki <strong>lifetime plan</strong>. Mencabut akses akan memberikan grace period <strong>30 hari</strong> sebelum berakhir.
                   </p>
-                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700">
+                  <div className="p-3 bg-red-500/10 border border-red-200 rounded-lg text-xs text-red-700">
                     ⚠️ Setelah dicabut, user perlu berlangganan secara reguler untuk melanjutkan akses.
                   </div>
                 </>
@@ -547,7 +547,7 @@ export default function UsersPage() {
                 <button
                   type="button"
                   onClick={() => setShowLifetimeModal(false)}
-                  className="px-5 border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold py-2 rounded-lg text-sm transition-colors"
+                  className="px-5 border border-separator hover:bg-surface-2 text-tx-muted font-semibold py-2 rounded-lg text-sm transition-colors"
                 >
                   Batal
                 </button>
@@ -560,17 +560,17 @@ export default function UsersPage() {
       {/* User Edit Modal */}
       {showModal && (
         <KeyboardShortcutWrapper onClose={() => setShowModal(false)} disabled={saving}>
-          <div className="bg-white rounded-xl shadow-lg max-w-md w-full my-8 overflow-hidden border border-gray-200">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <div className="bg-surface rounded-xl shadow-lg max-w-md w-full my-8 overflow-hidden border border-separator">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-separator">
               <div>
-                <h2 className="text-lg font-bold text-gray-900">
+                <h2 className="text-lg font-bold text-tx-main">
                   {modalMode === 'edit' ? 'Edit User' : 'Add User'}
                 </h2>
-                <p className="text-sm text-gray-500">{selectedUser?.email}</p>
+                <p className="text-sm text-tx-muted">{selectedUser?.email}</p>
               </div>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-tx-subtle hover:text-tx-muted transition-colors"
               >
                 <X size={20} />
               </button>
@@ -578,7 +578,7 @@ export default function UsersPage() {
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               {error && (
-                <div className="p-3 bg-red-50 border border-red-100 rounded-lg flex items-center gap-2 text-xs text-red-600">
+                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center gap-2 text-xs text-red-600">
                   <XCircle size={14} />
                   {error}
                 </div>
@@ -586,53 +586,53 @@ export default function UsersPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">First Name</label>
+                  <label className="block text-sm font-medium text-tx-muted mb-1.5">First Name</label>
                   <input
                     type="text"
                     value={formData.first_name}
                     onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-separator rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Last Name</label>
+                  <label className="block text-sm font-medium text-tx-muted mb-1.5">Last Name</label>
                   <input
                     type="text"
                     value={formData.last_name}
                     onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-separator rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Company Name</label>
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">Company Name</label>
                 <input
                   type="text"
                   value={formData.company_name}
                   onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-separator rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Role</label>
+                  <label className="block text-sm font-medium text-tx-muted mb-1.5">Role</label>
                   <select
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                    className="w-full px-3 py-2 border border-separator rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-surface"
                   >
                     <option value="user">User</option>
                     <option value="admin">Admin</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Status</label>
+                  <label className="block text-sm font-medium text-tx-muted mb-1.5">Status</label>
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                    className="w-full px-3 py-2 border border-separator rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-surface"
                   >
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
@@ -651,7 +651,7 @@ export default function UsersPage() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-6 border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold py-2 rounded-lg text-sm transition-colors"
+                  className="px-6 border border-separator hover:bg-surface-2 text-tx-muted font-semibold py-2 rounded-lg text-sm transition-colors"
                 >
                   Cancel
                 </button>

@@ -57,27 +57,27 @@ export default function StackResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f4f6f9] flex flex-col">
+    <div className="min-h-screen bg-base flex flex-col">
       <Navbar onLoginClick={() => navigate('/login')} onGetStartedClick={() => navigate('/register')} />
       <div className="flex-1 flex items-center justify-center px-4 py-16">
-        <div className="w-full max-w-[440px] bg-white rounded-2xl shadow-sm border border-gray-100 px-10 py-10">
+        <div className="w-full max-w-[440px] bg-surface rounded-2xl shadow-sm border border-separator px-10 py-10">
           <div className="text-center mb-7">
-            <h1 className="text-2xl font-bold text-gray-900 mb-1.5">Create new password</h1>
-            <p className="text-sm text-gray-500">
+            <h1 className="text-2xl font-bold text-tx-main mb-1.5">Create new password</h1>
+            <p className="text-sm text-tx-muted">
               {email ? `For ${email}` : 'Please enter your new password below'}
             </p>
           </div>
 
           <form onSubmit={handleReset} className="flex flex-col gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block text-sm font-medium text-tx-muted mb-1.5">
                 New Password
               </label>
               <div className="relative">
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-tx-subtle hover:text-tx-muted transition-colors"
                 >
                   {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
@@ -86,36 +86,36 @@ export default function StackResetPasswordPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter new password"
-                  className="w-full px-4 pr-10 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                  className="w-full px-4 pr-10 py-2.5 border border-separator rounded-lg text-sm text-tx-main placeholder:text-tx-subtle focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                   disabled={!token || !email}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block text-sm font-medium text-tx-muted mb-1.5">
                 Confirm Password
               </label>
               <div className="relative">
-                <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-tx-subtle" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm new password"
-                  className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                  className="w-full pl-9 pr-4 py-2.5 border border-separator rounded-lg text-sm text-tx-main placeholder:text-tx-subtle focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                   disabled={!token || !email}
                 />
               </div>
             </div>
 
             {error && (
-              <p className="text-xs text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+              <p className="text-xs text-red-500 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
                 {error}
               </p>
             )}
             {success && (
-              <p className="text-xs text-green-600 bg-green-50 border border-green-100 rounded-lg px-3 py-2">
+              <p className="text-xs text-green-600 bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
                 {success}
               </p>
             )}
@@ -129,7 +129,7 @@ export default function StackResetPasswordPage() {
             </button>
           </form>
 
-          <p className="text-center text-sm text-gray-500 mt-6">
+          <p className="text-center text-sm text-tx-muted mt-6">
             Remembered your password?{' '}
             <Link
               to="/login"

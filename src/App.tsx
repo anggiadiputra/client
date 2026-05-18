@@ -31,6 +31,7 @@ import PricingPage from './pages/PricingPage';
 import BillingPage from './pages/BillingPage';
 import AdminPlansPage from './pages/AdminPlansPage';
 import AdminTransactionsPage from './pages/AdminTransactionsPage';
+import RevenuePage from './pages/RevenuePage';
 
 // Components
 import Sidebar from './components/Sidebar';
@@ -73,6 +74,7 @@ function TitleUpdater() {
     else if (path === '/users') prefix = 'Users';
     else if (path === '/admin/plans') prefix = 'All Plans';
     else if (path === '/admin/transactions') prefix = 'All Transactions';
+    else if (path === '/revenue') prefix = 'Pendapatan';
 
     document.title = prefix ? `${prefix} - ${title}` : title;
   }, [location.pathname, settings.appName]);
@@ -203,6 +205,7 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
     if (path === '/billing') return 'billing';
     if (path === '/admin/plans') return 'admin-plans';
     if (path === '/admin/transactions') return 'admin-transactions';
+    if (path === '/revenue') return 'revenue';
     return 'dashboard';
   };
 
@@ -222,6 +225,7 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
       case 'users': return 'Manage Users';
       case 'admin-plans': return 'Plans Management';
       case 'admin-transactions': return 'Global Transactions';
+      case 'revenue': return 'Laporan Pendapatan';
       default: return 'Overview';
     }
   };
@@ -239,7 +243,7 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
         />
       )}
 
-      <div className={`flex-1 flex flex-col min-h-screen bg-[#f4f6f9] transition-all duration-300 ${isSidebarOpen ? 'md:ml-64' : 'ml-0 md:ml-64'}`}>
+      <div className={`flex-1 flex flex-col min-h-screen bg-base transition-all duration-300 ${isSidebarOpen ? 'md:ml-64' : 'ml-0 md:ml-64'}`}>
         <DashboardNavbar 
           pageTitle={getPageTitle()} 
           onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} 
@@ -337,6 +341,7 @@ export default function App() {
               <Route path="/billing" element={<ProtectedRoute><DashboardLayout><BillingPage /></DashboardLayout></ProtectedRoute>} />
               <Route path="/admin/plans" element={<ProtectedRoute><DashboardLayout><AdminPlansPage /></DashboardLayout></ProtectedRoute>} />
               <Route path="/admin/transactions" element={<ProtectedRoute><DashboardLayout><AdminTransactionsPage /></DashboardLayout></ProtectedRoute>} />
+              <Route path="/revenue" element={<ProtectedRoute><DashboardLayout><RevenuePage /></DashboardLayout></ProtectedRoute>} />
 
               <Route path="/" element={<LandingPage />} />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />

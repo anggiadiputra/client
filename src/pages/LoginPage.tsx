@@ -80,19 +80,19 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f4f6f9] flex flex-col">
+    <div className="min-h-screen bg-base flex flex-col">
       <Navbar onLoginClick={() => { }} onGetStartedClick={() => navigate('/register')} />
       <div className="flex-1 flex items-center justify-center px-4 py-16">
-        <div className="w-full max-w-[440px] bg-white rounded-2xl shadow-sm border border-gray-100 px-10 py-10">
+        <div className="w-full max-w-[440px] bg-surface rounded-2xl shadow-sm border border-separator px-10 py-10">
           <div className="text-center mb-7">
-            <h1 className="text-2xl font-bold text-gray-900 mb-1.5">Welcome back</h1>
-            <p className="text-sm text-gray-500">Sign in to your account to continue</p>
+            <h1 className="text-2xl font-bold text-tx-main mb-1.5">Welcome back</h1>
+            <p className="text-sm text-tx-muted">Sign in to your account to continue</p>
           </div>
 
           <div className="mb-6">
             <button 
               type="button"
-              className="flex items-center justify-center gap-3 w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm cursor-not-allowed opacity-70"
+              className="flex items-center justify-center gap-3 w-full px-4 py-2.5 bg-surface border border-separator rounded-lg text-sm font-semibold text-tx-muted hover:bg-surface-2 transition-colors shadow-sm cursor-not-allowed opacity-70"
               title="Google login is currently for decoration only"
             >
               <GoogleIcon />
@@ -100,10 +100,10 @@ export default function LoginPage() {
             </button>
             <div className="relative mt-6 mb-2">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-100"></div>
+                <div className="w-full border-t border-separator"></div>
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-gray-400">Or continue with email</span>
+                <span className="bg-surface px-2 text-tx-subtle">Or continue with email</span>
               </div>
             </div>
           </div>
@@ -111,24 +111,24 @@ export default function LoginPage() {
 
           <form onSubmit={handleLogin} className="flex flex-col gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block text-sm font-medium text-tx-muted mb-1.5">
                 Email address
               </label>
               <div className="relative">
-                <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-tx-subtle" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                  className="w-full pl-9 pr-4 py-2.5 border border-separator rounded-lg text-sm text-tx-main placeholder:text-tx-subtle focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                 />
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-tx-muted">
                   Password
                 </label>
                 <Link to="/forgot-password" className="text-sm font-medium text-blue-600 hover:text-blue-500">
@@ -139,7 +139,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-tx-subtle hover:text-tx-muted transition-colors"
                 >
                   {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
@@ -148,7 +148,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full px-4 pr-10 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                  className="w-full px-4 pr-10 py-2.5 border border-separator rounded-lg text-sm text-tx-main placeholder:text-tx-subtle focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                 />
               </div>
             </div>
@@ -168,12 +168,12 @@ export default function LoginPage() {
             )}
 
             {error && (
-              <p className="text-xs text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+              <p className="text-xs text-red-500 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
                 {error}
               </p>
             )}
             {success && (
-              <p className="text-xs text-green-600 bg-green-50 border border-green-100 rounded-lg px-3 py-2">
+              <p className="text-xs text-green-600 bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
                 {success}
               </p>
             )}
@@ -200,7 +200,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="text-center text-sm text-gray-500 mt-6">
+          <p className="text-center text-sm text-tx-muted mt-6">
             Don't have an account?{' '}
             <Link
               to="/register"

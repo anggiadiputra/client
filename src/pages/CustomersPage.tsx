@@ -323,8 +323,8 @@ export default function CustomersPage() {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Daftar Pelanggan</h1>
-          <p className="text-sm text-gray-500">Kelola database pelanggan dan alamat penagihan Anda</p>
+          <h1 className="text-2xl font-bold text-tx-main mb-1">Daftar Pelanggan</h1>
+          <p className="text-sm text-tx-muted">Kelola database pelanggan dan alamat penagihan Anda</p>
         </div>
         <button
           onClick={openCreateModal}
@@ -339,13 +339,13 @@ export default function CustomersPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
         <div className="flex flex-1 items-center gap-3">
           <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-tx-subtle" size={16} />
             <input
               type="text"
               placeholder="Cari nama atau email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-gray-400"
+              className="w-full pl-9 pr-4 py-2 bg-input-bg border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-tx-subtle"
             />
           </div>
           <DropdownFilter
@@ -366,24 +366,24 @@ export default function CustomersPage() {
         />
 
         {!loading && (
-          <span className="text-xs text-gray-400 whitespace-nowrap">{totalItems} customers</span>
+          <span className="text-xs text-tx-subtle whitespace-nowrap">{totalItems} customers</span>
         )}
       </div>
 
       {/* Table Section */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+      <div className="bg-surface rounded-lg border border-separator shadow-sm overflow-hidden">
         {loading ? (
           <SkeletonTable rows={10} columns={5} />
         ) : (
           <>
             <div className="overflow-x-auto hidden md:block">
               <table className="w-full text-left border-collapse">
-                <thead className="bg-gray-50 border-b border-gray-200 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                <thead className="bg-surface-2 border-b border-separator text-[10px] font-bold text-tx-subtle uppercase tracking-widest">
                   <tr>
                     <th className="w-10 px-4 py-2">
                       <button 
                         onClick={toggleSelectAll}
-                        className="text-gray-400 hover:text-blue-600 transition-colors"
+                        className="text-tx-subtle hover:text-blue-600 transition-colors"
                       >
                         {selectedIds.length > 0 && selectedIds.length === customers.length ? (
                           <CheckSquare size={16} className="text-blue-600" />
@@ -399,20 +399,20 @@ export default function CustomersPage() {
                     <th className="px-4 py-2 text-right">Aksi</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-separator">
                   {customers.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-4 py-12 text-center text-gray-400 text-xs italic">
+                      <td colSpan={6} className="px-4 py-12 text-center text-tx-subtle text-xs italic">
                         {searchTerm || statusFilter ? 'Tidak ada customer yang cocok.' : 'Belum ada customer.'}
                       </td>
                     </tr>
                   ) : (
                     customers.map((customer) => (
-                      <tr key={customer.id} className={`hover:bg-gray-50 transition-colors ${selectedIds.includes(customer.id) ? 'bg-blue-50/50' : ''}`}>
+                      <tr key={customer.id} className={`hover:bg-surface-2 transition-colors ${selectedIds.includes(customer.id) ? 'bg-blue-500/10/50' : ''}`}>
                         <td className="px-4 py-2">
                           <button 
                             onClick={() => toggleSelect(customer.id)}
-                            className="text-gray-400 hover:text-blue-600 transition-colors"
+                            className="text-tx-subtle hover:text-blue-600 transition-colors"
                           >
                             {selectedIds.includes(customer.id) ? (
                               <CheckSquare size={16} className="text-blue-600" />
@@ -422,23 +422,23 @@ export default function CustomersPage() {
                           </button>
                         </td>
                         <td className="px-4 py-3">
-                          <span className="text-sm font-bold text-gray-900">{customer.name}</span>
+                          <span className="text-sm font-bold text-tx-main">{customer.name}</span>
                         </td>
                         <td className="px-4 py-3 hidden lg:table-cell">
                           <div className="flex flex-col">
-                            <span className="text-xs text-gray-700 font-medium">{customer.email || '-'}</span>
-                            <span className="text-[11px] text-gray-400">{customer.phone || '-'}</span>
+                            <span className="text-xs text-tx-muted font-medium">{customer.email || '-'}</span>
+                            <span className="text-[11px] text-tx-subtle">{customer.phone || '-'}</span>
                           </div>
                         </td>
                         <td className="px-4 py-3 hidden xl:table-cell">
-                          <span className="text-xs text-gray-500 line-clamp-1">
+                          <span className="text-xs text-tx-muted line-clamp-1">
                             {[customer.regency_name || customer.city, customer.province_name].filter(Boolean).map(toTitleCase).join(', ')}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-center">
                           <div className="flex justify-center">
                             <span className={`inline-flex items-center px-2.5 py-1 rounded-[4px] text-[10px] font-black uppercase tracking-tight border ${
-                              (customer.status || 'active') === 'active' ? 'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100'
+                              (customer.status || 'active') === 'active' ? 'bg-green-500/10 text-green-700 border-green-500/20' : 'bg-red-500/10 text-red-700 border-red-500/20'
                             }`}>
                               {customer.status || 'active'}
                             </span>
@@ -446,9 +446,9 @@ export default function CustomersPage() {
                         </td>
                         <td className="px-4 py-3 text-right">
                           <div className="flex items-center justify-end gap-1">
-                            <button onClick={() => handleView(customer)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded border border-blue-50 transition-colors" title="View"><Eye size={16} /></button>
-                            <button onClick={() => handleEdit(customer)} className="p-1.5 text-amber-600 hover:bg-amber-50 rounded border border-amber-50 transition-colors" title="Edit"><Edit2 size={16} /></button>
-                            <button onClick={() => handleDelete(customer.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded border border-red-50 transition-colors" title="Delete"><Trash2 size={16} /></button>
+                            <button onClick={() => handleView(customer)} className="p-1.5 text-blue-600 hover:bg-blue-500/10 rounded border border-blue-50 transition-colors" title="View"><Eye size={16} /></button>
+                            <button onClick={() => handleEdit(customer)} className="p-1.5 text-amber-600 hover:bg-amber-500/10 rounded border border-amber-50 transition-colors" title="Edit"><Edit2 size={16} /></button>
+                            <button onClick={() => handleDelete(customer.id)} className="p-1.5 text-red-600 hover:bg-red-500/10 rounded border border-red-50 transition-colors" title="Delete"><Trash2 size={16} /></button>
                           </div>
                         </td>
                       </tr>
@@ -459,18 +459,18 @@ export default function CustomersPage() {
             </div>
 
             {/* Mobile View (Cards) */}
-            <div className="md:hidden divide-y divide-gray-100">
+            <div className="md:hidden divide-y divide-separator">
               {customers.length === 0 ? (
-                <div className="px-6 py-12 text-center text-gray-500">
+                <div className="px-6 py-12 text-center text-tx-muted">
                   {searchTerm || statusFilter ? 'No customers match your filters' : 'No customers yet'}
                 </div>
               ) : (
                 customers.map((customer) => (
-                  <div key={customer.id} className={`p-4 bg-white rounded-xl shadow-sm border border-gray-100 mb-3 mx-2 hover:shadow-md transition-all ${selectedIds.includes(customer.id) ? 'bg-blue-50/50 border-blue-200 ring-1 ring-blue-100' : ''}`}>
+                  <div key={customer.id} className={`p-4 bg-surface rounded-xl shadow-sm border border-separator mb-3 mx-2 hover:shadow-md transition-all ${selectedIds.includes(customer.id) ? 'bg-blue-500/10/50 border-blue-200 ring-1 ring-blue-100' : ''}`}>
                     <div className="flex items-start gap-3">
                       <button 
                         onClick={() => toggleSelect(customer.id)}
-                        className="mt-1 text-gray-400 hover:text-blue-600 transition-colors"
+                        className="mt-1 text-tx-subtle hover:text-blue-600 transition-colors"
                       >
                         {selectedIds.includes(customer.id) ? (
                           <CheckSquare size={20} className="text-blue-600" />
@@ -481,30 +481,30 @@ export default function CustomersPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between mb-3">
                           <div>
-                            <h3 className="text-sm font-extrabold text-gray-900 tracking-tight">{customer.name}</h3>
+                            <h3 className="text-sm font-extrabold text-tx-main tracking-tight">{customer.name}</h3>
                             <div className="flex items-center gap-1.5 mt-0.5">
-                              <Mail size={12} className="text-gray-400" />
-                              <p className="text-xs text-gray-500">{customer.email || 'No email'}</p>
+                              <Mail size={12} className="text-tx-subtle" />
+                              <p className="text-xs text-tx-muted">{customer.email || 'No email'}</p>
                             </div>
                           </div>
-                          <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-lg">
-                            <button onClick={() => handleView(customer)} className="p-1.5 text-blue-600 hover:bg-white hover:shadow-sm rounded-md transition-all" title="View"><Eye size={14} /></button>
-                            <button onClick={() => handleEdit(customer)} className="p-1.5 text-amber-600 hover:bg-white hover:shadow-sm rounded-md transition-all" title="Edit"><Edit2 size={14} /></button>
-                            <button onClick={() => handleDelete(customer.id)} className="p-1.5 text-red-600 hover:bg-white hover:shadow-sm rounded-md transition-all" title="Delete"><Trash2 size={14} /></button>
+                          <div className="flex items-center gap-1 bg-surface-2 p-1 rounded-lg">
+                            <button onClick={() => handleView(customer)} className="p-1.5 text-blue-600 hover:bg-surface hover:shadow-sm rounded-md transition-all" title="View"><Eye size={14} /></button>
+                            <button onClick={() => handleEdit(customer)} className="p-1.5 text-amber-600 hover:bg-surface hover:shadow-sm rounded-md transition-all" title="Edit"><Edit2 size={14} /></button>
+                            <button onClick={() => handleDelete(customer.id)} className="p-1.5 text-red-600 hover:bg-surface hover:shadow-sm rounded-md transition-all" title="Delete"><Trash2 size={14} /></button>
                           </div>
                         </div>
 
-                        <div className="space-y-2 border-t border-gray-50 pt-3">
+                        <div className="space-y-2 border-t border-separator pt-3">
                           {customer.phone && (
-                            <div className="flex items-center gap-2.5 text-xs text-gray-600">
-                              <div className="w-5 h-5 bg-green-50 rounded flex items-center justify-center shrink-0">
+                            <div className="flex items-center gap-2.5 text-xs text-tx-muted">
+                              <div className="w-5 h-5 bg-green-500/10 rounded flex items-center justify-center shrink-0">
                                 <Phone size={10} className="text-green-600" />
                               </div>
                               <span className="font-medium">{customer.phone}</span>
                             </div>
                           )}
-                          <div className="flex items-start gap-2.5 text-xs text-gray-500 leading-relaxed">
-                            <div className="w-5 h-5 bg-blue-50 rounded flex items-center justify-center shrink-0 mt-0.5">
+                          <div className="flex items-start gap-2.5 text-xs text-tx-muted leading-relaxed">
+                            <div className="w-5 h-5 bg-blue-500/10 rounded flex items-center justify-center shrink-0 mt-0.5">
                               <MapPin size={12} className="text-blue-600" />
                             </div>
                             <span className="line-clamp-2">{getFullAddress(customer)}</span>
@@ -523,12 +523,12 @@ export default function CustomersPage() {
       {/* Pagination Controls */}
       {!loading && totalPages > 1 && (
         <div className="flex items-center justify-between mt-4">
-          <p className="text-sm text-gray-500">Page {page} of {totalPages}</p>
+          <p className="text-sm text-tx-muted">Page {page} of {totalPages}</p>
           <div className="flex items-center gap-1">
             <button
               onClick={() => { setPage(page - 1); fetchCustomers(page - 1, searchTerm); }}
               disabled={page === 1}
-              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 text-sm text-tx-muted border border-separator rounded-lg disabled:opacity-40 hover:bg-surface-2 transition-colors"
             >
               <ChevronLeft size={15} /> Prev
             </button>
@@ -537,14 +537,14 @@ export default function CustomersPage() {
               const p = start + i;
               return (
                 <button key={p} onClick={() => { setPage(p); fetchCustomers(p, searchTerm); }}
-                  className={`w-8 h-8 text-sm rounded-lg transition-colors ${p === page ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-50 border border-gray-200'
+                  className={`w-8 h-8 text-sm rounded-lg transition-colors ${p === page ? 'bg-blue-600 text-white' : 'text-tx-muted hover:bg-surface-2 border border-separator'
                     }`}>{p}</button>
               );
             })}
             <button
               onClick={() => { setPage(page + 1); fetchCustomers(page + 1, searchTerm); }}
               disabled={page === totalPages}
-              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 text-sm text-tx-muted border border-separator rounded-lg disabled:opacity-40 hover:bg-surface-2 transition-colors"
             >
               Next <ChevronRight size={15} />
             </button>
@@ -560,20 +560,20 @@ export default function CustomersPage() {
       {/* Modal */}
       {showModal && (
         <KeyboardShortcutWrapper onClose={resetForm} disabled={saving}>
-          <div className="bg-white rounded-xl shadow-lg max-w-3xl w-full my-8 overflow-hidden border border-gray-200">
+          <div className="bg-surface rounded-xl shadow-lg max-w-3xl w-full my-8 overflow-hidden border border-separator">
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-separator">
               <div>
-                <h2 className="text-lg font-bold text-gray-900">
+                <h2 className="text-lg font-bold text-tx-main">
                   {modalMode === 'create' && 'Tambah Customer Baru'}
                   {modalMode === 'edit' && 'Edit Data Customer'}
                   {modalMode === 'view' && 'Detail Customer'}
                 </h2>
-                <p className="text-sm text-gray-500">Lengkapi informasi detail customer di bawah ini</p>
+                <p className="text-sm text-tx-muted">Lengkapi informasi detail customer di bawah ini</p>
               </div>
               <button
                 onClick={resetForm}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-tx-subtle hover:text-tx-muted transition-colors"
               >
                 <X size={20} />
               </button>
@@ -583,37 +583,37 @@ export default function CustomersPage() {
             {modalMode === 'view' && selectedCustomer ? (
               <div className="p-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Nama</label>
-                  <div className="text-gray-900">{selectedCustomer.name}</div>
+                  <label className="block text-sm font-semibold text-tx-muted mb-1">Nama</label>
+                  <div className="text-tx-main">{selectedCustomer.name}</div>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Email</label>
-                  <div className="text-gray-900">{selectedCustomer.email || '-'}</div>
+                  <label className="block text-sm font-semibold text-tx-muted mb-1">Email</label>
+                  <div className="text-tx-main">{selectedCustomer.email || '-'}</div>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Telepon</label>
-                  <div className="text-gray-900">{selectedCustomer.phone || '-'}</div>
+                  <label className="block text-sm font-semibold text-tx-muted mb-1">Telepon</label>
+                  <div className="text-tx-main">{selectedCustomer.phone || '-'}</div>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Alamat Lengkap</label>
-                  <div className="text-gray-900">{getFullAddress(selectedCustomer)}</div>
+                  <label className="block text-sm font-semibold text-tx-muted mb-1">Alamat Lengkap</label>
+                  <div className="text-tx-main">{getFullAddress(selectedCustomer)}</div>
                 </div>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
                 {error && (
-                  <p className="text-xs text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+                  <p className="text-xs text-red-500 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
                     {error}
                   </p>
                 )}
 
                 {/* Informasi Pelanggan */}
                 <div className="space-y-4">
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Ditujukan Kepada</h3>
+                  <h3 className="text-xs font-semibold text-tx-muted uppercase tracking-wider mb-3">Ditujukan Kepada</h3>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="col-span-2 md:col-span-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      <label className="block text-sm font-medium text-tx-muted mb-1.5">
                         Nama Lengkap <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -621,22 +621,22 @@ export default function CustomersPage() {
                         required
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full pl-4 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                        className="w-full pl-4 pr-4 py-2.5 border border-separator rounded-lg text-sm text-tx-main placeholder:text-tx-subtle focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                         placeholder="Full name"
                       />
                     </div>
                     <div className="col-span-2 md:col-span-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+                      <label className="block text-sm font-medium text-tx-muted mb-1.5">Email</label>
                       <input
                         type="email"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full pl-4 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                        className="w-full pl-4 pr-4 py-2.5 border border-separator rounded-lg text-sm text-tx-main placeholder:text-tx-subtle focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                         placeholder="email@example.com"
                       />
                     </div>
                     <div className="col-span-2 md:col-span-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">No. Telepon / WhatsApp</label>
+                      <label className="block text-sm font-medium text-tx-muted mb-1.5">No. Telepon / WhatsApp</label>
                       <div className="relative">
                         <input
                           type="tel"
@@ -650,12 +650,12 @@ export default function CustomersPage() {
                               handleValidatePhone();
                             }
                           }}
-                          className="w-full pl-4 pr-8 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                          className="w-full pl-4 pr-8 py-2.5 border border-separator rounded-lg text-sm text-tx-main placeholder:text-tx-subtle focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                           placeholder="08xxxxxxxxxx"
                         />
                         {validatingPhone && (
                           <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                            <Loader2 size={16} className="animate-spin text-gray-400" />
+                            <Loader2 size={16} className="animate-spin text-tx-subtle" />
                           </div>
                         )}
                       </div>
@@ -679,21 +679,21 @@ export default function CustomersPage() {
                       )}
                     </div>
                     <div className="col-span-2 md:col-span-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Kode Pos</label>
+                      <label className="block text-sm font-medium text-tx-muted mb-1.5">Kode Pos</label>
                       <input
                         type="text"
                         value={formData.postal_code}
                         onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
-                        className="w-full pl-4 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                        className="w-full pl-4 pr-4 py-2.5 border border-separator rounded-lg text-sm text-tx-main placeholder:text-tx-subtle focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                         placeholder="12345"
                       />
                     </div>
                     <div className="col-span-2 md:col-span-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Status</label>
+                      <label className="block text-sm font-medium text-tx-muted mb-1.5">Status</label>
                       <select
                         value={formData.status}
                         onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                        className="w-full pl-4 pr-10 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition appearance-none bg-white"
+                        className="w-full pl-4 pr-10 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition appearance-none bg-surface"
                       >
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
@@ -704,16 +704,16 @@ export default function CustomersPage() {
 
                 {/* Address Information */}
                 <div className="space-y-4">
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Detail Alamat</h3>
+                  <h3 className="text-xs font-semibold text-tx-muted uppercase tracking-wider mb-3">Detail Alamat</h3>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label className="block text-sm font-medium text-tx-muted mb-1.5">
                       Alamat Jalan / No. Rumah <span className="text-red-500">*</span>
                     </label>
                     <textarea
                       value={formData.address}
                       onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                      className="w-full px-4 py-2.5 border border-separator rounded-lg text-sm text-tx-main placeholder:text-tx-subtle focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                       rows={2}
                       placeholder="Street address, house number"
                       required
@@ -721,7 +721,7 @@ export default function CustomersPage() {
                   </div>
 
                   {/* Region Selector */}
-                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4">
+                  <div className="bg-surface-2 p-4 rounded-lg border border-separator mb-4">
                     <RegionSelect
                       provinceId={formData.province_id}
                       regencyId={formData.regency_id}
@@ -735,18 +735,18 @@ export default function CustomersPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Negara</label>
+                    <label className="block text-sm font-medium text-tx-muted mb-1.5">Negara</label>
                     <input
                       type="text"
                       value={formData.country}
                       onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                      className="w-full pl-4 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                      className="w-full pl-4 pr-4 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                     />
                   </div>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex gap-3 pt-4 border-t border-gray-200">
+                <div className="flex gap-3 pt-4 border-t border-separator">
                   <button
                     type="submit"
                     disabled={saving}
@@ -757,7 +757,7 @@ export default function CustomersPage() {
                   <button
                     type="button"
                     onClick={resetForm}
-                    className="border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold py-2.5 px-6 rounded-lg text-sm transition-colors"
+                    className="border border-separator hover:bg-surface-2 text-tx-muted font-semibold py-2.5 px-6 rounded-lg text-sm transition-colors"
                   >
                     Batal
                   </button>

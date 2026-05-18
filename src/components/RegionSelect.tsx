@@ -132,7 +132,7 @@ export default function RegionSelect({
     <div className="space-y-3">
       {/* Provinsi */}
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-1">
+        <label className="block text-sm font-semibold text-tx-muted mb-1">
           Provinsi <span className="text-red-500">*</span>
         </label>
         <select
@@ -152,12 +152,12 @@ export default function RegionSelect({
             </option>
           ))}
         </select>
-        {loadingProvinces && <p className="text-xs text-gray-500 mt-1">Memuat...</p>}
+        {loadingProvinces && <p className="text-xs text-tx-muted mt-1">Memuat...</p>}
       </div>
 
       {/* Kabupaten/Kota */}
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-1">
+        <label className="block text-sm font-semibold text-tx-muted mb-1">
           Kabupaten/Kota <span className="text-red-500">*</span>
         </label>
         <select
@@ -177,12 +177,12 @@ export default function RegionSelect({
             </option>
           ))}
         </select>
-        {loadingRegencies && <p className="text-xs text-gray-500 mt-1">Memuat...</p>}
+        {loadingRegencies && <p className="text-xs text-tx-muted mt-1">Memuat...</p>}
       </div>
 
       {/* Kecamatan */}
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-1">
+        <label className="block text-sm font-semibold text-tx-muted mb-1">
           Kecamatan <span className="text-red-500">*</span>
         </label>
         <select
@@ -202,12 +202,12 @@ export default function RegionSelect({
             </option>
           ))}
         </select>
-        {loadingDistricts && <p className="text-xs text-gray-500 mt-1">Memuat...</p>}
+        {loadingDistricts && <p className="text-xs text-tx-muted mt-1">Memuat...</p>}
       </div>
 
       {/* Kelurahan/Desa */}
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-1">
+        <label className="block text-sm font-semibold text-tx-muted mb-1">
           Kelurahan/Desa <span className="text-red-500">*</span>
         </label>
         <select
@@ -227,7 +227,7 @@ export default function RegionSelect({
             </option>
           ))}
         </select>
-        {loadingVillages && <p className="text-xs text-gray-500 mt-1">Memuat...</p>}
+        {loadingVillages && <p className="text-xs text-tx-muted mt-1">Memuat...</p>}
       </div>
     </div>
   );

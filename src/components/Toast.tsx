@@ -20,8 +20,8 @@ const Toast: React.FC<ToastProps> = ({ id, message, type, onClose }) => {
 
   const styles = {
     success: 'bg-emerald-50/90 border-emerald-100 text-emerald-900 shadow-emerald-100/50',
-    error: 'bg-red-50/90 border-red-100 text-red-900 shadow-red-100/50',
-    info: 'bg-blue-50/90 border-blue-100 text-blue-900 shadow-blue-100/50',
+    error: 'bg-red-500/10/90 border-red-500/20 text-red-900 shadow-red-100/50',
+    info: 'bg-blue-500/10/90 border-blue-500/20 text-blue-900 shadow-blue-100/50',
   };
 
   const icons = {
@@ -36,7 +36,7 @@ const Toast: React.FC<ToastProps> = ({ id, message, type, onClose }) => {
       <div className="flex-1 font-bold text-[13px] leading-tight">{message}</div>
       <button 
         onClick={() => onClose(id)} 
-        className="p-1.5 hover:bg-black/5 rounded-full transition-colors text-gray-400 hover:text-gray-600"
+        className="p-1.5 hover:bg-black/5 rounded-full transition-colors text-tx-subtle hover:text-tx-muted"
       >
         <X size={16} />
       </button>

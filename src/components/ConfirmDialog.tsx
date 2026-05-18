@@ -42,23 +42,23 @@ export default function ConfirmDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-[2px] animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/50 dark:bg-black/60 backdrop-blur-[2px] animate-in fade-in duration-200">
       <div 
-        className="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-gray-100 animate-in zoom-in-95 duration-200"
+        className="bg-surface rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-separator animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-6">
           <div className="flex items-start gap-4 mb-4">
-            <div className="p-2.5 bg-gray-50 rounded-xl border border-gray-100 flex-shrink-0">
+            <div className="p-2.5 bg-surface-2 rounded-xl border border-separator flex-shrink-0">
               {getIcon()}
             </div>
             <div className="flex-1">
-              <h3 className="text-base font-bold text-gray-900 mb-1">{title}</h3>
-              <p className="text-[13px] leading-relaxed text-gray-600">{message}</p>
+              <h3 className="text-base font-bold text-tx-main mb-1">{title}</h3>
+              <p className="text-[13px] leading-relaxed text-tx-muted">{message}</p>
             </div>
             <button 
               onClick={onCancel}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-tx-subtle hover:text-tx-muted transition-colors"
             >
               <X size={18} />
             </button>
@@ -67,7 +67,7 @@ export default function ConfirmDialog({
           <div className="flex gap-2.5 mt-2">
             <button
               onClick={onCancel}
-              className="flex-1 px-4 py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-bold rounded-xl border border-gray-200 transition-all active:scale-[0.98]"
+              className="flex-1 px-4 py-2.5 bg-surface-2 hover:bg-separator text-tx-muted text-xs font-bold rounded-xl border border-separator transition-all active:scale-[0.98]"
             >
               {cancelLabel}
             </button>

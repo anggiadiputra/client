@@ -424,8 +424,8 @@ export default function SettingsPage() {
       <div className="max-w-7xl mx-auto px-6 py-8 animate-pulse">
         {/* Header Skeleton */}
         <div className="mb-8">
-          <div className="h-8 bg-gray-200 rounded-lg w-48 mb-2"></div>
-          <div className="h-4 bg-gray-100 rounded-lg w-64"></div>
+          <div className="h-8 bg-surface-2 rounded-lg w-48 mb-2"></div>
+          <div className="h-4 bg-surface-2 rounded-lg w-64"></div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -433,14 +433,14 @@ export default function SettingsPage() {
           <div className="lg:col-span-4 space-y-6">
             {/* 3 Small Cards Skeletons */}
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white rounded-lg border border-gray-200 p-5 space-y-4">
+              <div key={i} className="bg-surface rounded-lg border border-separator p-5 space-y-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-gray-200 rounded"></div>
-                  <div className="h-4 bg-gray-200 rounded w-32"></div>
+                  <div className="w-4 h-4 bg-surface-2 rounded"></div>
+                  <div className="h-4 bg-surface-2 rounded w-32"></div>
                 </div>
                 <div className="space-y-3">
-                  <div className="h-10 bg-gray-100 rounded-lg w-full"></div>
-                  <div className="h-3 bg-gray-50 rounded w-3/4"></div>
+                  <div className="h-10 bg-surface-2 rounded-lg w-full"></div>
+                  <div className="h-3 bg-surface-2 rounded w-3/4"></div>
                 </div>
               </div>
             ))}
@@ -450,16 +450,16 @@ export default function SettingsPage() {
           <div className="lg:col-span-8 space-y-6">
             {/* 2 Large Cards Skeletons */}
             {[1, 2].map((i) => (
-              <div key={i} className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
+              <div key={i} className="bg-surface rounded-lg border border-separator p-6 space-y-6">
                 <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-gray-200 rounded"></div>
-                  <div className="h-5 bg-gray-200 rounded w-40"></div>
+                  <div className="w-5 h-5 bg-surface-2 rounded"></div>
+                  <div className="h-5 bg-surface-2 rounded w-40"></div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {[1, 2, 3, 4].map((j) => (
                     <div key={j} className="space-y-2">
-                      <div className="h-3 bg-gray-200 rounded w-24"></div>
-                      <div className="h-10 bg-gray-100 rounded-lg w-full"></div>
+                      <div className="h-3 bg-surface-2 rounded w-24"></div>
+                      <div className="h-10 bg-surface-2 rounded-lg w-full"></div>
                     </div>
                   ))}
                 </div>
@@ -474,8 +474,8 @@ export default function SettingsPage() {
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Pengaturan</h1>
-        <p className="text-sm text-gray-500">Konfigurasi sistem, integrasi, dan tampilan aplikasi</p>
+        <h1 className="text-2xl font-bold text-tx-main mb-1">Pengaturan</h1>
+        <p className="text-sm text-tx-muted">Konfigurasi sistem, integrasi, dan tampilan aplikasi</p>
       </div>
 
       {/* Two Column Layout */}
@@ -483,61 +483,61 @@ export default function SettingsPage() {
         {/* LEFT COLUMN */}
         <div className="space-y-5">
           {/* Section 1: Company Information */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+          <div className="bg-surface rounded-lg shadow-sm border border-separator p-5">
             <div className="flex items-center gap-2 mb-4">
-              <div className="bg-blue-100 text-blue-600 p-1.5 rounded-md">
+              <div className="bg-blue-500/15 text-blue-600 p-1.5 rounded-md">
                 <Monitor size={16} />
               </div>
               <div>
-                <h2 className="text-sm font-semibold text-gray-900">Profil Bisnis & Identitas</h2>
-                <p className="text-[10px] text-gray-500">Informasi ini akan muncul pada invoice Anda</p>
+                <h2 className="text-sm font-semibold text-tx-main">Profil Bisnis & Identitas</h2>
+                <p className="text-[10px] text-tx-muted">Informasi ini akan muncul pada invoice Anda</p>
               </div>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Nama Perusahaan</label>
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">Nama Perusahaan</label>
                 <input
                   type="text"
                   value={formData.company_name}
                   onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
                   disabled={!editingCompany}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   placeholder="PT. Contoh Perusahaan"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Email Perusahaan</label>
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">Email Perusahaan</label>
                 <input
                   type="email"
                   value={formData.company_email}
                   onChange={(e) => setFormData({ ...formData, company_email: e.target.value })}
                   disabled={!editingCompany}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   placeholder="info@perusahaan.com"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Telepon Perusahaan</label>
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">Telepon Perusahaan</label>
                 <input
                   type="tel"
                   value={formData.company_phone}
                   onChange={(e) => setFormData({ ...formData, company_phone: e.target.value })}
                   disabled={!editingCompany}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   placeholder="021-1234567"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Alamat Perusahaan (Jalan/Nomor)</label>
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">Alamat Perusahaan (Jalan/Nomor)</label>
                 <textarea
                   value={formData.company_address}
                   onChange={(e) => setFormData({ ...formData, company_address: e.target.value })}
                   disabled={!editingCompany}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   rows={2}
                   placeholder="Jl. Contoh No. 123"
                 />
@@ -545,7 +545,7 @@ export default function SettingsPage() {
 
               {editingCompany ? (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Wilayah</label>
+                  <label className="block text-sm font-medium text-tx-muted mb-2">Wilayah</label>
                   <RegionSelect
                     provinceId={formData.province_id}
                     regencyId={formData.regency_id}
@@ -568,39 +568,39 @@ export default function SettingsPage() {
               ) : (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Provinsi</label>
+                    <label className="block text-sm font-medium text-tx-muted mb-1.5">Provinsi</label>
                     <input
                       type="text"
                       value={formData.province_name}
                       disabled
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-500 bg-gray-50 cursor-not-allowed"
+                      className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-muted bg-surface-2 cursor-not-allowed"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Kabupaten / Kota</label>
+                    <label className="block text-sm font-medium text-tx-muted mb-1.5">Kabupaten / Kota</label>
                     <input
                       type="text"
                       value={formData.regency_name}
                       disabled
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-500 bg-gray-50 cursor-not-allowed"
+                      className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-muted bg-surface-2 cursor-not-allowed"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Kecamatan</label>
+                    <label className="block text-sm font-medium text-tx-muted mb-1.5">Kecamatan</label>
                     <input
                       type="text"
                       value={formData.district_name}
                       disabled
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-500 bg-gray-50 cursor-not-allowed"
+                      className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-muted bg-surface-2 cursor-not-allowed"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Kelurahan / Desa</label>
+                    <label className="block text-sm font-medium text-tx-muted mb-1.5">Kelurahan / Desa</label>
                     <input
                       type="text"
                       value={formData.village_name}
                       disabled
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-500 bg-gray-50 cursor-not-allowed"
+                      className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-muted bg-surface-2 cursor-not-allowed"
                     />
                   </div>
                 </div>
@@ -608,45 +608,45 @@ export default function SettingsPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Kode Pos</label>
+                  <label className="block text-sm font-medium text-tx-muted mb-1.5">Kode Pos</label>
                   <input
                     type="text"
                     value={formData.company_postal_code}
                     onChange={(e) => setFormData({ ...formData, company_postal_code: e.target.value })}
                     disabled={!editingCompany}
-                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                    className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                     placeholder="12345"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Website</label>
+                  <label className="block text-sm font-medium text-tx-muted mb-1.5">Website</label>
                   <input
                     type="url"
                     value={formData.company_website}
                     onChange={(e) => setFormData({ ...formData, company_website: e.target.value })}
                     disabled={!editingCompany}
-                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                    className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                     placeholder="https://www.perusahaan.com"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">URL Logo Perusahaan</label>
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">URL Logo Perusahaan</label>
                 <div className="flex gap-2">
                   <input
                     type="text"
                     value={formData.company_logo}
                     onChange={(e) => setFormData({ ...formData, company_logo: e.target.value })}
                     disabled={!editingCompany}
-                    className="flex-1 px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                    className="flex-1 px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                     placeholder="https://example.com/logo.png"
                   />
                   {formData.company_logo && editingCompany && (
                     <button
                       type="button"
                       onClick={() => setFormData({ ...formData, company_logo: '' })}
-                      className="flex items-center justify-center px-3 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors border border-red-100"
+                      className="flex items-center justify-center px-3 py-2.5 bg-red-500/10 hover:bg-red-500/15 text-red-600 rounded-lg transition-colors border border-red-500/20"
                       title="Hapus Logo"
                     >
                       <Trash2 size={16} />
@@ -677,7 +677,7 @@ export default function SettingsPage() {
                   />
                   <label 
                     htmlFor="logo-upload"
-                    className={`flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors border border-gray-200 ${(!editingCompany || uploadingLogo) ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}
+                    className={`flex items-center justify-center gap-2 px-4 py-2.5 bg-surface-2 hover:bg-surface-2 text-tx-muted text-sm font-medium rounded-lg transition-colors border border-separator ${(!editingCompany || uploadingLogo) ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}
                   >
                     {uploadingLogo ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
                     <span className="hidden sm:inline">Upload</span>
@@ -686,9 +686,9 @@ export default function SettingsPage() {
               </div>
 
               {/* Bank Accounts Section */}
-              <div className="pt-4 border-t border-gray-200 mt-6">
+              <div className="pt-4 border-t border-separator mt-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-bold text-gray-800">Rekening Pembayaran</h3>
+                  <h3 className="text-sm font-bold text-tx-main">Rekening Pembayaran</h3>
                   <button
                     type="button"
                     onClick={() => {
@@ -706,12 +706,12 @@ export default function SettingsPage() {
                 {/* Bank Accounts List */}
                 <div className="space-y-3">
                   {bankAccounts.length === 0 ? (
-                    <p className="text-sm text-gray-500 text-center py-4">Belum ada rekening. Klik "Tambah Rekening" untuk menambah.</p>
+                    <p className="text-sm text-tx-muted text-center py-4">Belum ada rekening. Klik "Tambah Rekening" untuk menambah.</p>
                   ) : (
                     bankAccounts.map((account) => (
                       <div
                         key={account.id}
-                        className={`border rounded-lg p-4 ${account.is_primary ? 'border-blue-300 bg-blue-50' : 'border-gray-200'}`}
+                        className={`border rounded-lg p-4 ${account.is_primary ? 'border-blue-300 bg-blue-500/10' : 'border-separator'}`}
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
@@ -719,20 +719,20 @@ export default function SettingsPage() {
                               {account.is_primary && (
                                 <Star size={14} className="text-yellow-500 fill-yellow-500" />
                               )}
-                              <span className="font-semibold text-gray-900">{account.bank_name}</span>
+                              <span className="font-semibold text-tx-main">{account.bank_name}</span>
                               {account.is_primary && (
-                                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">Utama</span>
+                                <span className="text-xs bg-blue-500/15 text-blue-700 px-2 py-0.5 rounded">Utama</span>
                               )}
                             </div>
-                            <p className="text-sm text-gray-600">{account.account_name}</p>
-                            <p className="text-sm font-mono text-gray-900 mt-1">{account.account_number}</p>
+                            <p className="text-sm text-tx-muted">{account.account_name}</p>
+                            <p className="text-sm font-mono text-tx-main mt-1">{account.account_number}</p>
                           </div>
                           <div className="flex items-center gap-2">
                             {!account.is_primary && (
                               <button
                                 type="button"
                                 onClick={() => handleSetPrimary(account.id)}
-                                className="text-gray-400 hover:text-yellow-500 p-1"
+                                className="text-tx-subtle hover:text-yellow-500 p-1"
                                 title="Jadikan Utama"
                               >
                                 <Star size={16} />
@@ -763,13 +763,13 @@ export default function SettingsPage() {
 
                 {/* Bank Account Form Modal */}
                 {showBankForm && (
-                  <div className="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                    <h4 className="text-sm font-bold text-gray-800 mb-3">
+                  <div className="mt-4 p-4 border border-separator rounded-lg bg-surface-2">
+                    <h4 className="text-sm font-bold text-tx-main mb-3">
                       {editingBankId ? 'Edit Rekening' : 'Tambah Rekening Baru'}
                     </h4>
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-xs font-semibold text-gray-700 mb-1">Nama Bank</label>
+                        <label className="block text-xs font-semibold text-tx-muted mb-1">Nama Bank</label>
                         <input
                           type="text"
                           value={bankFormData.bank_name}
@@ -780,7 +780,7 @@ export default function SettingsPage() {
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-xs font-semibold text-gray-700 mb-1">Atas Nama</label>
+                          <label className="block text-xs font-semibold text-tx-muted mb-1">Atas Nama</label>
                           <input
                             type="text"
                             value={bankFormData.account_name}
@@ -790,7 +790,7 @@ export default function SettingsPage() {
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-semibold text-gray-700 mb-1">Nomor Rekening</label>
+                          <label className="block text-xs font-semibold text-tx-muted mb-1">Nomor Rekening</label>
                           <input
                             type="text"
                             value={bankFormData.account_number}
@@ -808,7 +808,7 @@ export default function SettingsPage() {
                           onChange={(e) => setBankFormData({ ...bankFormData, is_primary: e.target.checked })}
                           className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                         />
-                        <label htmlFor="is_primary" className="text-sm text-gray-700">Jadikan rekening utama</label>
+                        <label htmlFor="is_primary" className="text-sm text-tx-muted">Jadikan rekening utama</label>
                       </div>
                       <div className="flex gap-2 pt-2">
                         <button
@@ -823,7 +823,7 @@ export default function SettingsPage() {
                         <button
                           type="button"
                           onClick={cancelBankForm}
-                          className="text-sm text-gray-600 hover:text-gray-800 py-2 px-4"
+                          className="text-sm text-tx-muted hover:text-tx-main py-2 px-4"
                         >
                           Batal
                         </button>
@@ -840,7 +840,7 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   onClick={() => setEditingCompany(true)}
-                  className="flex items-center gap-1.5 border border-gray-300 hover:border-blue-500 hover:text-blue-600 text-gray-600 text-sm font-medium py-1.5 px-3 rounded-lg transition-colors bg-white"
+                  className="flex items-center gap-1.5 border border-gray-300 hover:border-blue-500 hover:text-blue-600 text-tx-muted text-sm font-medium py-1.5 px-3 rounded-lg transition-colors bg-surface"
                 >
               <ExternalLink size={14} />
                   Edit
@@ -905,7 +905,7 @@ export default function SettingsPage() {
                       setEditingCompany(false);
                       fetchSettings(); // Reset form to original values
                     }}
-                    className="flex items-center gap-1.5 border border-gray-300 bg-white hover:bg-gray-50 text-gray-600 text-sm font-medium py-1.5 px-3 rounded-lg transition-colors"
+                    className="flex items-center gap-1.5 border border-gray-300 bg-surface hover:bg-surface-2 text-tx-muted text-sm font-medium py-1.5 px-3 rounded-lg transition-colors"
                   >
                     Batal
                   </button>
@@ -915,8 +915,8 @@ export default function SettingsPage() {
               {companyStatus !== 'idle' && (
                 <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
                   companyStatus === 'success'
-                    ? 'bg-green-50 text-green-700 border border-green-200'
-                    : 'bg-red-50 text-red-700 border border-red-200'
+                    ? 'bg-green-500/10 text-green-700 border border-green-200'
+                    : 'bg-red-500/10 text-red-700 border border-red-200'
                 }`}>
                   {companyStatus === 'success' ? (
                     <CheckCircle size={18} />
@@ -933,19 +933,19 @@ export default function SettingsPage() {
           {userRole === 'admin' && (
             <div className="space-y-5">
               <div className="flex items-center gap-2 px-2">
-                <Palette size={16} className="text-gray-400" />
-                <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Pengaturan Sistem (Admin)</h2>
+                <Palette size={16} className="text-tx-subtle" />
+                <h2 className="text-xs font-bold text-tx-muted uppercase tracking-widest">Pengaturan Sistem (Admin)</h2>
               </div>
               {/* Section 1.5: Appearance Configuration */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+              <div className="bg-surface rounded-lg shadow-sm border border-separator p-5">
               <div className="flex items-center gap-2 mb-4">
               <Palette size={16} className="text-blue-600" />
-              <h2 className="text-sm font-semibold text-gray-900">Tampilan Aplikasi</h2>
+              <h2 className="text-sm font-semibold text-tx-main">Tampilan Aplikasi</h2>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">
                   Nama Aplikasi
                 </label>
                 <input
@@ -953,10 +953,10 @@ export default function SettingsPage() {
                   value={formData.app_name}
                   onChange={(e) => setFormData({ ...formData, app_name: e.target.value })}
                   disabled={!editingAppearance}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   placeholder="Invoice System"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-tx-muted mt-1">
                   Nama aplikasi yang akan ditampilkan di sidebar dan title halaman
                 </p>
               </div>
@@ -968,7 +968,7 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   onClick={() => setEditingAppearance(true)}
-                  className="flex items-center gap-1.5 border border-gray-300 hover:border-blue-500 hover:text-blue-600 text-gray-600 text-sm font-medium py-1.5 px-3 rounded-lg transition-colors bg-white"
+                  className="flex items-center gap-1.5 border border-gray-300 hover:border-blue-500 hover:text-blue-600 text-tx-muted text-sm font-medium py-1.5 px-3 rounded-lg transition-colors bg-surface"
                 >
                   <Edit size={14} />
                   Edit
@@ -1000,7 +1000,7 @@ export default function SettingsPage() {
                       setEditingAppearance(false);
                       fetchSettings();
                     }}
-                    className="flex items-center gap-1.5 border border-gray-300 bg-white hover:bg-gray-50 text-gray-600 text-sm font-medium py-1.5 px-3 rounded-lg transition-colors"
+                    className="flex items-center gap-1.5 border border-gray-300 bg-surface hover:bg-surface-2 text-tx-muted text-sm font-medium py-1.5 px-3 rounded-lg transition-colors"
                   >
                     Batal
                   </button>
@@ -1010,8 +1010,8 @@ export default function SettingsPage() {
               {appearanceStatus !== 'idle' && (
                 <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
                   appearanceStatus === 'success'
-                    ? 'bg-green-50 text-green-700 border border-green-200'
-                    : 'bg-red-50 text-red-700 border border-red-200'
+                    ? 'bg-green-500/10 text-green-700 border border-green-200'
+                    : 'bg-red-500/10 text-red-700 border border-red-200'
                 }`}>
                   {appearanceStatus === 'success' ? (
                     <CheckCircle size={18} />
@@ -1025,12 +1025,12 @@ export default function SettingsPage() {
           </div>
 
           {/* Section 2: Cloudflare Turnstile Configuration */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-            <h2 className="text-sm font-semibold text-gray-900 mb-4">Cloudflare Turnstile Configuration</h2>
+          <div className="bg-surface rounded-lg shadow-sm border border-separator p-5">
+            <h2 className="text-sm font-semibold text-tx-main mb-4">Cloudflare Turnstile Configuration</h2>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">
                   Turnstile Site Key
                 </label>
                 <input
@@ -1038,10 +1038,10 @@ export default function SettingsPage() {
                   value={formData.turnstile_site_key}
                   onChange={(e) => setFormData({ ...formData, turnstile_site_key: e.target.value })}
                   disabled={!editingTurnstile}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   placeholder="Your Cloudflare Turnstile Site Key"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-tx-muted mt-1">
                   Dapatkan Site Key dari Cloudflare dashboard di{' '}
                   <a
                     href="https://dash.cloudflare.com/"
@@ -1056,7 +1056,7 @@ export default function SettingsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">
                   Turnstile Secret Key
                 </label>
                 <input
@@ -1064,10 +1064,10 @@ export default function SettingsPage() {
                   value={formData.turnstile_secret_key}
                   onChange={(e) => setFormData({ ...formData, turnstile_secret_key: e.target.value })}
                   disabled={!editingTurnstile}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   placeholder="Your Cloudflare Turnstile Secret Key"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-tx-muted mt-1">
                   Jaga Secret Key Anda dengan aman. Jangan bagikan ke siapapun.
                 </p>
               </div>
@@ -1079,7 +1079,7 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   onClick={() => setEditingTurnstile(true)}
-                  className="flex items-center gap-1.5 border border-gray-300 hover:border-blue-500 hover:text-blue-600 text-gray-600 text-sm font-medium py-1.5 px-3 rounded-lg transition-colors bg-white"
+                  className="flex items-center gap-1.5 border border-gray-300 hover:border-blue-500 hover:text-blue-600 text-tx-muted text-sm font-medium py-1.5 px-3 rounded-lg transition-colors bg-surface"
                 >
               <ExternalLink size={14} />
                   Edit
@@ -1131,7 +1131,7 @@ export default function SettingsPage() {
                       setEditingTurnstile(false);
                       fetchSettings(); // Reset form to original values
                     }}
-                    className="flex items-center gap-1.5 border border-gray-300 bg-white hover:bg-gray-50 text-gray-600 text-sm font-medium py-1.5 px-3 rounded-lg transition-colors"
+                    className="flex items-center gap-1.5 border border-gray-300 bg-surface hover:bg-surface-2 text-tx-muted text-sm font-medium py-1.5 px-3 rounded-lg transition-colors"
                   >
                     Batal
                   </button>
@@ -1141,8 +1141,8 @@ export default function SettingsPage() {
               {turnstileStatus !== 'idle' && (
                 <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
                   turnstileStatus === 'success'
-                    ? 'bg-green-50 text-green-700 border border-green-200'
-                    : 'bg-red-50 text-red-700 border border-red-200'
+                    ? 'bg-green-500/10 text-green-700 border border-green-200'
+                    : 'bg-red-500/10 text-red-700 border border-red-200'
                 }`}>
                   {turnstileStatus === 'success' ? (
                     <CheckCircle size={18} />
@@ -1156,15 +1156,15 @@ export default function SettingsPage() {
             </div>
 
             {/* Section 7: Fonnte WhatsApp Configuration (ADMIN ONLY) */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 mt-6">
+            <div className="bg-surface rounded-lg shadow-sm border border-separator p-5 mt-6">
               <div className="flex items-center gap-2 mb-4">
                 <Monitor size={16} className="text-blue-600" />
-                <h2 className="text-sm font-semibold text-gray-900">Fonnte WhatsApp Configuration</h2>
+                <h2 className="text-sm font-semibold text-tx-main">Fonnte WhatsApp Configuration</h2>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-medium text-tx-muted mb-1.5">
                     Fonnte Token
                   </label>
                   <input
@@ -1172,33 +1172,33 @@ export default function SettingsPage() {
                     value={formData.fonnte_token}
                     onChange={(e) => setFormData({ ...formData, fonnte_token: e.target.value })}
                     disabled={!editingFonnte}
-                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                    className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                     placeholder="Masukkan Fonnte Token Anda"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label className="block text-sm font-medium text-tx-muted mb-1.5">
                       Nomor Test WhatsApp
                     </label>
                     <input
                       type="tel"
                       value={formData.fonnte_test_target}
                       onChange={(e) => setFormData({ ...formData, fonnte_test_target: e.target.value })}
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                      className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                       placeholder="08xxxxxxxxxx"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label className="block text-sm font-medium text-tx-muted mb-1.5">
                       Pesan Test
                     </label>
                     <input
                       type="text"
                       value={formData.fonnte_test_message}
                       onChange={(e) => setFormData({ ...formData, fonnte_test_message: e.target.value })}
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                      className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                       placeholder="Test message..."
                     />
                   </div>
@@ -1209,7 +1209,7 @@ export default function SettingsPage() {
                     <button
                       type="button"
                       onClick={() => setEditingFonnte(true)}
-                      className="flex items-center gap-1.5 border border-gray-300 hover:border-blue-500 hover:text-blue-600 text-gray-600 text-sm font-medium py-1.5 px-3 rounded-lg transition-colors bg-white"
+                      className="flex items-center gap-1.5 border border-gray-300 hover:border-blue-500 hover:text-blue-600 text-tx-muted text-sm font-medium py-1.5 px-3 rounded-lg transition-colors bg-surface"
                     >
                       <Edit size={14} />
                       Edit
@@ -1249,7 +1249,7 @@ export default function SettingsPage() {
                           setEditingFonnte(false);
                           fetchSettings();
                         }}
-                        className="text-xs text-gray-500 hover:text-gray-700 font-medium"
+                        className="text-xs text-tx-muted hover:text-tx-muted font-medium"
                       >
                         Batal
                       </button>
@@ -1269,7 +1269,7 @@ export default function SettingsPage() {
 
                 {connectionStatus !== 'idle' && (
                   <div className={`text-xs px-3 py-2 rounded-lg ${
-                    connectionStatus === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+                    connectionStatus === 'success' ? 'bg-green-500/10 text-green-700 border border-green-200' : 'bg-red-500/10 text-red-700 border border-red-200'
                   }`}>
                     {connectionMessage}
                   </div>
@@ -1285,20 +1285,20 @@ export default function SettingsPage() {
           {userRole === 'admin' && (
             <div className="space-y-5">
               <div className="flex items-center gap-2 px-2">
-                <CreditCard size={16} className="text-gray-400" />
-                <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Konfigurasi Sistem (Admin)</h2>
+                <CreditCard size={16} className="text-tx-subtle" />
+                <h2 className="text-xs font-bold text-tx-muted uppercase tracking-widest">Konfigurasi Sistem (Admin)</h2>
               </div>
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+              <div className="bg-surface rounded-lg shadow-sm border border-separator p-5">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <CreditCard size={16} className="text-blue-600" />
-                    <h2 className="text-sm font-semibold text-gray-900">Pakasir Payment Gateway</h2>
+                    <h2 className="text-sm font-semibold text-tx-main">Pakasir Payment Gateway</h2>
                   </div>
                 {!editingPakasir ? (
                   <button
                     type="button"
                     onClick={() => setEditingPakasir(true)}
-                    className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors"
+                    className="p-1.5 text-tx-subtle hover:text-blue-600 transition-colors"
                   >
                     <Edit size={16} />
                   </button>
@@ -1310,7 +1310,7 @@ export default function SettingsPage() {
                         setEditingPakasir(false);
                         fetchSettings();
                       }}
-                      className="text-xs text-gray-500 hover:text-gray-700 font-medium"
+                      className="text-xs text-tx-muted hover:text-tx-muted font-medium"
                     >
                       Batal
                     </button>
@@ -1347,7 +1347,7 @@ export default function SettingsPage() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-medium text-tx-muted mb-1.5">
                     Pakasir Project Slug
                   </label>
                   <input
@@ -1355,13 +1355,13 @@ export default function SettingsPage() {
                     value={formData.pakasir_slug}
                     onChange={(e) => setFormData({ ...formData, pakasir_slug: e.target.value })}
                     disabled={!editingPakasir}
-                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:bg-gray-50 disabled:text-gray-500"
+                    className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:bg-surface-2 disabled:text-tx-muted"
                     placeholder="my-saas-project"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="block text-sm font-medium text-tx-muted mb-1.5">
                     Pakasir API Key
                   </label>
                   <input
@@ -1369,7 +1369,7 @@ export default function SettingsPage() {
                     value={formData.pakasir_api_key}
                     onChange={(e) => setFormData({ ...formData, pakasir_api_key: e.target.value })}
                     disabled={!editingPakasir}
-                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:bg-gray-50 disabled:text-gray-500"
+                    className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:bg-surface-2 disabled:text-tx-muted"
                     placeholder="pk_live_xxxxxxxxxxxx"
                   />
                 </div>
@@ -1383,22 +1383,22 @@ export default function SettingsPage() {
                     disabled={!editingPakasir}
                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 disabled:opacity-50"
                   />
-                  <label htmlFor="pakasir_is_sandbox" className="text-sm font-medium text-gray-700">
+                  <label htmlFor="pakasir_is_sandbox" className="text-sm font-medium text-tx-muted">
                     Gunakan Mode Sandbox (Testing)
                   </label>
                 </div>
 
                 {pakasirStatus !== 'idle' && (
                   <div className={`text-xs px-3 py-2 rounded-lg ${
-                    pakasirStatus === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+                    pakasirStatus === 'success' ? 'bg-green-500/10 text-green-700 border border-green-200' : 'bg-red-500/10 text-red-700 border border-red-200'
                   }`}>
                     {pakasirMessage}
                   </div>
                 )}
                 
-                <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                <div className="p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
                   <p className="text-[10px] text-blue-800 leading-relaxed font-medium">
-                    Webhooks URL: <span className="font-mono bg-white px-1 border border-blue-200 rounded">/api/webhooks/pakasir</span>
+                    Webhooks URL: <span className="font-mono bg-surface px-1 border border-blue-200 rounded">/api/webhooks/pakasir</span>
                     <br />
                     Pastikan Anda telah mengisi webhook URL ini di dashboard Pakasir untuk sinkronisasi otomatis saldo top-up.
                   </p>
@@ -1413,19 +1413,19 @@ export default function SettingsPage() {
           {userRole === 'admin' && (
             <div className="space-y-6">
               <div className="flex items-center gap-2 px-2">
-                <HardDrive size={16} className="text-gray-400" />
-                <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Storage & Email (Admin)</h2>
+                <HardDrive size={16} className="text-tx-subtle" />
+                <h2 className="text-xs font-bold text-tx-muted uppercase tracking-widest">Storage & Email (Admin)</h2>
               </div>
               {/* Section 4: S3 Compatible Storage Configuration */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+              <div className="bg-surface rounded-lg shadow-sm border border-separator p-5">
                 <div className="flex items-center gap-2 mb-4">
                   <HardDrive size={16} className="text-blue-600" />
-                  <h2 className="text-sm font-semibold text-gray-900">S3 Compatible Storage</h2>
+                  <h2 className="text-sm font-semibold text-tx-main">S3 Compatible Storage</h2>
                 </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">
                   S3 Endpoint
                 </label>
                 <input
@@ -1433,16 +1433,16 @@ export default function SettingsPage() {
                   value={formData.s3_endpoint}
                   onChange={(e) => setFormData({ ...formData, s3_endpoint: e.target.value })}
                   disabled={!editingS3}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   placeholder="https://s3.amazonaws.com or https://minio.example.com"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-tx-muted mt-1">
                   URL endpoint S3. Untuk MinIO atau S3-compatible lainnya, gunakan URL lokal Anda.
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">
                   Bucket Name
                 </label>
                 <input
@@ -1450,13 +1450,13 @@ export default function SettingsPage() {
                   value={formData.s3_bucket_name}
                   onChange={(e) => setFormData({ ...formData, s3_bucket_name: e.target.value })}
                   disabled={!editingS3}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   placeholder="my-invoice-bucket"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">
                   Region
                 </label>
                 <input
@@ -1464,13 +1464,13 @@ export default function SettingsPage() {
                   value={formData.s3_region}
                   onChange={(e) => setFormData({ ...formData, s3_region: e.target.value })}
                   disabled={!editingS3}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   placeholder="us-east-1 atau kosongkan untuk MinIO"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">
                   Access Key
                 </label>
                 <input
@@ -1478,13 +1478,13 @@ export default function SettingsPage() {
                   value={formData.s3_access_key}
                   onChange={(e) => setFormData({ ...formData, s3_access_key: e.target.value })}
                   disabled={!editingS3}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   placeholder="Your S3 Access Key"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">
                   Secret Key
                 </label>
                 <input
@@ -1492,13 +1492,13 @@ export default function SettingsPage() {
                   value={formData.s3_secret_key}
                   onChange={(e) => setFormData({ ...formData, s3_secret_key: e.target.value })}
                   disabled={!editingS3}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   placeholder="Your S3 Secret Key"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">
                   Public URL (Optional)
                 </label>
                 <input
@@ -1506,10 +1506,10 @@ export default function SettingsPage() {
                   value={formData.s3_public_url}
                   onChange={(e) => setFormData({ ...formData, s3_public_url: e.target.value })}
                   disabled={!editingS3}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   placeholder="https://cdn.example.com (untuk akses publik)"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-tx-muted mt-1">
                   URL publik untuk mengakses file. Kosongkan jika menggunakan endpoint default.
                 </p>
               </div>
@@ -1521,7 +1521,7 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   onClick={() => setEditingS3(true)}
-                  className="flex items-center gap-1.5 border border-gray-300 hover:border-blue-500 hover:text-blue-600 text-gray-600 text-sm font-medium py-1.5 px-3 rounded-lg transition-colors bg-white"
+                  className="flex items-center gap-1.5 border border-gray-300 hover:border-blue-500 hover:text-blue-600 text-tx-muted text-sm font-medium py-1.5 px-3 rounded-lg transition-colors bg-surface"
                 >
               <ExternalLink size={14} />
                   Edit
@@ -1583,7 +1583,7 @@ export default function SettingsPage() {
                       setEditingS3(false);
                       fetchSettings(); // Reset form to original values
                     }}
-                    className="flex items-center gap-1.5 border border-gray-300 bg-white hover:bg-gray-50 text-gray-600 text-sm font-medium py-1.5 px-3 rounded-lg transition-colors"
+                    className="flex items-center gap-1.5 border border-gray-300 bg-surface hover:bg-surface-2 text-tx-muted text-sm font-medium py-1.5 px-3 rounded-lg transition-colors"
                   >
                     Batal
                   </button>
@@ -1612,8 +1612,8 @@ export default function SettingsPage() {
               {s3Status !== 'idle' && (
                 <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
                   s3Status === 'success'
-                    ? 'bg-green-50 text-green-700 border border-green-200'
-                    : 'bg-red-50 text-red-700 border border-red-200'
+                    ? 'bg-green-500/10 text-green-700 border border-green-200'
+                    : 'bg-red-500/10 text-red-700 border border-red-200'
                 }`}>
                   {s3Status === 'success' ? (
                     <CheckCircle size={18} />
@@ -1626,11 +1626,11 @@ export default function SettingsPage() {
             </div>
 
             {s3Status === 'idle' && s3Message && (
-              <p className="text-sm text-gray-600 mt-4">{s3Message}</p>
+              <p className="text-sm text-tx-muted mt-4">{s3Message}</p>
             )}
 
             {/* S3 Info Box */}
-            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="mt-6 p-4 bg-blue-500/10 border border-blue-200 rounded-lg">
               <h3 className="text-sm font-semibold text-blue-900 mb-2">Supported Services:</h3>
               <ul className="text-xs text-blue-800 space-y-1">
                 <li>• Amazon S3</li>
@@ -1644,15 +1644,15 @@ export default function SettingsPage() {
           </div>
 
           {/* Section 5: SMTP Email Configuration */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+          <div className="bg-surface rounded-lg shadow-sm border border-separator p-5">
             <div className="flex items-center gap-2 mb-4">
               <Mail size={16} className="text-blue-600" />
-              <h2 className="text-sm font-semibold text-gray-900">SMTP Email Configuration</h2>
+              <h2 className="text-sm font-semibold text-tx-main">SMTP Email Configuration</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">
                   SMTP Host <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -1660,30 +1660,30 @@ export default function SettingsPage() {
                   value={formData.smtp_host}
                   onChange={(e) => setFormData({ ...formData, smtp_host: e.target.value })}
                   disabled={!editingSmtp}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   placeholder="smtp.gmail.com"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Port</label>
+                  <label className="block text-sm font-medium text-tx-muted mb-1.5">Port</label>
                   <input
                     type="number"
                     value={formData.smtp_port}
                     onChange={(e) => setFormData({ ...formData, smtp_port: Number(e.target.value) })}
                     disabled={!editingSmtp}
-                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                    className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                     placeholder="587"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Encryption</label>
+                  <label className="block text-sm font-medium text-tx-muted mb-1.5">Encryption</label>
                   <select
                     value={formData.smtp_encryption}
                     onChange={(e) => setFormData({ ...formData, smtp_encryption: e.target.value })}
                     disabled={!editingSmtp}
-                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                    className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   >
                     <option value="tls">TLS</option>
                     <option value="ssl">SSL</option>
@@ -1693,59 +1693,59 @@ export default function SettingsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Username</label>
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">Username</label>
                 <input
                   type="text"
                   value={formData.smtp_user}
                   onChange={(e) => setFormData({ ...formData, smtp_user: e.target.value })}
                   disabled={!editingSmtp}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   placeholder="email@example.com"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">Password</label>
                 <input
                   type="password"
                   value={formData.smtp_pass}
                   onChange={(e) => setFormData({ ...formData, smtp_pass: e.target.value })}
                   disabled={!editingSmtp}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   placeholder="••••••••"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">From Email</label>
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">From Email</label>
                 <input
                   type="email"
                   value={formData.smtp_from_email}
                   onChange={(e) => setFormData({ ...formData, smtp_from_email: e.target.value })}
                   disabled={!editingSmtp}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   placeholder="noreply@example.com"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">From Name</label>
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">From Name</label>
                 <input
                   type="text"
                   value={formData.smtp_from_name}
                   onChange={(e) => setFormData({ ...formData, smtp_from_name: e.target.value })}
                   disabled={!editingSmtp}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   placeholder="My Company"
                 />
               </div>
 
-              <div className="pt-4 border-t border-gray-200">
-                <h3 className="text-sm font-bold text-gray-800 mb-4">Test Email</h3>
+              <div className="pt-4 border-t border-separator">
+                <h3 className="text-sm font-bold text-tx-main mb-4">Test Email</h3>
                 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label className="block text-sm font-medium text-tx-muted mb-1.5">
                       Email Test
                     </label>
                     <input
@@ -1755,13 +1755,13 @@ export default function SettingsPage() {
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="recipient@example.com"
                     />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-tx-muted mt-1">
                       Email yang akan menerima email test
                     </p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label className="block text-sm font-medium text-tx-muted mb-1.5">
                       Pesan Test (Opsional)
                     </label>
                     <textarea
@@ -1771,7 +1771,7 @@ export default function SettingsPage() {
                       rows={3}
                       placeholder="Test message from Invoice System (kosongkan untuk default)"
                     />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-tx-muted mt-1">
                       Pesan yang akan dikirim saat Anda klik "Test Koneksi".
                     </p>
                   </div>
@@ -1785,7 +1785,7 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   onClick={() => setEditingSmtp(true)}
-                  className="flex items-center gap-1.5 border border-gray-300 hover:border-blue-500 hover:text-blue-600 text-gray-600 text-sm font-medium py-1.5 px-3 rounded-lg transition-colors bg-white"
+                  className="flex items-center gap-1.5 border border-gray-300 hover:border-blue-500 hover:text-blue-600 text-tx-muted text-sm font-medium py-1.5 px-3 rounded-lg transition-colors bg-surface"
                 >
                   <Edit size={14} />
                   Edit
@@ -1817,7 +1817,7 @@ export default function SettingsPage() {
                       setEditingSmtp(false);
                       fetchSettings();
                     }}
-                    className="flex items-center gap-1.5 border border-gray-300 bg-white hover:bg-gray-50 text-gray-600 text-sm font-medium py-1.5 px-3 rounded-lg transition-colors"
+                    className="flex items-center gap-1.5 border border-gray-300 bg-surface hover:bg-surface-2 text-tx-muted text-sm font-medium py-1.5 px-3 rounded-lg transition-colors"
                   >
                     Batal
                   </button>
@@ -1846,8 +1846,8 @@ export default function SettingsPage() {
               {smtpStatus !== 'idle' && (
                 <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
                   smtpStatus === 'success'
-                    ? 'bg-green-50 text-green-700 border border-green-200'
-                    : 'bg-red-50 text-red-700 border border-red-200'
+                    ? 'bg-green-500/10 text-green-700 border border-green-200'
+                    : 'bg-red-500/10 text-red-700 border border-red-200'
                 }`}>
                   {smtpStatus === 'success' ? <CheckCircle size={18} /> : <XCircle size={18} />}
                   <span className="text-sm font-medium">{smtpMessage}</span>
@@ -1856,7 +1856,7 @@ export default function SettingsPage() {
             </div>
 
             {/* Info Box */}
-            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="mt-6 p-4 bg-blue-500/10 border border-blue-200 rounded-lg">
               <h3 className="text-sm font-semibold text-blue-900 mb-2">Contoh Konfigurasi:</h3>
               <ul className="text-xs text-blue-800 space-y-1">
                 <li>• <strong>Gmail:</strong> Host: smtp.gmail.com, Port: 587, Encryption: TLS</li>

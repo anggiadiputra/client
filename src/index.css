@@ -1,3 +1,40 @@
+/* stylelint-disable at-rule-no-unknown */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ── Light Mode (default) ── */
+:root {
+  --color-base:       #f4f6f9;
+  --color-surface:    #ffffff;
+  --color-surface-2:  #f9fafb;
+  --color-border:     #e5e7eb;
+  --color-text-main:  #111827;
+  --color-text-muted: #6b7280;
+  --color-text-subtle:#9ca3af;
+  --color-input-bg:   #f9fafb;
+}
+
+/* ── Dark Mode ── */
+.dark {
+  --color-base:       #0d1117;
+  --color-surface:    #161b27;
+  --color-surface-2:  #1e2336;
+  --color-border:     #2d3448;
+  --color-text-main:  #f0f4ff;
+  --color-text-muted: #8b95b0;
+  --color-text-subtle:#5c677d;
+  --color-input-bg:   #1e2336;
+}
+
+/* Smooth transition for all color changes */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color;
+  transition-duration: 150ms;
+  transition-timing-function: ease;
+}
+
+/* Disable transition on page load to avoid flash */
+.no-transition, .no-transition * {
+  transition: none !important;
+}

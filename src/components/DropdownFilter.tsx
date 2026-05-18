@@ -1,4 +1,3 @@
-import React from 'react';
 import { Filter } from 'lucide-react';
 
 interface DropdownFilterProps {
@@ -18,13 +17,13 @@ export default function DropdownFilter({
 }: DropdownFilterProps) {
   return (
     <div className={`relative flex items-center ${className}`}>
-      <div className="absolute left-3 text-gray-400 pointer-events-none">
+      <div className="absolute left-3 text-tx-subtle pointer-events-none">
         <Filter size={14} />
       </div>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="appearance-none pl-9 pr-8 py-1.5 text-sm bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors cursor-pointer text-gray-700 min-w-[140px]"
+        className="appearance-none pl-9 pr-8 py-1.5 text-sm bg-surface border border-separator rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors cursor-pointer text-tx-muted min-w-[140px]"
       >
         <option value="">{placeholder}</option>
         {options.map((opt) => (
@@ -33,7 +32,7 @@ export default function DropdownFilter({
           </option>
         ))}
       </select>
-      <div className="absolute right-3 pointer-events-none text-gray-400">
+      <div className="absolute right-3 pointer-events-none text-tx-subtle">
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
         </svg>

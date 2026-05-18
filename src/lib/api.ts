@@ -218,6 +218,14 @@ export const invoicesAPI = {
     return response.json();
   },
 
+  getDailyStats: async (year: number, month: number) => {
+    const params = new URLSearchParams({ year: String(year), month: String(month) });
+    const response = await fetch(`${API_URL}/invoices/stats/daily?${params.toString()}`, {
+      ...(await getOptions()),
+    });
+    return handleResponse(response, 'Failed to fetch daily stats');
+  },
+
   getById: async (id: number | string) => {
     const response = await fetch(`${API_URL}/invoices/${id}`, {
       ...(await getOptions()),

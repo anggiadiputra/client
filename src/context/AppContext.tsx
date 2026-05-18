@@ -8,6 +8,8 @@ interface AppContextType {
   turnstileSiteKey?: string;
   subscription: any | null;
   wallet: any | null;
+  theme: 'light' | 'dark';
+  toggleTheme: () => void;
   updateSettings: (newSettings: Partial<AppSettings>) => void;
   setUserRole: (role: 'admin' | 'member' | null) => void;
   refreshSaaSData: () => Promise<void>;
@@ -25,6 +27,8 @@ const AppContext = createContext<AppContextType>({
   turnstileSiteKey: undefined,
   subscription: null,
   wallet: null,
+  theme: 'light',
+  toggleTheme: () => {},
   updateSettings: () => {},
   setUserRole: () => {},
   refreshSaaSData: async () => {},
@@ -58,6 +62,32 @@ export function AppProvider({ children }: { children: ReactNode }) {
   });
   const [subscription, setSubscription] = useState<any | null>(null);
   const [wallet, setWallet] = useState<any | null>(null);
+
+  // ── Theme management ──────────────────────────────────────────────
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark' || saved === 'light') return saved;
+    // Respect system preference on first visit
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    // Temporarily disable transitions to avoid flash on initial load
+    root.classList.add('no-transition');
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+    // Re-enable transitions after a brief moment
+    const t = setTimeout(() => root.classList.remove('no-transition'), 50);
+    return () => clearTimeout(t);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  // ─────────────────────────────────────────────────────────────────
 
   const refreshSaaSData = async () => {
     // Check both sessionStorage and localStorage for an active session
@@ -141,7 +171,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AppContext.Provider value={{ settings, userRole, turnstileSiteKey: settings.turnstileSiteKey, subscription, wallet, updateSettings, setUserRole, refreshSaaSData }}>
+    <AppContext.Provider value={{ settings, userRole, turnstileSiteKey: settings.turnstileSiteKey, subscription, wallet, theme, toggleTheme, updateSettings, setUserRole, refreshSaaSData }}>
       {children}
     </AppContext.Provider>
   );

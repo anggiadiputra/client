@@ -133,7 +133,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        <div className="mb-6 border-b border-gray-200 pb-5">
+        <div className="mb-6 border-b border-separator pb-5">
           <SkeletonBlock width="150px" height="32px" className="mb-2" />
           <SkeletonBlock width="250px" height="20px" />
         </div>
@@ -155,31 +155,31 @@ export default function ProfilePage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
 
       {/* Page Header */}
-      <div className="mb-6 border-b border-gray-200 pb-5">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Profile</h1>
-        <p className="text-sm text-gray-500">Manage your profile and account settings</p>
+      <div className="mb-6 border-b border-separator pb-5">
+        <h1 className="text-2xl font-bold text-tx-main mb-1">Profile</h1>
+        <p className="text-sm text-tx-muted">Manage your profile and account settings</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* LEFT COLUMN */}
         <div className="space-y-5">
           {/* Section 1: Profile Information */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+          <div className="bg-surface rounded-lg shadow-sm border border-separator p-5">
             <div className="flex items-center gap-2 mb-4">
               <User size={16} className="text-blue-600" />
-              <h2 className="text-sm font-semibold text-gray-900">Personal Information</h2>
+              <h2 className="text-sm font-semibold text-tx-main">Personal Information</h2>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Name</label>
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">Full Name</label>
                 <input
                   type="text"
                   value={profileName}
                   onChange={(e) => setProfileName(e.target.value)}
                   disabled={!editingName}
                   placeholder="Enter your full name"
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                 />
               </div>
 
@@ -188,7 +188,7 @@ export default function ProfilePage() {
                   <button
                     type="button"
                     onClick={() => setEditingName(true)}
-                    className="flex items-center gap-1.5 border border-gray-300 hover:border-blue-500 hover:text-blue-600 text-gray-600 text-sm font-medium py-1.5 px-3 rounded-lg transition-colors bg-white"
+                    className="flex items-center gap-1.5 border border-gray-300 hover:border-blue-500 hover:text-blue-600 text-tx-muted text-sm font-medium py-1.5 px-3 rounded-lg transition-colors bg-surface"
                   >
                     <ExternalLink size={14} />
                     Edit
@@ -210,7 +210,7 @@ export default function ProfilePage() {
                     <button
                       type="button"
                       onClick={() => { setEditingName(false); setProfileName(user?.displayName || ''); }}
-                      className="flex items-center gap-1.5 border border-gray-300 bg-white hover:bg-gray-50 text-gray-600 text-sm font-medium py-1.5 px-3 rounded-lg transition-colors"
+                      className="flex items-center gap-1.5 border border-gray-300 bg-surface hover:bg-surface-2 text-tx-muted text-sm font-medium py-1.5 px-3 rounded-lg transition-colors"
                     >
                       Cancel
                     </button>
@@ -221,22 +221,22 @@ export default function ProfilePage() {
           </div>
 
           {/* Section 2: Email Account */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+          <div className="bg-surface rounded-lg shadow-sm border border-separator p-5">
             <div className="flex items-center gap-2 mb-4">
               <Mail size={16} className="text-blue-600" />
-              <h2 className="text-sm font-semibold text-gray-900">Account Email</h2>
+              <h2 className="text-sm font-semibold text-tx-main">Account Email</h2>
             </div>
 
             <div className="space-y-4">
               <div>
-                <p className="text-xs text-gray-500 mb-3 block">Primary email used for login and important notifications. This email cannot be changed.</p>
+                <p className="text-xs text-tx-muted mb-3 block">Primary email used for login and important notifications. This email cannot be changed.</p>
                 <div className="relative">
-                  <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-tx-subtle" />
                   <input
                     type="text"
                     value={user?.email || ''}
                     disabled
-                    className="w-full px-3 py-2.5 pl-10 border border-gray-200 rounded-lg text-sm text-gray-500 bg-gray-50 cursor-not-allowed"
+                    className="w-full px-3 py-2.5 pl-10 border border-separator rounded-lg text-sm text-tx-muted bg-surface-2 cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -244,43 +244,43 @@ export default function ProfilePage() {
           </div>
 
           {/* Section 3: Security & Password */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+          <div className="bg-surface rounded-lg shadow-sm border border-separator p-5">
             <div className="flex items-center gap-2 mb-4">
               <ShieldCheck size={16} className="text-blue-600" />
-              <h2 className="text-sm font-semibold text-gray-900">Security & Password</h2>
+              <h2 className="text-sm font-semibold text-tx-main">Security & Password</h2>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Current Password</label>
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">Current Password</label>
                 <input
                   type="password"
                   value={passwordData.current}
                   onChange={(e) => setPasswordData({ ...passwordData, current: e.target.value })}
                   disabled={!editingPassword}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   placeholder="••••••••"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">New Password</label>
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">New Password</label>
                 <input
                   type="password"
                   value={passwordData.new}
                   onChange={(e) => setPasswordData({ ...passwordData, new: e.target.value })}
                   disabled={!editingPassword}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   placeholder="••••••••"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Confirm Password</label>
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">Confirm Password</label>
                 <input
                   type="password"
                   value={passwordData.confirm}
                   onChange={(e) => setPasswordData({ ...passwordData, confirm: e.target.value })}
                   disabled={!editingPassword}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   placeholder="••••••••"
                 />
               </div>
@@ -290,7 +290,7 @@ export default function ProfilePage() {
                   <button
                     type="button"
                     onClick={() => setEditingPassword(true)}
-                    className="flex items-center gap-1.5 border border-gray-300 hover:border-blue-500 hover:text-blue-600 text-gray-600 text-sm font-medium py-1.5 px-3 rounded-lg transition-colors bg-white"
+                    className="flex items-center gap-1.5 border border-gray-300 hover:border-blue-500 hover:text-blue-600 text-tx-muted text-sm font-medium py-1.5 px-3 rounded-lg transition-colors bg-surface"
                   >
                     <ExternalLink size={14} />
                     Edit
@@ -312,7 +312,7 @@ export default function ProfilePage() {
                     <button
                       type="button"
                       onClick={() => { setEditingPassword(false); setPasswordData({ current: '', new: '', confirm: '' }); }}
-                      className="flex items-center gap-1.5 border border-gray-300 bg-white hover:bg-gray-50 text-gray-600 text-sm font-medium py-1.5 px-3 rounded-lg transition-colors"
+                      className="flex items-center gap-1.5 border border-gray-300 bg-surface hover:bg-surface-2 text-tx-muted text-sm font-medium py-1.5 px-3 rounded-lg transition-colors"
                     >
                       Cancel
                     </button>
@@ -326,59 +326,59 @@ export default function ProfilePage() {
         {/* RIGHT COLUMN */}
         <div className="space-y-5">
           {/* Section 4: Address & Billing Information */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+          <div className="bg-surface rounded-lg shadow-sm border border-separator p-5">
             <div className="flex items-center gap-2 mb-4">
               <MapPin size={16} className="text-blue-600" />
-              <h2 className="text-sm font-semibold text-gray-900">Address & Billing Information</h2>
+              <h2 className="text-sm font-semibold text-tx-main">Address & Billing Information</h2>
             </div>
 
             <div className="space-y-4">
               {/* Company / Entity Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Entity / Company Name</label>
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">Entity / Company Name</label>
                 <input
                   type="text"
                   value={billingInfo.company_name}
                   onChange={(e) => setBillingInfo({ ...billingInfo, company_name: e.target.value })}
                   disabled={!editingCustomer}
                   placeholder="Full name or company name"
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main placeholder:text-tx-subtle focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                 />
               </div>
 
               {/* Website */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Website</label>
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">Website</label>
                 <div className="relative">
-                  <Globe size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <Globe size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-tx-subtle" />
                   <input
                     type="text"
                     value={billingInfo.company_website}
                     onChange={(e) => setBillingInfo({ ...billingInfo, company_website: e.target.value })}
                     disabled={!editingCustomer}
                     placeholder="https://example.com"
-                    className="w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                    className="w-full pl-10 pr-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main placeholder:text-tx-subtle focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
 
               {/* Street Address */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Street Address</label>
+                <label className="block text-sm font-medium text-tx-muted mb-1.5">Street Address</label>
                 <input
                   type="text"
                   value={billingInfo.company_address}
                   onChange={(e) => setBillingInfo({ ...billingInfo, company_address: e.target.value })}
                   disabled={!editingCustomer}
                   placeholder="Street name, house no., RT/RW"
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main placeholder:text-tx-subtle focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                 />
               </div>
 
               {/* Region Dropdowns — only shown in edit mode */}
               {editingCustomer ? (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Region</label>
+                  <label className="block text-sm font-medium text-tx-muted mb-2">Region</label>
                   <RegionSelect
                     provinceId={billingInfo.province_id}
                     regencyId={billingInfo.regency_id}
@@ -402,39 +402,39 @@ export default function ProfilePage() {
                 /* View mode: show names as read-only fields */
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Province</label>
+                    <label className="block text-sm font-medium text-tx-muted mb-1.5">Province</label>
                     <input
                       type="text"
                       value={billingInfo.province_name}
                       disabled
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-500 bg-gray-50 cursor-not-allowed"
+                      className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-muted bg-surface-2 cursor-not-allowed"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Regency / City</label>
+                    <label className="block text-sm font-medium text-tx-muted mb-1.5">Regency / City</label>
                     <input
                       type="text"
                       value={billingInfo.regency_name}
                       disabled
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-500 bg-gray-50 cursor-not-allowed"
+                      className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-muted bg-surface-2 cursor-not-allowed"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">District</label>
+                    <label className="block text-sm font-medium text-tx-muted mb-1.5">District</label>
                     <input
                       type="text"
                       value={billingInfo.district_name}
                       disabled
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-500 bg-gray-50 cursor-not-allowed"
+                      className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-muted bg-surface-2 cursor-not-allowed"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Village</label>
+                    <label className="block text-sm font-medium text-tx-muted mb-1.5">Village</label>
                     <input
                       type="text"
                       value={billingInfo.village_name}
                       disabled
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-500 bg-gray-50 cursor-not-allowed"
+                      className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-muted bg-surface-2 cursor-not-allowed"
                     />
                   </div>
                 </div>
@@ -443,23 +443,23 @@ export default function ProfilePage() {
               {/* Postal Code & Country */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Postal Code</label>
+                  <label className="block text-sm font-medium text-tx-muted mb-1.5">Postal Code</label>
                   <input
                     type="text"
                     value={billingInfo.company_postal_code}
                     onChange={(e) => setBillingInfo({ ...billingInfo, company_postal_code: e.target.value })}
                     disabled={!editingCustomer}
-                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                    className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Country</label>
+                  <label className="block text-sm font-medium text-tx-muted mb-1.5">Country</label>
                   <input
                     type="text"
                     value={billingInfo.company_country}
                     onChange={(e) => setBillingInfo({ ...billingInfo, company_country: e.target.value })}
                     disabled={!editingCustomer}
-                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                    className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -467,30 +467,30 @@ export default function ProfilePage() {
               {/* Phone & WhatsApp */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Phone</label>
+                  <label className="block text-sm font-medium text-tx-muted mb-1.5">Phone</label>
                   <div className="relative">
-                    <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-tx-subtle" />
                     <input
                       type="text"
                       value={billingInfo.company_phone}
                       onChange={(e) => setBillingInfo({ ...billingInfo, company_phone: e.target.value })}
                       disabled={!editingCustomer}
                       placeholder="021-xxxx"
-                      className="w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                      className="w-full pl-10 pr-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main placeholder:text-tx-subtle focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">WhatsApp / Mobile</label>
+                  <label className="block text-sm font-medium text-tx-muted mb-1.5">WhatsApp / Mobile</label>
                   <div className="relative">
-                    <Smartphone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <Smartphone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-tx-subtle" />
                     <input
                       type="text"
                       value={billingInfo.company_mobile_phone}
                       onChange={(e) => setBillingInfo({ ...billingInfo, company_mobile_phone: e.target.value })}
                       disabled={!editingCustomer}
                       placeholder="081xxx"
-                      className="w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                      className="w-full pl-10 pr-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main placeholder:text-tx-subtle focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:bg-surface-2 disabled:text-tx-muted disabled:cursor-not-allowed"
                     />
                   </div>
                 </div>
@@ -503,7 +503,7 @@ export default function ProfilePage() {
                 <button
                   type="button"
                   onClick={() => setEditingCustomer(true)}
-                  className="flex items-center gap-1.5 border border-gray-300 hover:border-blue-500 hover:text-blue-600 text-gray-600 text-sm font-medium py-1.5 px-3 rounded-lg transition-colors bg-white"
+                  className="flex items-center gap-1.5 border border-gray-300 hover:border-blue-500 hover:text-blue-600 text-tx-muted text-sm font-medium py-1.5 px-3 rounded-lg transition-colors bg-surface"
                 >
                   <ExternalLink size={14} />
                   Edit
@@ -525,7 +525,7 @@ export default function ProfilePage() {
                   <button
                     type="button"
                     onClick={() => { setEditingCustomer(false); fetchBillingInfo(); }}
-                    className="flex items-center gap-1.5 border border-gray-300 bg-white hover:bg-gray-50 text-gray-600 text-sm font-medium py-1.5 px-3 rounded-lg transition-colors"
+                    className="flex items-center gap-1.5 border border-gray-300 bg-surface hover:bg-surface-2 text-tx-muted text-sm font-medium py-1.5 px-3 rounded-lg transition-colors"
                   >
                     Cancel
                   </button>

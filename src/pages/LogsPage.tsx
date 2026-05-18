@@ -11,7 +11,7 @@ export default function LogsPage() {
       description: 'Riwayat pengiriman notifikasi invoice melalui WhatsApp.',
       path: '/logs/whatsapp',
       icon: WhatsAppIcon,
-      color: 'bg-green-500',
+      color: 'bg-green-500/100',
       stats: 'Fonnte API',
     },
     {
@@ -19,7 +19,7 @@ export default function LogsPage() {
       description: 'Riwayat pengiriman notifikasi invoice melalui Email (SMTP/Brevo).',
       path: '/logs/emails',
       icon: Mail,
-      color: 'bg-blue-500',
+      color: 'bg-blue-500/100',
       stats: 'SMTP Server',
     },
   ];
@@ -27,8 +27,8 @@ export default function LogsPage() {
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Riwayat Log</h1>
-        <p className="text-sm text-gray-500">Pilih kategori log untuk melihat rincian pengiriman notifikasi.</p>
+        <h1 className="text-2xl font-bold text-tx-main mb-1">Riwayat Log</h1>
+        <p className="text-sm text-tx-muted">Pilih kategori log untuk melihat rincian pengiriman notifikasi.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -38,17 +38,17 @@ export default function LogsPage() {
             <div 
               key={idx} 
               onClick={() => navigate(cat.path)}
-              className="bg-white rounded-lg border border-gray-200 shadow-sm p-5 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
+              className="bg-surface rounded-lg border border-separator shadow-sm p-5 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
             >
               <div className="flex items-start justify-between mb-3">
                 <div className={`${cat.color} p-2.5 rounded-lg text-white`}>
                   <Icon size={20} />
                 </div>
-                <span className="text-xs text-gray-400 bg-gray-50 border border-gray-100 px-2 py-1 rounded">{cat.stats}</span>
+                <span className="text-xs text-tx-subtle bg-surface-2 border border-separator px-2 py-1 rounded">{cat.stats}</span>
               </div>
               
-              <h2 className="text-base font-semibold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">{cat.title}</h2>
-              <p className="text-sm text-gray-500 mb-4">{cat.description}</p>
+              <h2 className="text-base font-semibold text-tx-main mb-1 group-hover:text-blue-600 transition-colors">{cat.title}</h2>
+              <p className="text-sm text-tx-muted mb-4">{cat.description}</p>
               
               <div className="flex items-center text-blue-600 text-sm font-medium">
                 Buka Log <Clock size={14} className="ml-1.5" />
@@ -58,7 +58,7 @@ export default function LogsPage() {
         })}
       </div>
       
-      <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
+      <div className="mt-6 p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
         <h3 className="text-sm font-semibold text-blue-900 mb-1.5 flex items-center gap-2">
           <AlertCircle size={15} />
           Informasi Logging

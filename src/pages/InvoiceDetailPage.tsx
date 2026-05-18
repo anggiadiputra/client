@@ -273,8 +273,8 @@ export default function InvoiceDetailPage() {
 
   if (!invoice) {
     return (
-      <div className="p-8 bg-gray-50 min-h-[60vh]">
-        <div className="text-center py-12 text-gray-500">Invoice tidak ditemukan</div>
+      <div className="p-8 bg-surface-2 min-h-[60vh]">
+        <div className="text-center py-12 text-tx-muted">Invoice tidak ditemukan</div>
       </div>
     );
   }
@@ -321,9 +321,9 @@ export default function InvoiceDetailPage() {
     <div className="max-w-5xl mx-auto px-4 py-8">
       <button
         onClick={() => navigate('/billing')}
-        className="group flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-all mb-8"
+        className="group flex items-center gap-2 text-tx-muted hover:text-tx-main transition-all mb-8"
       >
-        <div className="p-1.5 rounded-lg group-hover:bg-gray-100 transition-colors">
+        <div className="p-1.5 rounded-lg group-hover:bg-surface-2 transition-colors">
           <ArrowLeft size={18} />
         </div>
         <span className="text-sm font-medium">Kembali ke Daftar</span>
@@ -375,13 +375,13 @@ export default function InvoiceDetailPage() {
           )}
         </div>
 
-        <div className="bg-gray-50 border-t border-gray-100 p-6 flex justify-end items-center">
+        <div className="bg-surface-2 border-t border-separator p-6 flex justify-end items-center">
           <div className="flex items-center gap-3 w-auto">
             <div className="flex gap-2 w-auto">
               {!invoice.is_system && (
               <button
                 onClick={() => navigate(`/invoices/${invoice.invoice_number}/edit`)}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-bold py-2.5 px-4 rounded-xl border border-gray-200 transition-all text-sm shadow-sm"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-surface hover:bg-surface-2 text-tx-muted font-bold py-2.5 px-4 rounded-xl border border-separator transition-all text-sm shadow-sm"
                 title="Edit Invoice"
               >
                 <Edit size={16} /> <span>Edit</span>
@@ -391,7 +391,7 @@ export default function InvoiceDetailPage() {
               <button
                 onClick={handleDownloadPDF}
                 disabled={isDownloading}
-                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-bold py-2.5 px-4 rounded-xl border border-gray-200 transition-all text-sm shadow-sm ${isDownloading ? 'opacity-70 cursor-wait' : ''}`}
+                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 bg-surface hover:bg-surface-2 text-tx-muted font-bold py-2.5 px-4 rounded-xl border border-separator transition-all text-sm shadow-sm ${isDownloading ? 'opacity-70 cursor-wait' : ''}`}
                 title="Download PDF"
               >
                 {isDownloading ? (
@@ -405,7 +405,7 @@ export default function InvoiceDetailPage() {
               <button
                 onClick={handleShareLink}
                 disabled={isDownloading}
-                className="flex-none flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-bold py-2.5 px-4 rounded-xl border border-gray-200 transition-all text-sm shadow-sm disabled:opacity-50"
+                className="flex-none flex items-center justify-center gap-2 bg-surface hover:bg-surface-2 text-tx-muted font-bold py-2.5 px-4 rounded-xl border border-separator transition-all text-sm shadow-sm disabled:opacity-50"
                 title="Share Link"
               >
                 <Share2 size={16} /> <span>Bagikan</span>
@@ -420,7 +420,7 @@ export default function InvoiceDetailPage() {
               </button>
             </div>
 
-            <div className="w-px h-8 bg-gray-200 mx-1"></div>
+            <div className="w-px h-8 bg-surface-2 mx-1"></div>
 
             <div className="flex gap-2 w-auto">
               <button
@@ -439,7 +439,7 @@ export default function InvoiceDetailPage() {
               <button
                 onClick={handleWhatsApp}
                 disabled={isDownloading}
-                className="flex-none flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 px-5 rounded-xl transition-all text-sm shadow-md shadow-green-200 disabled:opacity-50"
+                className="flex-none flex items-center justify-center gap-2 bg-green-500/100 hover:bg-green-600 text-white font-bold py-2.5 px-5 rounded-xl transition-all text-sm shadow-md shadow-green-200 disabled:opacity-50"
               >
                 <WhatsAppIcon size={16} className="fill-current" /> WhatsApp
               </button>
@@ -450,13 +450,13 @@ export default function InvoiceDetailPage() {
 
       {showShareLink && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
-            <h3 className="text-xl font-black text-gray-900 mb-2">Bagikan Link Invoice</h3>
-            <p className="text-sm text-gray-500 mb-6 leading-relaxed">
+          <div className="bg-surface rounded-2xl shadow-2xl max-w-md w-full p-8">
+            <h3 className="text-xl font-black text-tx-main mb-2">Bagikan Link Invoice</h3>
+            <p className="text-sm text-tx-muted mb-6 leading-relaxed">
               Salin link publik berikut untuk dikirimkan kepada customer. Link ini berlaku hingga masa kedaluwarsa invoice.
             </p>
             
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6 group relative">
+            <div className="bg-surface-2 border border-separator rounded-xl p-4 mb-6 group relative">
               <code className="text-xs text-blue-600 font-mono break-all line-clamp-2">
                 {window.location.origin}/public/invoice/{invoice.invoice_number}
               </code>
@@ -472,7 +472,7 @@ export default function InvoiceDetailPage() {
               </button>
               <button
                 onClick={() => setShowShareLink(false)}
-                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 px-4 rounded-xl transition-colors text-sm"
+                className="flex-1 bg-surface-2 hover:bg-surface-2 text-tx-muted font-bold py-3 px-4 rounded-xl transition-colors text-sm"
               >
                 Tutup
               </button>
