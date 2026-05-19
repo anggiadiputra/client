@@ -251,7 +251,7 @@ export default function RevenuePage() {
                         </td>
                         <td className="px-4 py-3 text-center">
                           {parseInt(String(row.paid_count)) > 0
-                            ? <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[10px] font-black uppercase tracking-tight border bg-green-500/15 text-green-800 border-green-200">{row.paid_count}</span>
+                            ? <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[10px] font-black uppercase tracking-tight border bg-green-500/15 text-green-800 border-green-200 dark:text-green-400 dark:border-green-800/30">{row.paid_count}</span>
                             : <span className="text-tx-subtle text-sm">—</span>
                           }
                         </td>

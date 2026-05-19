@@ -194,10 +194,14 @@ export default function UsersPage() {
   };
 
   const getRoleBadge = (role: string) =>
-    role === 'admin' ? 'bg-purple-500/15 text-purple-800' : 'bg-blue-500/15 text-blue-800';
+    role === 'admin' 
+      ? 'bg-purple-500/15 text-purple-800 border border-purple-200 dark:text-purple-400 dark:border-purple-800/30' 
+      : 'bg-blue-500/15 text-blue-800 border border-blue-200 dark:text-blue-400 dark:border-blue-800/30';
 
   const getStatusBadge = (status: string) =>
-    status === 'active' ? 'bg-green-500/15 text-green-800' : 'bg-red-500/15 text-red-800';
+    status === 'active' 
+      ? 'bg-green-500/15 text-green-800 border border-green-200 dark:text-green-400 dark:border-green-800/30' 
+      : 'bg-red-500/15 text-red-800 border border-red-200 dark:text-red-400 dark:border-red-800/30';
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">

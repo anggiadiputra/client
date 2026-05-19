@@ -131,11 +131,11 @@ export default function InvoicesPage() {
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'paid':
-        return 'bg-green-500/15 text-green-800 border border-green-200';
+        return 'bg-green-500/15 text-green-800 border border-green-200 dark:text-green-400 dark:border-green-800/30';
       case 'sent':
-        return 'bg-blue-500/15 text-blue-800 border border-blue-200';
+        return 'bg-blue-500/15 text-blue-800 border border-blue-200 dark:text-blue-400 dark:border-blue-800/30';
       case 'overdue':
-        return 'bg-red-500/15 text-red-800 border border-red-200';
+        return 'bg-red-500/15 text-red-800 border border-red-200 dark:text-red-400 dark:border-red-800/30';
       case 'draft':
       default:
         return 'bg-surface-2 text-tx-main border border-separator';

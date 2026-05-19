@@ -37,10 +37,10 @@ export default function ViewInvoiceModal({ isOpen, onClose, invoiceId }: ViewInv
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      draft: 'bg-surface-2 text-tx-main',
-      sent: 'bg-blue-500/15 text-blue-800',
-      paid: 'bg-green-500/15 text-green-800',
-      overdue: 'bg-red-500/15 text-red-800',
+      draft: 'bg-surface-2 text-tx-main border border-separator',
+      sent: 'bg-blue-500/15 text-blue-800 border border-blue-200 dark:text-blue-400 dark:border-blue-800/30',
+      paid: 'bg-green-500/15 text-green-800 border border-green-200 dark:text-green-400 dark:border-green-800/30',
+      overdue: 'bg-red-500/15 text-red-800 border border-red-200 dark:text-red-400 dark:border-red-800/30',
     };
     return colors[status] || colors.draft;
   };

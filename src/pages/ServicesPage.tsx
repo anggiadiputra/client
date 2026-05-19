@@ -288,7 +288,7 @@ export default function ServicesPage() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                            service.status === 'active' ? 'bg-green-500/15 text-green-800' : 'bg-red-500/15 text-red-800'
+                            service.status === 'active' ? 'bg-green-500/15 text-green-800 border border-green-200 dark:text-green-400 dark:border-green-800/30' : 'bg-red-500/15 text-red-800 border border-red-200 dark:text-red-400 dark:border-red-800/30'
                           }`}>
                             {service.status || 'active'}
                           </span>
@@ -333,7 +333,7 @@ export default function ServicesPage() {
                             <h3 className="text-sm font-extrabold text-tx-main tracking-tight truncate">{service.name}</h3>
                             <div className="flex items-center gap-1.5 mt-0.5">
                               <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${
-                                service.status === 'active' ? 'bg-green-500/15 text-green-800' : 'bg-red-500/15 text-red-800'
+                                service.status === 'active' ? 'bg-green-500/15 text-green-800 border border-green-200 dark:text-green-400 dark:border-green-800/30' : 'bg-red-500/15 text-red-800 border border-red-200 dark:text-red-400 dark:border-red-800/30'
                               }`}>
                                 {service.status || 'active'}
                               </span>

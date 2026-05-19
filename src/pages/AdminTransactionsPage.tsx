@@ -244,18 +244,18 @@ export default function AdminTransactionsPage() {
                             <span className={`px-2 py-0.5 rounded-[4px] text-[11px] font-black uppercase tracking-tight border ${
                               tx.expired_at && new Date(tx.expired_at) < new Date() 
                                 ? 'bg-surface-2 text-tx-subtle border-separator' 
-                                : 'bg-amber-500/10 text-amber-600 border-amber-500/20'
+                                : 'bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400 dark:border-amber-800/30'
                             }`}>
                               {tx.expired_at && new Date(tx.expired_at) < new Date() ? 'Kadaluarsa' : 'Pending'}
                             </span>
                           )}
                           {tx.status === 'completed' && (
-                            <span className="px-2 py-0.5 rounded-[4px] text-[11px] font-black uppercase tracking-tight bg-green-500/10 text-green-700 border border-green-500/20">
+                            <span className="px-2 py-0.5 rounded-[4px] text-[11px] font-black uppercase tracking-tight bg-green-500/10 text-green-700 border border-green-500/20 dark:text-green-400 dark:border-green-800/30">
                               Berhasil
                             </span>
                           )}
                           {tx.status === 'failed' && (
-                            <span className="px-2 py-0.5 rounded-[4px] text-[11px] font-black uppercase tracking-tight bg-red-500/10 text-red-700 border border-red-500/20">
+                            <span className="px-2 py-0.5 rounded-[4px] text-[11px] font-black uppercase tracking-tight bg-red-500/10 text-red-700 border border-red-500/20 dark:text-red-400 dark:border-red-800/30">
                               Gagal
                             </span>
                           )}
@@ -319,18 +319,18 @@ export default function AdminTransactionsPage() {
                         <span className={`px-2 py-0.5 rounded-[4px] text-[10px] font-black uppercase tracking-tight border ${
                           tx.expired_at && new Date(tx.expired_at) < new Date() 
                             ? 'bg-surface-2 text-tx-subtle border-separator' 
-                            : 'bg-amber-500/10 text-amber-600 border-amber-500/20'
+                            : 'bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400 dark:border-amber-800/30'
                         }`}>
                           {tx.expired_at && new Date(tx.expired_at) < new Date() ? 'Kadaluarsa' : 'Pending'}
                         </span>
                       )}
                       {tx.status === 'completed' && (
-                        <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-black uppercase tracking-tight bg-green-500/10 text-green-700 border border-green-500/20">
+                        <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-black uppercase tracking-tight bg-green-500/10 text-green-700 border border-green-500/20 dark:text-green-400 dark:border-green-800/30">
                           Berhasil
                         </span>
                       )}
                       {tx.status === 'failed' && (
-                        <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-black uppercase tracking-tight bg-red-500/10 text-red-700 border border-red-500/20">
+                        <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-black uppercase tracking-tight bg-red-500/10 text-red-700 border border-red-500/20 dark:text-red-400 dark:border-red-800/30">
                           Gagal
                         </span>
                       )}
