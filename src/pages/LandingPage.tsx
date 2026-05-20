@@ -59,14 +59,14 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
             <button 
               onClick={() => navigate('/register')}
-              className="group flex items-center justify-center gap-2 px-8 py-3.5 bg-blue-600 text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition-all shadow-xl shadow-blue-100"
+              className="group flex items-center justify-center gap-2 px-8 py-3.5 bg-blue-600 text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 dark:shadow-blue-900/40"
             >
               Coba Gratis Sekarang
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </button>
             <button 
               onClick={() => navigate('/login')}
-              className="px-8 py-3.5 bg-surface text-tx-muted border border-separator rounded-xl font-bold text-sm hover:bg-surface-2 transition-all shadow-sm"
+              className="px-8 py-3.5 bg-surface text-tx-muted border border-separator rounded-xl font-bold text-sm hover:bg-surface-2 transition-all shadow-sm dark:shadow-none"
             >
               Masuk ke Akun
             </button>
@@ -121,7 +121,7 @@ export default function LandingPage() {
           </p>
 
           <div className="max-w-md mx-auto">
-            <div className="bg-surface rounded-3xl border-2 border-blue-500 p-10 shadow-2xl shadow-blue-100 relative overflow-hidden group">
+            <div className="bg-surface rounded-3xl border-2 border-blue-500 p-10 shadow-2xl shadow-blue-100 dark:shadow-blue-900/40 relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-4">
                 <CheckCircle2 className="text-blue-500 opacity-10" size={80} />
               </div>
@@ -138,7 +138,7 @@ export default function LandingPage() {
                 <div className="space-y-4">
                   <button 
                     onClick={() => navigate('/register')}
-                    className="w-full py-4 bg-blue-600 text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-100"
+                    className="w-full py-4 bg-blue-600 text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 dark:shadow-blue-900/40"
                   >
                     Get Started
                   </button>
@@ -164,7 +164,7 @@ export default function LandingPage() {
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
              {[1,2,3,4].map(i => (
-               <div key={i} className="aspect-[3/4] bg-surface-2 rounded-xl border border-dashed border-gray-300 flex items-center justify-center text-tx-subtle text-xs font-medium italic">
+               <div key={i} className="aspect-[3/4] bg-surface-2 rounded-xl border border-dashed border-separator flex items-center justify-center text-tx-subtle text-xs font-medium italic">
                  Template Preview {i}
                </div>
              ))}

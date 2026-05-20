@@ -618,24 +618,24 @@ export default function EditInvoicePage() {
                 onClick={() => setFormData({ ...formData, template_id: 'classic' })}
                 className={`relative cursor-pointer rounded-2xl border-2 transition-all overflow-hidden group ${
                   formData.template_id === 'classic' 
-                    ? 'border-blue-600 bg-blue-500/10/30' 
-                    : 'border-separator hover:border-separator bg-surface'
+                    ? 'border-blue-600 bg-blue-500/10 dark:bg-blue-500/10' 
+                    : 'border-separator hover:border-separator bg-surface dark:bg-surface'
                 }`}
               >
-                <div className="aspect-[4/3] bg-surface-2 p-4 overflow-hidden relative">
+                <div className="aspect-[4/3] bg-white p-4 overflow-hidden relative">
                    {/* Mini Mockup for Classic */}
-                   <div className="bg-surface h-full w-full shadow-sm rounded-sm p-4 space-y-2">
+                   <div className="bg-slate-50 h-full w-full shadow-sm rounded-sm p-4 space-y-2">
                      <div className="h-4 w-12 bg-blue-600 rounded-full mb-4"></div>
                      <div className="flex justify-between items-start">
                        <div className="space-y-1">
-                         <div className="h-1.5 w-16 bg-surface-2 rounded"></div>
-                         <div className="h-1.5 w-20 bg-surface-2 rounded"></div>
+                         <div className="h-1.5 w-16 bg-slate-200 rounded"></div>
+                         <div className="h-1.5 w-20 bg-slate-200 rounded"></div>
                        </div>
-                       <div className="h-6 w-16 bg-surface-2 rounded"></div>
+                       <div className="h-6 w-16 bg-slate-200 rounded"></div>
                      </div>
-                     <div className="pt-4 border-t border-separator mt-4 space-y-2">
-                       <div className="h-2 w-full bg-surface-2 rounded"></div>
-                       <div className="h-2 w-full bg-surface-2 rounded"></div>
+                     <div className="pt-4 border-t border-slate-200 mt-4 space-y-2">
+                       <div className="h-2 w-full bg-slate-200 rounded"></div>
+                       <div className="h-2 w-full bg-slate-200 rounded"></div>
                      </div>
                    </div>
                 </div>
@@ -657,8 +657,8 @@ export default function EditInvoicePage() {
                 onClick={() => setFormData({ ...formData, template_id: 'modern' })}
                 className={`relative cursor-pointer rounded-2xl border-2 transition-all overflow-hidden group ${
                   formData.template_id === 'modern' 
-                    ? 'border-blue-600 bg-blue-500/10/30' 
-                    : 'border-separator hover:border-separator bg-surface'
+                    ? 'border-blue-600 bg-blue-500/10 dark:bg-blue-500/10' 
+                    : 'border-separator hover:border-separator bg-surface dark:bg-surface'
                 }`}
               >
                 <div className="aspect-[4/3] bg-slate-900 p-4 overflow-hidden relative">
@@ -715,7 +715,7 @@ export default function EditInvoicePage() {
             <button
               type="button"
               onClick={() => navigate(`/invoices/${formData.invoice_number}/view`)}
-              className="flex items-center justify-center px-5 py-2.5 border border-gray-300 text-tx-muted font-semibold rounded-lg hover:bg-surface-2 transition-colors text-sm"
+              className="flex items-center justify-center px-5 py-2.5 border border-separator text-tx-muted font-semibold rounded-lg hover:bg-surface-2 transition-colors text-sm"
             >
               Cancel
             </button>

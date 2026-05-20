@@ -320,7 +320,7 @@ export default function InvoiceDetailPage() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
       <button
-        onClick={() => navigate('/billing')}
+        onClick={() => navigate('/invoices')}
         className="group flex items-center gap-2 text-tx-muted hover:text-tx-main transition-all mb-8"
       >
         <div className="p-1.5 rounded-lg group-hover:bg-surface-2 transition-colors">

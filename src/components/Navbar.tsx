@@ -1,4 +1,4 @@
-import { Plane, LogIn } from 'lucide-react';
+import { Plane, LogIn, Moon, Sun } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSettings } from '../context/AppContext';
 
@@ -17,7 +17,7 @@ export default function Navbar({
   showLogin = true, 
   showRegister = true 
 }: NavbarProps) {
-  const { settings } = useAppSettings();
+  const { settings, theme, toggleTheme } = useAppSettings();
   const navigate = useNavigate();
 
   const handleMenuClick = (id: string) => {
@@ -63,6 +63,13 @@ export default function Navbar({
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            onClick={toggleTheme}
+            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            className="p-2 rounded-md border border-separator text-tx-muted hover:bg-surface-2 transition-colors"
+          >
+            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
           {showLogin && (
             <button
               onClick={onLoginClick}
