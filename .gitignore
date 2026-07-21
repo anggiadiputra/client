@@ -4,3 +4,5 @@ dist/
 .DS_Store
 *.local
 npm-debug.log*
+__tests__/
+src/tests/
