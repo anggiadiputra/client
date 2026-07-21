@@ -118,7 +118,13 @@ export interface WalletTransaction {
   amount: number | string;
   balance_after: number | string;
   description: string;
-  pakasir_order_id?: string;
+  payment_order_id?: string;
+  payment_id?: string; // Sumopod payment UUID
+  payment_url?: string;
+  payment_link_url?: string;
+  payment_method?: string;
+  payment_number?: string;
+  fee_amount?: number | string;
   status: string;
   expired_at?: string;
   invoice_id?: number | string;

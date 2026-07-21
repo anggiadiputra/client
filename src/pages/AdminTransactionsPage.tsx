@@ -220,7 +220,7 @@ export default function AdminTransactionsPage() {
                       <td className="px-4 py-3">
                         <div className="flex flex-col">
                           <span className="text-sm font-medium text-tx-main">{tx.description}</span>
-                          <span className="text-xs text-tx-subtle font-mono">{tx.pakasir_order_id || 'SYSTEM'}</span>
+                          <span className="text-xs text-tx-subtle font-mono">{tx.payment_order_id || 'SYSTEM'}</span>
                         </div>
                       </td>
                       <td className="px-4 py-3 text-xs text-tx-muted">
@@ -272,9 +272,9 @@ export default function AdminTransactionsPage() {
                               <ExternalLink size={16} />
                             </button>
                           )}
-                          {tx.status === 'pending' && tx.pakasir_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date()) && (
+                          {tx.status === 'pending' && tx.payment_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date()) && (
                             <button
-                              onClick={() => handleCancelTransaction(tx.pakasir_order_id!)}
+                              onClick={() => handleCancelTransaction(tx.payment_order_id!)}
                               className="p-1.5 text-red-600 hover:bg-red-500/10 rounded border border-red-500/20 transition-colors"
                               title="Batalkan Transaksi"
                             >
@@ -312,7 +312,7 @@ export default function AdminTransactionsPage() {
                   <div className="flex items-center justify-between text-xs mb-2.5">
                     <div className="min-w-0">
                       <p className="text-xs font-semibold text-tx-main truncate">{tx.description}</p>
-                      <p className="text-[10px] text-tx-subtle font-mono truncate">{tx.pakasir_order_id || 'SYSTEM'}</p>
+                      <p className="text-[10px] text-tx-subtle font-mono truncate">{tx.payment_order_id || 'SYSTEM'}</p>
                     </div>
                     <div className="shrink-0 ml-2">
                       {tx.status === 'pending' && (
@@ -354,9 +354,9 @@ export default function AdminTransactionsPage() {
                           <ExternalLink size={14} />
                         </button>
                       )}
-                      {tx.status === 'pending' && tx.pakasir_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date()) && (
+                      {tx.status === 'pending' && tx.payment_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date()) && (
                         <button
-                          onClick={() => handleCancelTransaction(tx.pakasir_order_id!)}
+                          onClick={() => handleCancelTransaction(tx.payment_order_id!)}
                           className="p-1.5 text-red-600 hover:bg-red-500/10 rounded border border-red-500/20 transition-colors"
                           title="Batalkan Transaksi"
                         >

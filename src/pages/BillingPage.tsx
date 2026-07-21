@@ -144,11 +144,12 @@ export default function BillingPage() {
       const totalAmount = nominalAmount + feeAmount;
 
       setCheckoutData({
-        order_id: tx.pakasir_order_id,
+        order_id: tx.payment_order_id,
         amount: totalAmount,
         nominal: nominalAmount,
         fee_amount: feeAmount,
         payment_url: tx.payment_url,
+        payment_link_url: tx.payment_url, // Sumopod returns payment_link_url stored in payment_url column
         payment_method: tx.payment_method,
         payment_number: tx.payment_number,
         expired_at: tx.expired_at,
@@ -373,16 +374,17 @@ export default function BillingPage() {
                                 </div>
                                 <span 
                                   className={`text-[12px] font-semibold ${
-                                    tx.status === 'pending' && tx.pakasir_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date())
+                                    tx.status === 'pending' && tx.payment_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date())
                                       ? 'text-blue-600 cursor-pointer hover:underline' 
                                       : 'text-tx-main'
                                   }`}
                                   onClick={() => {
-                                    if (tx.status === 'pending' && tx.pakasir_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date())) {
+                                    if (tx.status === 'pending' && tx.payment_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date())) {
                                       setCheckoutData({
-                                        order_id: tx.pakasir_order_id,
+                                        order_id: tx.payment_order_id,
                                         amount: tx.amount,
                                         payment_url: tx.payment_url,
+                                        payment_link_url: tx.payment_url,
                                         payment_method: tx.payment_method,
                                         payment_number: tx.payment_number,
                                         expired_at: tx.expired_at,
@@ -397,7 +399,7 @@ export default function BillingPage() {
                               </div>
                             </td>
                             <td className="px-4 py-2">
-                              <span className="text-[10px] font-mono text-tx-subtle">{tx.pakasir_order_id || '-'}</span>
+                              <span className="text-[10px] font-mono text-tx-subtle">{tx.payment_order_id || '-'}</span>
                             </td>
                             <td className="px-4 py-2">
                               <span className="text-[10px] text-tx-muted">{formatDate(tx.created_at)}</span>
@@ -436,14 +438,14 @@ export default function BillingPage() {
                             </td>
                             <td className="px-4 py-2 text-right">
                               <div className="flex items-center justify-end gap-1">
-                                {tx.status === 'pending' && tx.pakasir_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date()) && (
+                                {tx.status === 'pending' && tx.payment_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date()) && (
                                   <button
                                     onClick={async (e) => {
                                       e.stopPropagation();
                                       const btn = e.currentTarget;
                                       btn.disabled = true;
                                       try {
-                                        const res = await walletAPI.checkStatus(tx.pakasir_order_id, tx.amount);
+                                        const res = await walletAPI.checkStatus(tx.payment_order_id, tx.amount);
                                         if (res.status === 'completed') {
                                           toast.success('Berhasil!');
                                           refreshSaaSData();
@@ -492,16 +494,17 @@ export default function BillingPage() {
                             <div className="min-w-0">
                               <p 
                                 className={`text-sm font-bold truncate leading-tight ${
-                                  tx.status === 'pending' && tx.pakasir_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date())
+                                  tx.status === 'pending' && tx.payment_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date())
                                     ? 'text-blue-600 cursor-pointer hover:underline' 
                                     : 'text-tx-main'
                                 }`}
                                 onClick={() => {
-                                  if (tx.status === 'pending' && tx.pakasir_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date())) {
+                                  if (tx.status === 'pending' && tx.payment_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date())) {
                                     setCheckoutData({
-                                      order_id: tx.pakasir_order_id,
+                                      order_id: tx.payment_order_id,
                                       amount: tx.amount,
                                       payment_url: tx.payment_url,
+                                      payment_link_url: tx.payment_url,
                                       payment_method: tx.payment_method,
                                       payment_number: tx.payment_number,
                                       expired_at: tx.expired_at,
@@ -513,7 +516,7 @@ export default function BillingPage() {
                               >
                                 {tx.description}
                               </p>
-                              <div className="text-[10px] text-tx-subtle font-mono mt-0.5">{tx.pakasir_order_id || '-'}</div>
+                              <div className="text-[10px] text-tx-subtle font-mono mt-0.5">{tx.payment_order_id || '-'}</div>
                             </div>
                           </div>
                           <p className={`font-black text-sm tabular-nums shrink-0 ${
@@ -548,14 +551,14 @@ export default function BillingPage() {
                               </span>
                             )}
 
-                            {tx.status === 'pending' && tx.pakasir_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date()) && (
+                            {tx.status === 'pending' && tx.payment_order_id && (!tx.expired_at || new Date(tx.expired_at) > new Date()) && (
                               <button
                                 onClick={async (e) => {
                                   e.stopPropagation();
                                   const btn = e.currentTarget;
                                   btn.disabled = true;
                                   try {
-                                    const res = await walletAPI.checkStatus(tx.pakasir_order_id, tx.amount);
+                                    const res = await walletAPI.checkStatus(tx.payment_order_id, tx.amount);
                                     if (res.status === 'completed') {
                                       toast.success('Berhasil!');
                                       refreshSaaSData();
@@ -745,11 +748,11 @@ export default function BillingPage() {
                     )}
                   </div>
 
-                  {checkoutData.payment_url && checkoutData.payment_method === 'qris' ? (
+                  {checkoutData.payment_link_url && checkoutData.payment_method === 'qris' ? (
                     <div className="flex flex-col items-center">
                       <div className="p-4 bg-surface border-2 border-dashed border-separator rounded-2xl mb-4">
                         <img 
-                          src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(checkoutData.payment_url)}`} 
+                          src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(checkoutData.payment_link_url)}`} 
                           alt="QRIS Code"
                           className="w-48 h-48 border border-white"
                         />
@@ -758,24 +761,18 @@ export default function BillingPage() {
                         <QrCode size={12} /> Scan QRIS melalui aplikasi e-wallet Anda
                       </p>
                     </div>
-                  ) : checkoutData.payment_number ? (
-                    <div className="bg-surface-2 rounded-xl p-5 border border-separator">
-                      <div className="flex justify-between items-center mb-3">
-                        <span className="text-[10px] font-bold text-tx-subtle uppercase tracking-widest">Nomor Virtual Account</span>
-                        <span className="text-[10px] font-bold text-blue-600 bg-blue-500/10 px-2 py-0.5 rounded uppercase tracking-wider">{checkoutData.payment_method}</span>
-                      </div>
-                      <div className="flex items-center justify-between gap-4">
-                        <code className="text-2xl font-mono font-black text-tx-main tracking-wider">
-                          {checkoutData.payment_number}
-                        </code>
-                        <button 
-                          onClick={() => copyToClipboard(checkoutData.payment_number)}
-                          className="p-2 bg-surface border border-separator rounded-lg text-blue-600 hover:bg-blue-500/10 transition-colors shadow-sm"
-                        >
-                          <Copy size={18} />
-                        </button>
-                      </div>
-                    </div>
+                  ) : null}
+
+                  {checkoutData.payment_link_url ? (
+                    <a
+                      href={checkoutData.payment_link_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-md flex items-center justify-center gap-2 active:scale-[0.98] mb-3"
+                    >
+                      <ExternalLink size={16} />
+                      Buka Halaman Pembayaran
+                    </a>
                   ) : null}
 
                   <div className="space-y-3">
@@ -786,7 +783,7 @@ export default function BillingPage() {
                         className="flex-[2] bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-md shadow-green-100 flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-70"
                       >
                         {isCheckingStatus ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
-                        Cek Status
+                        Cek Status Pembayaran
                       </button>
 
                       <button

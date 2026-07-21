@@ -45,11 +45,11 @@ export default function SettingsPage() {
   const [s3Status, setS3Status] = useState<'idle' | 'success' | 'error'>('idle');
   const [s3Message, setS3Message] = useState('');
 
-  // Pakasir states
-  const [editingPakasir, setEditingPakasir] = useState(false);
-  const [savingPakasir, setSavingPakasir] = useState(false);
-  const [pakasirStatus, setPakasirStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [pakasirMessage, setPakasirMessage] = useState('');
+  // Sumopod states
+  const [editingSumopod, setEditingSumopod] = useState(false);
+  const [savingSumopod, setSavingSumopod] = useState(false);
+  const [sumopodStatus, setSumopodStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [sumopodMessage, setSumopodMessage] = useState('');
 
   // SMTP states
   const [editingSmtp, setEditingSmtp] = useState(false);
@@ -98,9 +98,10 @@ export default function SettingsPage() {
     smtp_test_target: '',
     smtp_test_message: '',
     app_name: 'Invoice System',
-    pakasir_slug: '',
-    pakasir_api_key: '',
-    pakasir_is_sandbox: false,
+    sumopod_api_key: '',
+    sumopod_is_sandbox: true,
+    sumopod_webhook_token: '',
+    sumopod_webhook_secret: '',
     province_id: '',
     regency_id: '',
     district_id: '',
@@ -145,9 +146,10 @@ export default function SettingsPage() {
         smtp_test_target: data.smtp_test_target || '',
         smtp_test_message: data.smtp_test_message || '',
         app_name: data.app_name || 'Invoice System',
-        pakasir_slug: data.pakasir_slug || '',
-        pakasir_api_key: data.pakasir_api_key || '',
-        pakasir_is_sandbox: data.pakasir_is_sandbox || false,
+        sumopod_api_key: data.sumopod_api_key || '',
+        sumopod_is_sandbox: data.sumopod_is_sandbox !== false,
+        sumopod_webhook_token: data.sumopod_webhook_token || '',
+        sumopod_webhook_secret: data.sumopod_webhook_secret || '',
         province_id: data.province_id || '',
         regency_id: data.regency_id || '',
         district_id: data.district_id || '',
@@ -1281,7 +1283,7 @@ export default function SettingsPage() {
         </div>
         {/* RIGHT COLUMN */}
         <div className="space-y-6">
-          {/* Section 8: Pakasir Payment Gateway Configuration (ADMIN ONLY) */}
+          {/* Section 8: Sumopod Payment Gateway Configuration (ADMIN ONLY) */}
           {userRole === 'admin' && (
             <div className="space-y-5">
               <div className="flex items-center gap-2 px-2">
@@ -1292,12 +1294,12 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <CreditCard size={16} className="text-blue-600" />
-                    <h2 className="text-sm font-semibold text-tx-main">Pakasir Payment Gateway</h2>
+                    <h2 className="text-sm font-semibold text-tx-main">Sumopod Payment Gateway</h2>
                   </div>
-                {!editingPakasir ? (
+                {!editingSumopod ? (
                   <button
                     type="button"
-                    onClick={() => setEditingPakasir(true)}
+                    onClick={() => setEditingSumopod(true)}
                     className="p-1.5 text-tx-subtle hover:text-blue-600 transition-colors"
                   >
                     <Edit size={16} />
@@ -1307,7 +1309,7 @@ export default function SettingsPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        setEditingPakasir(false);
+                        setEditingSumopod(false);
                         fetchSettings();
                       }}
                       className="text-xs text-tx-muted hover:text-tx-muted font-medium"
@@ -1317,28 +1319,29 @@ export default function SettingsPage() {
                     <button
                       type="button"
                       onClick={async () => {
-                        setSavingPakasir(true);
+                        setSavingSumopod(true);
                         try {
                           await settingsAPI.updateSystem({
-                            pakasir_slug: formData.pakasir_slug,
-                            pakasir_api_key: formData.pakasir_api_key,
-                            pakasir_is_sandbox: formData.pakasir_is_sandbox,
+                            sumopod_api_key: formData.sumopod_api_key,
+                            sumopod_is_sandbox: formData.sumopod_is_sandbox,
+                            sumopod_webhook_token: formData.sumopod_webhook_token,
+                            sumopod_webhook_secret: formData.sumopod_webhook_secret,
                           });
-                          setEditingPakasir(false);
-                          setPakasirStatus('success');
-                          setPakasirMessage('Konfigurasi Pakasir berhasil disimpan!');
-                          setTimeout(() => setPakasirStatus('idle'), 3000);
+                          setEditingSumopod(false);
+                          setSumopodStatus('success');
+                          setSumopodMessage('Konfigurasi Sumopod berhasil disimpan!');
+                          setTimeout(() => setSumopodStatus('idle'), 3000);
                         } catch (error: any) {
-                          setPakasirStatus('error');
-                          setPakasirMessage(error.message || 'Gagal menyimpan konfigurasi Pakasir');
+                          setSumopodStatus('error');
+                          setSumopodMessage(error.message || 'Gagal menyimpan konfigurasi Sumopod');
                         } finally {
-                          setSavingPakasir(false);
+                          setSavingSumopod(false);
                         }
                       }}
-                      disabled={savingPakasir}
+                      disabled={savingSumopod}
                       className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 disabled:bg-blue-400 font-semibold flex items-center gap-1"
                     >
-                      {savingPakasir ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle size={12} />}
+                      {savingSumopod ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle size={12} />}
                       Simpan
                     </button>
                   </div>
@@ -1348,65 +1351,79 @@ export default function SettingsPage() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-tx-muted mb-1.5">
-                    Pakasir Project Slug
+                    Sumopod API Key
                   </label>
                   <input
-                    type="text"
-                    value={formData.pakasir_slug}
-                    onChange={(e) => setFormData({ ...formData, pakasir_slug: e.target.value })}
-                    disabled={!editingPakasir}
+                    type="password"
+                    value={formData.sumopod_api_key}
+                    onChange={(e) => setFormData({ ...formData, sumopod_api_key: e.target.value })}
+                    disabled={!editingSumopod}
                     className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:bg-surface-2 disabled:text-tx-muted"
-                    placeholder="my-saas-project"
+                    placeholder="7eb441b5d404..."
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-tx-muted mb-1.5">
-                    Pakasir API Key
+                    Webhook Token (X-Webhook-Token)
                   </label>
                   <input
                     type="password"
-                    value={formData.pakasir_api_key}
-                    onChange={(e) => setFormData({ ...formData, pakasir_api_key: e.target.value })}
-                    disabled={!editingPakasir}
+                    value={formData.sumopod_webhook_token}
+                    onChange={(e) => setFormData({ ...formData, sumopod_webhook_token: e.target.value })}
+                    disabled={!editingSumopod}
                     className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:bg-surface-2 disabled:text-tx-muted"
-                    placeholder="pk_live_xxxxxxxxxxxx"
+                    placeholder="whtok_xxxxxxxxxxxx"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-tx-muted mb-1.5">
+                    Webhook Secret (whsec_)
+                  </label>
+                  <input
+                    type="password"
+                    value={formData.sumopod_webhook_secret}
+                    onChange={(e) => setFormData({ ...formData, sumopod_webhook_secret: e.target.value })}
+                    disabled={!editingSumopod}
+                    className="w-full px-3 py-2.5 border border-separator rounded-lg text-sm text-tx-main focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:bg-surface-2 disabled:text-tx-muted"
+                    placeholder="whsec_xxxxxxxxxxxx"
                   />
                 </div>
 
                 <div className="flex items-center gap-3">
                   <input
                     type="checkbox"
-                    id="pakasir_is_sandbox"
-                    checked={formData.pakasir_is_sandbox}
-                    onChange={(e) => setFormData({ ...formData, pakasir_is_sandbox: e.target.checked })}
-                    disabled={!editingPakasir}
+                    id="sumopod_is_sandbox"
+                    checked={formData.sumopod_is_sandbox}
+                    onChange={(e) => setFormData({ ...formData, sumopod_is_sandbox: e.target.checked })}
+                    disabled={!editingSumopod}
                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 disabled:opacity-50"
                   />
-                  <label htmlFor="pakasir_is_sandbox" className="text-sm font-medium text-tx-muted">
+                  <label htmlFor="sumopod_is_sandbox" className="text-sm font-medium text-tx-muted">
                     Gunakan Mode Sandbox (Testing)
                   </label>
                 </div>
 
-                {pakasirStatus !== 'idle' && (
+                {sumopodStatus !== 'idle' && (
                   <div className={`text-xs px-3 py-2 rounded-lg ${
-                    pakasirStatus === 'success' ? 'bg-green-500/10 text-green-700 border border-green-200' : 'bg-red-500/10 text-red-700 border border-red-200'
+                    sumopodStatus === 'success' ? 'bg-green-500/10 text-green-700 border border-green-200' : 'bg-red-500/10 text-red-700 border border-red-200'
                   }`}>
-                    {pakasirMessage}
+                    {sumopodMessage}
                   </div>
                 )}
                 
                 <div className="p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
                   <p className="text-[10px] text-blue-800 leading-relaxed font-medium">
-                    Webhooks URL: <span className="font-mono bg-surface px-1 border border-blue-200 rounded">/api/webhooks/pakasir</span>
+                    Webhook URL saat ini: <span className="font-mono bg-surface px-1 border border-blue-200 rounded">/api/wallet/webhook/sumopod</span>
                     <br />
-                    Pastikan Anda telah mengisi webhook URL ini di dashboard Pakasir untuk sinkronisasi otomatis saldo top-up.
+                    Pastikan Anda telah mengisi Webhook Token di atas dan mendaftarkan URL ini di dashboard Sumopod untuk sinkronisasi otomatis saldo top-up.
                   </p>
                 </div>
               </div>
             </div>
           </div>
-        )}
+          )}
 
 
 
