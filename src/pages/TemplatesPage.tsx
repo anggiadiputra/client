@@ -84,17 +84,23 @@ export default function TemplatesPage() {
       '{public_invoice_url}': '#'
     };
     
-    let rendered = html;
-    Object.entries(mock).forEach(([key, val]) => {
-      rendered = rendered.replace(new RegExp(key, 'g'), val);
-    });
+	    let rendered = html;
+	    Object.entries(mock).forEach(([key, val]) => {
+	      rendered = rendered.replace(new RegExp(key, 'g'), val);
+	    });
 
-    return (
-      <div 
-        className="flex-1 bg-surface border border-separator rounded-lg p-4 overflow-auto min-h-[300px] text-sm"
-        dangerouslySetInnerHTML={{ __html: rendered }}
-      />
-    );
+	    // Sanitize: strip script tags, event handlers, javascript: URLs
+	    const sanitized = rendered
+	      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+	      .replace(/\bon\w+\s*=\s*["'][^"']*["']/gi, '')
+	      .replace(/javascript:\s*/gi, 'blocked:');
+
+	    return (
+	      <div 
+	        className="flex-1 bg-surface border border-separator rounded-lg p-4 overflow-auto min-h-[300px] text-sm"
+	        dangerouslySetInnerHTML={{ __html: sanitized }}
+	      />
+	    );
   };
 
   if (loading) {
