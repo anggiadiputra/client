@@ -72,7 +72,7 @@ export default function CreateInvoicePage() {
   const addItem = () => {
     setItems([
       ...items,
-      { id: Date.now(), service_id: null, description: '', quantity: 1, unit: '', unit_price: 0, discount: 0, tax_rate: 0 },
+      { id: crypto.randomUUID(), service_id: null, description: '', quantity: 1, unit: '', unit_price: 0, discount: 0, tax_rate: 0 },
     ]);
   };
 
@@ -137,15 +137,9 @@ export default function CreateInvoicePage() {
         }
       }
 
-      // Generate invoice number
-      const year = new Date().getFullYear();
-      const month = String(new Date().getMonth() + 1).padStart(2, '0');
-      const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-      const invoice_number = `INV-${year}${month}-${random}`;
-
+      // We no longer generate invoice_number here. The backend will generate it securely.
       const createdInvoice = await invoicesAPI.create({
         customer_id: parseInt(formData.customer_id),
-        invoice_number,
         issue_date: formData.issue_date,
         due_date: formData.due_date,
         show_tax: showTax,

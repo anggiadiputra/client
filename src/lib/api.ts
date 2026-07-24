@@ -75,7 +75,7 @@ const requestJSON = async (
 
 // Customers
 export const customersAPI = {
-  getAll: async (page?: number, limit?: number, search?: string, status?: string) => {
+  getAll: async (page?: number, limit?: number, search?: string, status?: string, options?: RequestInit) => {
     const params = new URLSearchParams();
     if (page) params.append('page', String(page));
     if (limit) params.append('limit', String(limit));
@@ -85,6 +85,7 @@ export const customersAPI = {
     const queryString = params.toString() ? `?${params.toString()}` : '';
     const response = await fetch(`${API_URL}/customers${queryString}`, {
       ...(await getOptions()),
+      ...options,
     });
     return handleResponse(response, 'Failed to fetch customers');
   },
@@ -134,7 +135,7 @@ export const customersAPI = {
 
 // Services
 export const servicesAPI = {
-  getAll: async (page?: number, limit?: number, search?: string, status?: string) => {
+  getAll: async (page?: number, limit?: number, search?: string, status?: string, options?: RequestInit) => {
     const params = new URLSearchParams();
     if (page) params.append('page', String(page));
     if (limit) params.append('limit', String(limit));
@@ -144,6 +145,7 @@ export const servicesAPI = {
     const queryString = params.toString() ? `?${params.toString()}` : '';
     const response = await fetch(`${API_URL}/services${queryString}`, {
       ...(await getOptions()),
+      ...options,
     });
     return handleResponse(response, 'Failed to fetch services');
   },
@@ -189,7 +191,7 @@ export const servicesAPI = {
 
 // Invoices
 export const invoicesAPI = {
-  getAll: async (page?: number, limit?: number, status?: string, search?: string) => {
+  getAll: async (page?: number, limit?: number, status?: string, search?: string, options?: RequestInit) => {
     const params = new URLSearchParams();
     if (page) params.append('page', String(page));
     if (limit) params.append('limit', String(limit));
@@ -199,6 +201,7 @@ export const invoicesAPI = {
 
     const response = await fetch(`${API_URL}/invoices${queryString}`, {
       ...(await getOptions()),
+      ...options,
     });
     return handleResponse(response, 'Failed to fetch invoices');
   },
@@ -661,7 +664,7 @@ export const regionsAPI = {
 
 // Wallet
 export const walletAPI = {
-  get: async (page = 1, limit = 10, search = '') => {
+  get: async (page = 1, limit = 10, search = '', options?: RequestInit) => {
     const params = new URLSearchParams({
       page: String(page),
       limit: String(limit),
@@ -669,6 +672,7 @@ export const walletAPI = {
     });
     return requestJSON(`/wallet?${params.toString()}`, {
       ...(await getOptions()),
+      ...options,
     }, 'Failed to fetch wallet data');
   },
 
@@ -696,7 +700,7 @@ export const walletAPI = {
     }, 'Failed to cancel top-up');
   },
 
-  getAllTransactions: async (page = 1, limit = 10, search = '') => {
+  getAllTransactions: async (page = 1, limit = 10, search = '', options?: RequestInit) => {
     const params = new URLSearchParams({
       page: String(page),
       limit: String(limit),
@@ -704,6 +708,7 @@ export const walletAPI = {
     });
     return requestJSON(`/wallet/all-transactions?${params.toString()}`, {
       ...(await getOptions()),
+      ...options,
     }, 'Failed to fetch all transactions');
   },
 
@@ -779,7 +784,7 @@ export const plansAPI = {
 
 // Users (Admin Only)
 export const usersAPI = {
-  getAll: async (page?: number, limit?: number, search?: string, status?: string) => {
+  getAll: async (page?: number, limit?: number, search?: string, status?: string, options?: RequestInit) => {
     const params = new URLSearchParams();
     if (page) params.append('page', String(page));
     if (limit) params.append('limit', String(limit));
@@ -789,6 +794,7 @@ export const usersAPI = {
 
     const response = await fetch(`${API_URL}/users${queryString}`, {
       ...(await getOptions()),
+      ...options,
     });
     return handleResponse(response, 'Failed to fetch users');
   },

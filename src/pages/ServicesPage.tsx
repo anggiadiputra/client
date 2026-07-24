@@ -33,10 +33,10 @@ export default function ServicesPage() {
     status: 'active'
   });
 
-  const fetchServices = async () => {
+  const fetchServices = async (options?: RequestInit) => {
     setLoading(true);
     try {
-      const json = await servicesAPI.getAll(page, PAGE_SIZE, searchTerm, statusFilter);
+      const json = await servicesAPI.getAll(page, LIMIT, searchTerm, statusFilter, options);
       if (json.pagination) {
         setServices(json.data);
         setTotalPages(json.pagination.totalPages);
@@ -46,19 +46,25 @@ export default function ServicesPage() {
         setTotalPages(1);
         setTotalItems(json.length);
       }
-    } catch (error) {
-      console.error('Error fetching services:', error);
-      setError('Failed to load services data');
+    } catch (error: any) {
+      if (error.name !== 'AbortError') {
+        console.error('Error fetching services:', error);
+        setError('Failed to load services data');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    const controller = new AbortController();
     const timer = setTimeout(() => {
-      fetchServices();
+      fetchServices({ signal: controller.signal });
     }, searchTerm ? 400 : 0);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, [page, searchTerm, statusFilter]);
 
   // Reset page when filters change

@@ -140,7 +140,7 @@ export default function EditInvoiceModal({ isOpen, onClose, invoiceId, onSuccess
   const addItem = () => {
     setItems([
       ...items,
-      { id: Date.now(), service_id: null, description: '', quantity: 1, unit: '', unit_price: 0, discount: 0, tax_rate: 0 },
+      { id: crypto.randomUUID(), service_id: null, description: '', quantity: 1, unit: '', unit_price: 0, discount: 0, tax_rate: 0 },
     ]);
   };
 

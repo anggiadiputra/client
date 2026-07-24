@@ -42,11 +42,11 @@ export default function UsersPage() {
   const [lifetimeLoading, setLifetimeLoading] = useState(false);
   const [userSubscriptions, setUserSubscriptions] = useState<Record<number, any>>({});
 
-  const fetchUsers = useCallback(async () => {
+  const fetchUsers = useCallback(async (options?: RequestInit) => {
     setLoading(true);
-    setError('');
+    setError(null);
     try {
-      const json = await usersAPI.getAll(page, PAGE_SIZE, searchTerm, statusFilter);
+      const json = await usersAPI.getAll(page, LIMIT, searchTerm, statusFilter, options);
       if (json.pagination) {
         setUsers(json.users || []);
         setTotalPages(json.pagination.totalPages);
@@ -55,18 +55,24 @@ export default function UsersPage() {
         setTotalPages(1);
       }
     } catch (err: any) {
-      console.error('Error fetching users:', err);
-      setError(err.message || 'Failed to load users');
+      if (err.name !== 'AbortError') {
+        console.error('Error fetching users:', err);
+        setError(err.message || 'Failed to load users');
+      }
     } finally {
       setLoading(false);
     }
   }, [page, statusFilter, searchTerm]);
 
   useEffect(() => {
+    const controller = new AbortController();
     const timer = setTimeout(() => {
-      fetchUsers();
+      fetchUsers({ signal: controller.signal });
     }, searchTerm ? 400 : 0);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, [page, searchTerm, statusFilter, fetchUsers]);
 
   // Reset page when search or status filter changes

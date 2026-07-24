@@ -37,24 +37,28 @@ export default function BillingPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCheckingStatus, setIsCheckingStatus] = useState(false);
 
-  const fetchHistory = async () => {
+  const fetchHistory = async (options?: RequestInit) => {
     setLoading(true);
     try {
-      const data = await walletAPI.get(page, limit, searchTerm);
+      const data = await walletAPI.get(page, limit, searchTerm, options);
       setHistory(data.history || []);
       setTotal(data.total || 0);
-    } catch (error) {
-      console.error('Failed to fetch wallet history:', error);
+    } catch (error: any) {
+      if (error.name !== 'AbortError') console.error('Failed to fetch wallet history:', error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    const controller = new AbortController();
     const timer = setTimeout(() => {
-      fetchHistory();
+      fetchHistory({ signal: controller.signal });
     }, searchTerm ? 500 : 0);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, [page, searchTerm]);
 
   // Reset to page 1 whenever search changes

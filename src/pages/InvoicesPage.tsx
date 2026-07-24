@@ -40,10 +40,10 @@ export default function InvoicesPage() {
     }
   };
 
-  const fetchInvoices = async () => {
+  const fetchInvoices = async (options?: RequestInit) => {
     setLoading(true);
     try {
-      const data = await invoicesAPI.getAll(page, PAGE_SIZE, statusFilter, searchTerm);
+      const data = await invoicesAPI.getAll(page, PAGE_SIZE, statusFilter, searchTerm, options);
       // Backend returns { data, pagination } if paged
       if (data.data) {
         setInvoices(data.data);
@@ -52,20 +52,26 @@ export default function InvoicesPage() {
         setInvoices(data);
         setTotalItems(data.length);
       }
-    } catch (error) {
-      console.error('Error fetching invoices:', error);
-      toast.error('Failed to load invoices');
+    } catch (error: any) {
+      if (error.name !== 'AbortError') {
+        console.error('Error fetching invoices:', error);
+        toast.error('Failed to load invoices');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    const controller = new AbortController();
     const timer = setTimeout(() => {
-      fetchInvoices();
+      fetchInvoices({ signal: controller.signal });
       fetchCompanySettings();
     }, searchTerm ? 400 : 0);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, [page, statusFilter, searchTerm]);
 
   // Reset to page 1 whenever search or status changes

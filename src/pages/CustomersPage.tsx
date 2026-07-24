@@ -76,10 +76,10 @@ export default function CustomersPage() {
     status: 'active',
   });
 
-  const fetchCustomers = useCallback(async (currentPage = page, search = searchTerm, status = statusFilter) => {
+  const fetchCustomers = useCallback(async (currentPage = page, search = searchTerm, status = statusFilter, options?: RequestInit) => {
     setLoading(true);
     try {
-      const json = await customersAPI.getAll(currentPage, LIMIT, search, status);
+      const json = await customersAPI.getAll(currentPage, LIMIT, search, status, options);
       // Backend returns { data, pagination } when page/limit provided
       if (json.pagination) {
         setCustomers(json.data);
@@ -88,20 +88,26 @@ export default function CustomersPage() {
       } else {
         setCustomers(json);
       }
-    } catch (error) {
-      console.error('Error fetching customers:', error);
-      setError('Failed to load customers data');
+    } catch (error: any) {
+      if (error.name !== 'AbortError') {
+        console.error('Error fetching customers:', error);
+        setError('Failed to load customers data');
+      }
     } finally {
       setLoading(false);
     }
   }, [page, searchTerm, statusFilter]);
 
   useEffect(() => {
+    const controller = new AbortController();
     const timer = setTimeout(() => {
-      fetchCustomers(page, searchTerm, statusFilter);
+      fetchCustomers(page, searchTerm, statusFilter, { signal: controller.signal });
     }, searchTerm ? 400 : 0); // Only debounce if there is a search term
     
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, [page, searchTerm, statusFilter, fetchCustomers]);
 
   // Reset page when filters change

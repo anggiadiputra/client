@@ -37,16 +37,17 @@ export default function AdminTransactionsPage() {
 
   // Debounced user search
   useEffect(() => {
+    const controller = new AbortController();
     const timer = setTimeout(async () => {
       // Only search if it's a fresh adjust (no userId) and there's enough characters
       if (showAdjustModal && !formData.userId && formData.email.length >= 2) {
         setIsSearchingUser(true);
         try {
-          const result = await usersAPI.getAll(1, 5, formData.email);
+          const result = await usersAPI.getAll(1, 5, formData.email, undefined, { signal: controller.signal });
           setUserSuggestions(result.users || []);
           setShowSuggestions(true);
-        } catch (err) {
-          console.error('Failed to search users:', err);
+        } catch (err: any) {
+          if (err.name !== 'AbortError') console.error('Failed to search users:', err);
         } finally {
           setIsSearchingUser(false);
         }
@@ -56,27 +57,34 @@ export default function AdminTransactionsPage() {
       }
     }, 400);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, [formData.email, showAdjustModal, formData.userId]);
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = async (options?: RequestInit) => {
     setLoading(true);
     try {
-      const data = await walletAPI.getAllTransactions(page, limit, searchTerm);
+      const data = await walletAPI.getAllTransactions(page, limit, searchTerm, options);
       setTransactions(data.transactions || []);
       setTotal(data.total || 0);
     } catch (err: any) {
-      toast.error(err.message || 'Failed to fetch transactions');
+      if (err.name !== 'AbortError') toast.error(err.message || 'Failed to fetch transactions');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    const controller = new AbortController();
     const timer = setTimeout(() => {
-      fetchTransactions();
+      fetchTransactions({ signal: controller.signal });
     }, searchTerm ? 500 : 0);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, [page, searchTerm]);
 
   // Reset page when search term changes
